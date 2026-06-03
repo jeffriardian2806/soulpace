@@ -1,4 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Soulpace — Ruang Curhat Anonim",
+  description:
+    "Soulpace adalah ruang aman untuk melampiaskan beban dan keluh kesah secara anonim, tanpa dihakimi. Kamu nggak sendirian.",
+  robots: { index: true, follow: true },
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Soulpace — Ruang Curhat Anonim",
+    description: "Ruang aman buat melampiaskan beban, tanpa dihakimi.",
+    url: "/",
+    siteName: "Soulpace",
+    type: "website",
+  },
+};
 
 export default function Home() {
   return (
