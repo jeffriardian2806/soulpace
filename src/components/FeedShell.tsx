@@ -226,14 +226,25 @@ export function FeedShell({
           )}
         </header>
 
-        {/* Tools wellness: ikut sticky biar ga ilang saat scroll */}
-        <nav className="-mx-1 flex gap-2 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <Link href="/mood" className="glass flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-100">Mood</Link>
-          <Link href="/jurnal" className="glass flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-100">Jurnal</Link>
-          <Link href="/surat" className="glass flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-100">Surat</Link>
-          <Link href="/edukasi" className="glass flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-100">Tips</Link>
-          <Link href="/skrining" className="glass flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-100">Skrining</Link>
-        </nav>
+        {/* Tools wellness: gaya shortcut (ikon + label) biar beda jelas dari filter */}
+        <div className="grid grid-cols-5 gap-1">
+          {[
+            { href: "/mood", icon: "🙂", label: "Mood" },
+            { href: "/jurnal", icon: "📓", label: "Jurnal" },
+            { href: "/surat", icon: "✉️", label: "Surat" },
+            { href: "/edukasi", icon: "💡", label: "Tips" },
+            { href: "/skrining", icon: "📋", label: "Skrining" },
+          ].map((t) => (
+            <Link
+              key={t.href}
+              href={t.href}
+              className="flex flex-col items-center gap-1 rounded-xl py-1.5 text-ink/70 transition-colors hover:bg-sky-50"
+            >
+              <span className="text-lg leading-none">{t.icon}</span>
+              <span className="text-[10px] font-medium">{t.label}</span>
+            </Link>
+          ))}
+        </div>
 
         {/* Kategori: tombol client (filter tanpa navigasi) */}
         <div className="relative -mx-5 px-5">
