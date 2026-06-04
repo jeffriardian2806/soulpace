@@ -51,6 +51,19 @@ export default function EdukasiPage() {
         .
       </div>
 
+      <Link
+        href="/skrining"
+        className="glass flex items-center justify-between rounded-2xl p-4 transition-colors hover:bg-sky-100"
+      >
+        <span className="text-sm font-medium text-ink">
+          Coba skrining kesehatan mental
+          <span className="block text-xs font-normal text-ink/55">
+            Cek gejala depresi &amp; kecemasan (PHQ-9 / GAD-7)
+          </span>
+        </span>
+        <span className="text-sky-600">→</span>
+      </Link>
+
       <Card title="Teknik Napas 4-7-8">
         <p>
           Dipakai pas mulai cemas atau susah tidur. Caranya: tarik napas lewat hidung
