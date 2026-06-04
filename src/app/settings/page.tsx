@@ -31,6 +31,26 @@ export default async function SettingsPage() {
         </p>
         <HandleForm current={profile?.handle ?? ""} action={updateHandleAction} />
       </section>
+
+      {profile?.role === "moderator" && (
+        <section className="glass rounded-2xl p-2">
+          <h2 className="px-2 py-1 text-sm font-semibold text-ink">Admin</h2>
+          <Link
+            href="/moderation"
+            className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+          >
+            <span>🛡️ Moderasi</span>
+            <span className="text-ink/40">→</span>
+          </Link>
+          <Link
+            href="/admin/skrining"
+            className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+          >
+            <span>⚙️ Kelola skrining</span>
+            <span className="text-ink/40">→</span>
+          </Link>
+        </section>
+      )}
     </main>
   );
 }
