@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getPostsService } from "@/modules/posts";
 import { getNotificationsService } from "@/modules/notifications";
-import { PostCard } from "@/components/PostCard";
+import { FeedList } from "@/components/FeedList";
 import { guestAction } from "@/app/auth/actions";
 import { getDailyQuote } from "@/lib/dailyQuote";
 import { BellIcon, UserIcon, GearIcon, LogoutIcon } from "@/components/icons";
@@ -123,17 +123,13 @@ export default async function FeedPage({
         </div>
       )}
 
-      <div className="flex flex-col gap-3">
-        {posts.length === 0 ? (
-          <p className="py-10 text-center text-sm text-ink/40">
-            Belum ada curhat di sini. Jadi yang pertama?
-          </p>
-        ) : (
-          posts.map((p) => (
-            <PostCard key={p.id} post={p} peluked={peluked.has(p.id)} canReport={!!user} />
-          ))
-        )}
-      </div>
+      <FeedList
+        initialPosts={posts}
+        initialPeluked={[...peluked]}
+        canReport={!!user}
+        cat={sp.cat}
+        pageSize={20}
+      />
 
       {user && (
         <Link

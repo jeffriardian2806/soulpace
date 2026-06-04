@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPostsService } from "@/modules/posts";
 import { DomainError } from "@/core/errors";
+import type { FeedPost } from "@/core/entities/post";
 
 export type ComposeState = { error: string | null };
 
@@ -45,4 +46,41 @@ export async function togglePelukAction(formData: FormData): Promise<void> {
   await svc.togglePeluk(postId, user.id, peluked);
   revalidatePath("/feed");
   revalidatePath(`/post/${postId}`);
+}
+
+// Peluk imperatif untuk optimistic UI di client.
+// Sengaja TIDAK revalidatePath("/feed") supaya state infinite-scroll ga ke-reset.
+export async function pelukAction(
+  postId: string,
+  currentlyPeluked: boolean
+): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const svc = await getPostsService();
+  await svc.togglePeluk(postId, user.id, currentlyPeluked);
+  revalidatePath(`/post/${postId}`);
+}
+
+// Ambil halaman feed berikutnya (infinite scroll).
+export async function loadMoreFeed(
+  cat: string | null,
+  offset: number,
+  limit: number
+): Promise<{ posts: FeedPost[]; peluked: string[] }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const svc = await getPostsService();
+  const posts = await svc.feedPage(cat ?? undefined, offset, limit);
+  const peluked = await svc.pelukedIds(
+    posts.map((p) => p.id),
+    user?.id ?? null
+  );
+  return { posts, peluked: [...peluked] };
 }

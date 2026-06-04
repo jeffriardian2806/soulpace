@@ -1,5 +1,8 @@
+"use client";
+
+import { useState, useTransition } from "react";
 import Link from "next/link";
-import { togglePelukAction } from "@/app/feed/actions";
+import { pelukAction } from "@/app/feed/actions";
 import { createReportAction } from "@/app/_actions/report";
 import { ReportButton } from "@/components/ReportButton";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
@@ -25,6 +28,27 @@ export function PostCard({
   peluked: boolean;
   canReport?: boolean;
 }) {
+  const [isPeluked, setIsPeluked] = useState(peluked);
+  const [count, setCount] = useState(post.pelukCount);
+  const [, startTransition] = useTransition();
+
+  function onPeluk() {
+    const prevPeluked = isPeluked;
+    const prevCount = count;
+    // optimistic
+    setIsPeluked(!prevPeluked);
+    setCount(prevPeluked ? prevCount - 1 : prevCount + 1);
+    startTransition(async () => {
+      try {
+        await pelukAction(post.id, prevPeluked);
+      } catch {
+        // revert kalau gagal
+        setIsPeluked(prevPeluked);
+        setCount(prevCount);
+      }
+    });
+  }
+
   return (
     <div className="glass rounded-2xl p-4">
       <div className="mb-2 flex items-center gap-3">
@@ -33,7 +57,7 @@ export function PostCard({
         </div>
         <div>
           <p className="text-sm font-semibold text-ink">{post.authorHandle}</p>
-          <p className="text-xs text-ink/45">
+          <p className="text-xs text-ink/45" suppressHydrationWarning>
             {timeAgo(post.createdAt)} · {post.categoryName}
           </p>
         </div>
@@ -61,16 +85,13 @@ export function PostCard({
       )}
 
       <div className="flex items-center gap-4 text-sm text-ink/60">
-        <form action={togglePelukAction}>
-          <input type="hidden" name="post_id" value={post.id} />
-          <input type="hidden" name="peluked" value={peluked ? "1" : "0"} />
-          <button
-            type="submit"
-            className={peluked ? "font-semibold text-sky-600" : "text-ink/60"}
-          >
-            {peluked ? "Dipeluk" : "Peluk"} · {post.pelukCount}
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={onPeluk}
+          className={isPeluked ? "font-semibold text-sky-600" : "text-ink/60"}
+        >
+          {isPeluked ? "Dipeluk" : "Peluk"} · {count}
+        </button>
         <Link href={`/post/${post.id}`} className="hover:underline">
           {post.replyCount} balasan
         </Link>

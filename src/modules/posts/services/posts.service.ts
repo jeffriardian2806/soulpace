@@ -75,6 +75,19 @@ export class PostsService {
     return { categories, posts };
   }
 
+  async feedPage(
+    categorySlug: string | undefined,
+    offset: number,
+    limit: number
+  ): Promise<FeedPost[]> {
+    let categoryId: number | undefined;
+    if (categorySlug) {
+      const categories = await this.repo.listCategories();
+      categoryId = categories.find((c) => c.slug === categorySlug)?.id;
+    }
+    return this.repo.listPosts({ categoryId, limit, offset });
+  }
+
   getPost(id: string): Promise<FeedPost | null> {
     return this.repo.getPost(id);
   }
