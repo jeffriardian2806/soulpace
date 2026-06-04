@@ -42,6 +42,15 @@ export default function Home() {
           Sudah punya akun? Masuk
         </Link>
       </div>
+      <footer className="flex justify-center gap-3 text-xs text-ink/40">
+        <Link href="/terms" className="hover:underline">
+          Ketentuan Layanan
+        </Link>
+        <span>·</span>
+        <Link href="/privacy" className="hover:underline">
+          Kebijakan Privasi
+        </Link>
+      </footer>
     </main>
   );
 }

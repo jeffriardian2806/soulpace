@@ -45,15 +45,18 @@ export function PostCard({
 
       {post.crisisFlag && (
         <div className="mb-3 rounded-xl bg-sky-50 p-3 text-xs leading-relaxed text-ink/70">
-          {CRISIS_RESOURCE.message}{" "}
+          {CRISIS_RESOURCE.message} Telepon{" "}
+          <span className="font-semibold text-ink/80">{CRISIS_RESOURCE.phone}</span>{" "}
+          (SEJIWA, gratis 24 jam) atau{" "}
           <a
             href={CRISIS_RESOURCE.url}
             target="_blank"
             rel="nofollow noopener noreferrer"
             className="font-medium text-sky-600 underline"
           >
-            Lihat dukungan
+            kunjungi healing119.id
           </a>
+          .
         </div>
       )}
 
