@@ -79,9 +79,27 @@ export function PostCard({
         <button
           type="button"
           onClick={handleToggle}
-          className={peluked ? "font-semibold text-sky-600" : "text-ink/60"}
+          aria-pressed={peluked}
+          aria-label={peluked ? "Batalkan peluk" : "Beri peluk"}
+          className={`flex items-center gap-1.5 transition-colors ${
+            peluked ? "font-semibold text-sky-600" : "text-ink/60 hover:text-sky-600"
+          }`}
         >
-          {peluked ? "Dipeluk" : "Peluk"} · {post.pelukCount}
+          <svg
+            viewBox="0 0 24 24"
+            className="h-4 w-4"
+            fill={peluked ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z" />
+          </svg>
+          <span>
+            {peluked ? "Dipeluk" : "Peluk"} · {post.pelukCount}
+          </span>
         </button>
         <Link href={`/post/${post.id}`} className="hover:underline">
           {post.replyCount} balasan
