@@ -13,6 +13,7 @@ import type { Category, FeedPost } from "@/core/entities/post";
 
 export function FeedShell({
   isLoggedIn,
+  isModerator,
   unread,
   categories,
   initialPosts,
@@ -22,6 +23,7 @@ export function FeedShell({
   quote,
 }: {
   isLoggedIn: boolean;
+  isModerator: boolean;
   unread: number;
   categories: Category[];
   initialPosts: FeedPost[];
@@ -245,6 +247,23 @@ export function FeedShell({
             </Link>
           ))}
         </div>
+
+        {isModerator && (
+          <div className="flex gap-2">
+            <Link
+              href="/moderation"
+              className="flex-1 rounded-lg bg-amber-50 px-3 py-1.5 text-center text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100"
+            >
+              🛡️ Moderasi
+            </Link>
+            <Link
+              href="/admin/skrining"
+              className="flex-1 rounded-lg bg-amber-50 px-3 py-1.5 text-center text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100"
+            >
+              ⚙️ Kelola Skrining
+            </Link>
+          </div>
+        )}
 
         {/* Kategori: tombol client (filter tanpa navigasi) */}
         <div className="relative -mx-5 px-5">

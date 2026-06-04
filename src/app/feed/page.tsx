@@ -20,9 +20,16 @@ export default async function FeedPage({
   const { posts, peluked } = await svc.feedPage(sp.cat, 0, 20, user?.id ?? null);
 
   let unread = 0;
+  let isModerator = false;
   if (user) {
     const notif = await getNotificationsService();
     unread = await notif.unreadCount(user.id);
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    isModerator = prof?.role === "moderator";
   }
 
   const quote = getDailyQuote();
@@ -30,6 +37,7 @@ export default async function FeedPage({
   return (
     <FeedShell
       isLoggedIn={!!user}
+      isModerator={isModerator}
       unread={unread}
       categories={categories}
       initialPosts={posts}
