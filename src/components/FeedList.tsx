@@ -25,6 +25,14 @@ export function FeedList({
   const [loading, setLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
+  // Reset state when category changes
+  useEffect(() => {
+    setPosts(initialPosts);
+    setPeluked(new Set(initialPeluked));
+    setOffset(initialPosts.length);
+    setHasMore(initialPosts.length >= pageSize);
+  }, [cat, initialPosts, initialPeluked, pageSize]);
+
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) return;
     setLoading(true);
