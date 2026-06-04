@@ -6,6 +6,7 @@ import { PostCard } from "@/components/PostCard";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import { loadMoreFeed, pelukAction } from "@/app/feed/actions";
 import { createClient } from "@/lib/supabase/client";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { guestAction } from "@/app/auth/actions";
 import { BellIcon, UserIcon, GearIcon, LogoutIcon } from "@/components/icons";
 import type { Category, FeedPost } from "@/core/entities/post";
@@ -96,8 +97,7 @@ export function FeedShell({
   }, [loadMore]);
 
   const [, startTransition] = useTransition();
-  // Tandai aksi peluk dari device ini biar echo realtime-nya ga dihitung dobel.
-  const recentSelf = useRef<Map<string, number>>(new Map());
+  const channelRef = useRef<RealtimeChannel | null>(null);
 
   const bumpCount = useCallback((postId: string, delta: number) => {
     setPosts((prev) =>
@@ -109,10 +109,31 @@ export function FeedShell({
     );
   }, []);
 
+  // Realtime cross-device pakai BROADCAST (bukan postgres_changes).
+  // Ga bergantung replica identity / RLS, dan jalan sama buat peluk & un-peluk.
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase.channel("peluk-sync", {
+      config: { broadcast: { self: false } },
+    });
+    channel
+      .on("broadcast", { event: "peluk" }, ({ payload }) => {
+        const postId = (payload as { postId?: string })?.postId;
+        const delta = (payload as { delta?: number })?.delta;
+        if (postId && typeof delta === "number") bumpCount(postId, delta);
+      })
+      .subscribe();
+    channelRef.current = channel;
+    return () => {
+      supabase.removeChannel(channel);
+      channelRef.current = null;
+    };
+  }, [bumpCount]);
+
   const onToggle = useCallback(
     (postId: string) => {
       const was = peluked.has(postId);
-      recentSelf.current.set(`${postId}:${was ? "del" : "add"}`, Date.now());
+      const delta = was ? -1 : 1;
       // optimistic (instan di device ini)
       setPeluked((prev) => {
         const n = new Set(prev);
@@ -120,10 +141,16 @@ export function FeedShell({
         else n.add(postId);
         return n;
       });
-      bumpCount(postId, was ? -1 : 1);
+      bumpCount(postId, delta);
       startTransition(async () => {
         try {
           await pelukAction(postId, was);
+          // sebar ke device lain (self:false -> device ini ga nerima balik)
+          channelRef.current?.send({
+            type: "broadcast",
+            event: "peluk",
+            payload: { postId, delta },
+          });
         } catch {
           // revert kalau gagal
           setPeluked((prev) => {
@@ -132,53 +159,12 @@ export function FeedShell({
             else n.delete(postId);
             return n;
           });
-          bumpCount(postId, was ? 1 : -1);
+          bumpCount(postId, -delta);
         }
       });
     },
     [peluked, bumpCount]
   );
-
-  // Realtime cross-device: dengerin perubahan tabel reactions.
-  useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel("reactions-feed")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "reactions" },
-        (payload) => {
-          const postId = (payload.new as { post_id?: string })?.post_id;
-          if (!postId) return;
-          const key = `${postId}:add`;
-          const t = recentSelf.current.get(key);
-          if (t && Date.now() - t < 6000) {
-            recentSelf.current.delete(key); // echo dari device ini, abaikan
-            return;
-          }
-          bumpCount(postId, 1);
-        }
-      )
-      .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "reactions" },
-        (payload) => {
-          const postId = (payload.old as { post_id?: string })?.post_id;
-          if (!postId) return;
-          const key = `${postId}:del`;
-          const t = recentSelf.current.get(key);
-          if (t && Date.now() - t < 6000) {
-            recentSelf.current.delete(key);
-            return;
-          }
-          bumpCount(postId, -1);
-        }
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [bumpCount]);
 
   const pill = (active: boolean) =>
     `rounded-full px-3 py-1 text-xs flex-shrink-0 transition-colors ${
