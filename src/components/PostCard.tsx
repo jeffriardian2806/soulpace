@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import Link from "next/link";
 import { pelukAction } from "@/app/feed/actions";
 import { createReportAction } from "@/app/_actions/report";
@@ -23,32 +23,23 @@ export function PostCard({
   post,
   peluked,
   canReport = false,
+  onToggle,
 }: {
   post: FeedPost;
   peluked: boolean;
   canReport?: boolean;
+  onToggle?: () => void;
 }) {
-  const [isPeluked, setIsPeluked] = useState(peluked);
-  const [count, setCount] = useState(post.pelukCount);
   const [, startTransition] = useTransition();
-
-  function onPeluk() {
-    const prevPeluked = isPeluked;
-    const prevCount = count;
-    // optimistic
-    setIsPeluked(!prevPeluked);
-    setCount(prevPeluked ? prevCount - 1 : prevCount + 1);
-    startTransition(async () => {
-      try {
-        await pelukAction(post.id, prevPeluked);
-      } catch {
-        // revert kalau gagal
-        setIsPeluked(prevPeluked);
-        setCount(prevCount);
-      }
+  // Di feed, onToggle dikontrol FeedShell (optimistic + realtime).
+  // Di halaman lain (detail/profil), fallback panggil server action langsung.
+  const handleToggle =
+    onToggle ??
+    (() => {
+      startTransition(() => {
+        void pelukAction(post.id, peluked);
+      });
     });
-  }
-
   return (
     <div className="glass rounded-2xl p-4">
       <div className="mb-2 flex items-center gap-3">
@@ -87,10 +78,10 @@ export function PostCard({
       <div className="flex items-center gap-4 text-sm text-ink/60">
         <button
           type="button"
-          onClick={onPeluk}
-          className={isPeluked ? "font-semibold text-sky-600" : "text-ink/60"}
+          onClick={handleToggle}
+          className={peluked ? "font-semibold text-sky-600" : "text-ink/60"}
         >
-          {isPeluked ? "Dipeluk" : "Peluk"} · {count}
+          {peluked ? "Dipeluk" : "Peluk"} · {post.pelukCount}
         </button>
         <Link href={`/post/${post.id}`} className="hover:underline">
           {post.replyCount} balasan

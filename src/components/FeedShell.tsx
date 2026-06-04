@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useTransition } from "react";
 import Link from "next/link";
 import { PostCard } from "@/components/PostCard";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
-import { loadMoreFeed } from "@/app/feed/actions";
+import { loadMoreFeed, pelukAction } from "@/app/feed/actions";
+import { createClient } from "@/lib/supabase/client";
 import { guestAction } from "@/app/auth/actions";
 import { BellIcon, UserIcon, GearIcon, LogoutIcon } from "@/components/icons";
 import type { Category, FeedPost } from "@/core/entities/post";
@@ -93,6 +94,91 @@ export function FeedShell({
     obs.observe(el);
     return () => obs.disconnect();
   }, [loadMore]);
+
+  const [, startTransition] = useTransition();
+  // Tandai aksi peluk dari device ini biar echo realtime-nya ga dihitung dobel.
+  const recentSelf = useRef<Map<string, number>>(new Map());
+
+  const bumpCount = useCallback((postId: string, delta: number) => {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? { ...p, pelukCount: Math.max(0, p.pelukCount + delta) }
+          : p
+      )
+    );
+  }, []);
+
+  const onToggle = useCallback(
+    (postId: string) => {
+      const was = peluked.has(postId);
+      recentSelf.current.set(`${postId}:${was ? "del" : "add"}`, Date.now());
+      // optimistic (instan di device ini)
+      setPeluked((prev) => {
+        const n = new Set(prev);
+        if (was) n.delete(postId);
+        else n.add(postId);
+        return n;
+      });
+      bumpCount(postId, was ? -1 : 1);
+      startTransition(async () => {
+        try {
+          await pelukAction(postId, was);
+        } catch {
+          // revert kalau gagal
+          setPeluked((prev) => {
+            const n = new Set(prev);
+            if (was) n.add(postId);
+            else n.delete(postId);
+            return n;
+          });
+          bumpCount(postId, was ? 1 : -1);
+        }
+      });
+    },
+    [peluked, bumpCount]
+  );
+
+  // Realtime cross-device: dengerin perubahan tabel reactions.
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel("reactions-feed")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "reactions" },
+        (payload) => {
+          const postId = (payload.new as { post_id?: string })?.post_id;
+          if (!postId) return;
+          const key = `${postId}:add`;
+          const t = recentSelf.current.get(key);
+          if (t && Date.now() - t < 6000) {
+            recentSelf.current.delete(key); // echo dari device ini, abaikan
+            return;
+          }
+          bumpCount(postId, 1);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "reactions" },
+        (payload) => {
+          const postId = (payload.old as { post_id?: string })?.post_id;
+          if (!postId) return;
+          const key = `${postId}:del`;
+          const t = recentSelf.current.get(key);
+          if (t && Date.now() - t < 6000) {
+            recentSelf.current.delete(key);
+            return;
+          }
+          bumpCount(postId, -1);
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [bumpCount]);
 
   const pill = (active: boolean) =>
     `rounded-full px-3 py-1 text-xs flex-shrink-0 transition-colors ${
@@ -213,6 +299,7 @@ export function FeedShell({
               post={p}
               peluked={peluked.has(p.id)}
               canReport={isLoggedIn}
+              onToggle={() => onToggle(p.id)}
             />
           ))
         )}
