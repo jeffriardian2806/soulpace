@@ -23,6 +23,10 @@ export default async function ComposePage() {
         </Link>
         <h1 className="text-xl font-medium text-ink">Tulis curhat</h1>
       </header>
+      <p className="text-sm leading-relaxed text-ink/55">
+        Lepasin aja apa yang kamu rasain. Boleh marah, boleh pakai kata kasar — yang
+        penting jangan menyerang atau membahayakan orang lain.
+      </p>
       <ComposeForm categories={categories} action={createPostAction} />
     </main>
   );

@@ -33,7 +33,7 @@ export default function TermsPage() {
         </div>
         <div>
           <h2 className="mb-1 font-semibold text-ink">5. Aturan konten</h2>
-          <p>Curhat yang jujur selalu dihormati. Namun dilarang: melecehkan, mengancam, atau merundung; menyebarkan data pribadi orang lain; konten ilegal; mendorong atau mengglorifikasi tindakan menyakiti diri sendiri atau orang lain; spam atau promosi.</p>
+          <p>Curhat yang jujur selalu dihormati — termasuk kalau kamu marah, kesal, atau pakai kata kasar buat melampiaskan. Kata kasar atau umpatan saja tidak akan dihapus. Yang dilarang adalah konten yang menyerang atau membahayakan orang lain: melecehkan, mengancam, atau merundung; menyebarkan data pribadi orang lain; konten ilegal; mendorong atau mengglorifikasi tindakan menyakiti diri sendiri atau orang lain; spam atau promosi.</p>
         </div>
         <div>
           <h2 className="mb-1 font-semibold text-ink">6. Moderasi</h2>
