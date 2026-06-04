@@ -227,8 +227,9 @@ export function FeedShell({
         </header>
 
         {/* Tools wellness: gaya shortcut (ikon + label) biar beda jelas dari filter */}
-        <div className="grid grid-cols-5 gap-1">
+        <div className="grid grid-cols-6 gap-1">
           {[
+            { href: "/cerita", icon: "📖", label: "Cerita" },
             { href: "/mood", icon: "🙂", label: "Mood" },
             { href: "/jurnal", icon: "📓", label: "Jurnal" },
             { href: "/surat", icon: "✉️", label: "Surat" },
