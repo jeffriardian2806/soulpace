@@ -1,0 +1,151 @@
+﻿├── [public]
+│   ├── apple-icon.png
+│   ├── icon-192.png
+│   ├── icon-512.png
+│   ├── sw.js
+├── [src]
+│   ├── [app]
+│   │   ├── [auth]
+│   │   │   ├── [confirm]
+│   │   │   │   ├── route.ts
+│   │   │   ├── [signout]
+│   │   │   │   ├── route.ts
+│   │   │   ├── actions.ts
+│   │   ├── [compose]
+│   │   │   ├── page.tsx
+│   │   ├── [feed]
+│   │   │   ├── actions.ts
+│   │   │   ├── page.tsx
+│   │   ├── [login]
+│   │   │   ├── page.tsx
+│   │   ├── [moderation]
+│   │   │   ├── actions.ts
+│   │   │   ├── page.tsx
+│   │   ├── [notifications]
+│   │   │   ├── page.tsx
+│   │   ├── [post]
+│   │   │   ├── [[id]]
+│   │   ├── [privacy]
+│   │   │   ├── page.tsx
+│   │   ├── [profile]
+│   │   │   ├── page.tsx
+│   │   ├── [register]
+│   │   │   ├── page.tsx
+│   │   ├── [report]
+│   │   │   ├── actions.ts
+│   │   ├── [settings]
+│   │   │   ├── actions.ts
+│   │   │   ├── page.tsx
+│   │   ├── [share]
+│   │   │   ├── [[id]]
+│   │   ├── [terms]
+│   │   │   ├── page.tsx
+│   │   ├── [welcome]
+│   │   │   ├── page.tsx
+│   │   ├── [_actions]
+│   │   │   ├── report.ts
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   ├── manifest.ts
+│   │   ├── page.tsx
+│   │   ├── robots.ts
+│   │   ├── sitemap.ts
+│   ├── [components]
+│   │   ├── AuthForm.tsx
+│   │   ├── ComposeForm.tsx
+│   │   ├── FeedList.tsx
+│   │   ├── HandleForm.tsx
+│   │   ├── icons.tsx
+│   │   ├── InstallPrompt.tsx
+│   │   ├── PostCard.tsx
+│   │   ├── ReplyForm.tsx
+│   │   ├── ReportButton.tsx
+│   │   ├── ServiceWorkerRegister.tsx
+│   │   ├── ShareCard.tsx
+│   ├── [core]
+│   │   ├── [entities]
+│   │   │   ├── notification.ts
+│   │   │   ├── post.ts
+│   │   │   ├── profile.ts
+│   │   │   ├── reply.ts
+│   │   ├── crisisResources.ts
+│   │   ├── errors.ts
+│   ├── [lib]
+│   │   ├── [supabase]
+│   │   │   ├── client.ts
+│   │   │   ├── middleware.ts
+│   │   │   ├── server.ts
+│   │   ├── dailyQuote.ts
+│   ├── [modules]
+│   │   ├── [auth]
+│   │   │   ├── [data]
+│   │   │   │   ├── auth.repository.ts
+│   │   │   │   ├── supabase-auth.repository.ts
+│   │   │   ├── [domain]
+│   │   │   │   ├── auth.types.ts
+│   │   │   ├── [services]
+│   │   │   │   ├── auth.service.ts
+│   │   │   ├── index.ts
+│   │   ├── [moderation]
+│   │   │   ├── [data]
+│   │   │   │   ├── reports.repository.ts
+│   │   │   │   ├── supabase-reports.repository.ts
+│   │   │   ├── [domain]
+│   │   │   │   ├── report.types.ts
+│   │   │   ├── [services]
+│   │   │   │   ├── moderation.service.ts
+│   │   │   ├── index.ts
+│   │   ├── [notifications]
+│   │   │   ├── [data]
+│   │   │   │   ├── notifications.repository.ts
+│   │   │   │   ├── supabase-notifications.repository.ts
+│   │   │   ├── [services]
+│   │   │   │   ├── notifications.service.ts
+│   │   │   ├── index.ts
+│   │   ├── [posts]
+│   │   │   ├── [data]
+│   │   │   │   ├── posts.repository.ts
+│   │   │   │   ├── supabase-posts.repository.ts
+│   │   │   ├── [domain]
+│   │   │   │   ├── post.types.ts
+│   │   │   ├── [services]
+│   │   │   │   ├── posts.service.ts
+│   │   │   ├── index.ts
+│   │   ├── [profiles]
+│   │   │   ├── [data]
+│   │   │   │   ├── profiles.repository.ts
+│   │   │   │   ├── supabase-profiles.repository.ts
+│   │   │   ├── [services]
+│   │   │   │   ├── profiles.service.ts
+│   │   │   ├── index.ts
+│   │   ├── [replies]
+│   │   │   ├── [data]
+│   │   │   │   ├── replies.repository.ts
+│   │   │   │   ├── supabase-replies.repository.ts
+│   │   │   ├── [domain]
+│   │   │   │   ├── reply.types.ts
+│   │   │   ├── [services]
+│   │   │   │   ├── replies.service.ts
+│   │   │   ├── index.ts
+│   │   ├── [reports]
+│   │   │   ├── [data]
+│   │   │   │   ├── reports.repository.ts
+│   │   │   │   ├── supabase-reports.repository.ts
+│   │   │   ├── [domain]
+│   │   │   │   ├── report.types.ts
+│   │   │   ├── [services]
+│   │   │   │   ├── reports.service.ts
+│   │   │   ├── index.ts
+├── .env.local
+├── .env.local.example
+├── middleware.ts
+├── next-env.d.ts
+├── next.config.mjs
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── project_structure.txt
+├── README.md
+├── tailwind.config.ts
+├── tsconfig.json
+├── tsconfig.tsbuildinfo
