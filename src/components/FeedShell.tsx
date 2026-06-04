@@ -250,13 +250,15 @@ export function FeedShell({
       <div className="rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 p-4 text-white">
         <p className="text-xs uppercase tracking-wide text-white/70">Pesan hari ini</p>
         <p className="mt-1 text-sm font-medium leading-relaxed">{quote}</p>
-        <Link
-          href="/edukasi"
-          className="mt-3 inline-block text-xs font-medium text-white/90 underline"
-        >
-          Tips relaksasi &amp; kesehatan mental →
-        </Link>
       </div>
+
+      <nav className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <Link href="/mood" className="glass flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-100">Mood</Link>
+        <Link href="/jurnal" className="glass flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-100">Jurnal</Link>
+        <Link href="/surat" className="glass flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-100">Surat</Link>
+        <Link href="/edukasi" className="glass flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-100">Tips</Link>
+        <Link href="/skrining" className="glass flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-100">Skrining</Link>
+      </nav>
 
       {!isLoggedIn && (
         <div className="glass rounded-2xl p-3 text-sm text-ink/70">
