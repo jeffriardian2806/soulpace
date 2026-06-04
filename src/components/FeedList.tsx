@@ -25,7 +25,7 @@ export function FeedList({
   const [loading, setLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  // Reset state when category changes
+  // Reset state ketika kategori berubah (props baru dari server)
   useEffect(() => {
     setPosts(initialPosts);
     setPeluked(new Set(initialPeluked));

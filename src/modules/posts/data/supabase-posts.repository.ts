@@ -6,8 +6,8 @@ import type { CreatePostInput, ListPostsOptions } from "../domain/post.types";
 const POST_SELECT =
   "id, body, crisis_flag, created_at, categories!inner(name, slug), profiles!inner(handle), reactions(count), replies(count)";
 
-function mapPost(r: any, userPelukedIds?: Set<string>): FeedPost {
-  const post: FeedPost = {
+function mapPost(r: any): FeedPost {
+  return {
     id: r.id,
     body: r.body,
     crisisFlag: r.crisis_flag,
@@ -18,34 +18,25 @@ function mapPost(r: any, userPelukedIds?: Set<string>): FeedPost {
     pelukCount: r.reactions?.[0]?.count ?? 0,
     replyCount: r.replies?.[0]?.count ?? 0,
   };
-  return post;
 }
 
 export class SupabasePostsRepository implements PostsRepository {
   private categoryCache: { data: Category[]; timestamp: number } | null = null;
-  private readonly CACHE_TTL = 3600000; // 1 hour
+  private readonly CACHE_TTL = 3600000; // 1 jam — bantu dedup listCategories dalam 1 request
 
   constructor(private readonly supabase: SupabaseClient) {}
 
   async listCategories(): Promise<Category[]> {
     const now = Date.now();
-    // Return cached categories if still fresh
-    if (
-      this.categoryCache &&
-      now - this.categoryCache.timestamp < this.CACHE_TTL
-    ) {
+    if (this.categoryCache && now - this.categoryCache.timestamp < this.CACHE_TTL) {
       return this.categoryCache.data;
     }
-
     const { data, error } = await this.supabase
       .from("categories")
       .select("id, slug, name")
       .eq("is_active", true)
       .order("sort_order");
-
     if (error) throw new Error(error.message);
-
-    // Cache the result
     const categories = (data ?? []) as Category[];
     this.categoryCache = { data: categories, timestamp: now };
     return categories;
@@ -58,35 +49,30 @@ export class SupabasePostsRepository implements PostsRepository {
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .range(opts.offset, opts.offset + opts.limit - 1);
-
     if (opts.categoryId) q = q.eq("category_id", opts.categoryId);
-
     const { data, error } = await q;
     if (error) throw new Error(error.message);
-    return (data ?? []).map((r) => mapPost(r));
+    return (data ?? []).map(mapPost);
   }
 
   async listPostsWithUserReactions(
     opts: ListPostsOptions,
     userId: string | null
   ): Promise<{ posts: FeedPost[]; pelukedIds: Set<string> }> {
-    // Fetch posts
     let q = this.supabase
       .from("posts")
       .select(POST_SELECT)
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .range(opts.offset, opts.offset + opts.limit - 1);
-
     if (opts.categoryId) q = q.eq("category_id", opts.categoryId);
 
     const { data: postsData, error: postsError } = await q;
     if (postsError) throw new Error(postsError.message);
 
-    const posts = (postsData ?? []).map((r) => mapPost(r));
+    const posts = (postsData ?? []).map(mapPost);
     const postIds = posts.map((p) => p.id);
 
-    // Fetch user's peluked posts in parallel
     let pelukedIds = new Set<string>();
     if (userId && postIds.length > 0) {
       const { data: reactionsData, error: reactionsError } = await this.supabase
@@ -94,7 +80,6 @@ export class SupabasePostsRepository implements PostsRepository {
         .select("post_id")
         .eq("user_id", userId)
         .in("post_id", postIds);
-
       if (reactionsError) throw new Error(reactionsError.message);
       pelukedIds = new Set(
         (reactionsData ?? []).map((r: any) => r.post_id as string)
@@ -111,7 +96,6 @@ export class SupabasePostsRepository implements PostsRepository {
       .eq("id", id)
       .eq("status", "active")
       .maybeSingle();
-
     if (error) throw new Error(error.message);
     return data ? mapPost(data) : null;
   }
@@ -123,9 +107,8 @@ export class SupabasePostsRepository implements PostsRepository {
       .eq("author_id", authorId)
       .eq("status", "active")
       .order("created_at", { ascending: false });
-
     if (error) throw new Error(error.message);
-    return (data ?? []).map((r) => mapPost(r));
+    return (data ?? []).map(mapPost);
   }
 
   async createPost(input: CreatePostInput): Promise<void> {
@@ -135,7 +118,6 @@ export class SupabasePostsRepository implements PostsRepository {
       body: input.body,
       crisis_flag: input.crisisFlag,
     });
-
     if (error) throw new Error(error.message);
   }
 
@@ -144,7 +126,6 @@ export class SupabasePostsRepository implements PostsRepository {
       .from("posts")
       .update({ status })
       .eq("id", id);
-
     if (error) throw new Error(error.message);
   }
 
@@ -153,13 +134,11 @@ export class SupabasePostsRepository implements PostsRepository {
     userId: string | null
   ): Promise<Set<string>> {
     if (!userId || postIds.length === 0) return new Set();
-
     const { data, error } = await this.supabase
       .from("reactions")
       .select("post_id")
       .eq("user_id", userId)
       .in("post_id", postIds);
-
     if (error) throw new Error(error.message);
     return new Set((data ?? []).map((r: any) => r.post_id as string));
   }
@@ -168,7 +147,6 @@ export class SupabasePostsRepository implements PostsRepository {
     const { error } = await this.supabase
       .from("reactions")
       .insert({ post_id: postId, user_id: userId });
-
     if (error && !/duplicate|unique/i.test(error.message)) {
       throw new Error(error.message);
     }
@@ -180,7 +158,6 @@ export class SupabasePostsRepository implements PostsRepository {
       .delete()
       .eq("post_id", postId)
       .eq("user_id", userId);
-
     if (error) throw new Error(error.message);
   }
 }

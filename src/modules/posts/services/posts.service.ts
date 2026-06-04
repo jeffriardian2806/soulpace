@@ -3,7 +3,6 @@ import type { PostsRepository } from "../data/posts.repository";
 import type { Category, FeedPost } from "@/core/entities/post";
 
 const CRISIS_KEYWORDS = [
-  // bunuh diri / mengakhiri hidup
   "bunuh diri",
   "bundir",
   "gantung diri",
@@ -12,7 +11,6 @@ const CRISIS_KEYWORDS = [
   "akhiri hidup",
   "akhirin hidup",
   "mengakhiri semuanya",
-  // ingin mati
   "pengen mati",
   "pengin mati",
   "pgn mati",
@@ -22,7 +20,6 @@ const CRISIS_KEYWORDS = [
   "lebih baik mati",
   "mending mati",
   "baik mati",
-  // tidak sanggup / tidak mau hidup
   "gak mau hidup",
   "ga mau hidup",
   "nggak mau hidup",
@@ -32,10 +29,8 @@ const CRISIS_KEYWORDS = [
   "capek hidup",
   "lelah hidup",
   "capek idup",
-  // pergi / menghilang selamanya
   "pergi selamanya",
   "menghilang selamanya",
-  // menyakiti diri
   "menyakiti diri",
   "melukai diri",
   "nyakitin diri",
@@ -86,13 +81,10 @@ export class PostsService {
       const categories = await this.repo.listCategories();
       categoryId = categories.find((c) => c.slug === categorySlug)?.id;
     }
-
-    // Use optimized query that combines posts + peluked in single DB operation
     const { posts, pelukedIds } = await this.repo.listPostsWithUserReactions(
       { categoryId, limit, offset },
       userId
     );
-
     return { posts, peluked: [...pelukedIds] };
   }
 
