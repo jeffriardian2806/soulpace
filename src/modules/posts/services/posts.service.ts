@@ -3,15 +3,48 @@ import type { PostsRepository } from "../data/posts.repository";
 import type { Category, FeedPost } from "@/core/entities/post";
 
 const CRISIS_KEYWORDS = [
+  // bunuh diri / mengakhiri hidup
   "bunuh diri",
+  "bundir",
+  "gantung diri",
   "mengakhiri hidup",
   "ngakhirin hidup",
+  "akhiri hidup",
+  "akhirin hidup",
+  "mengakhiri semuanya",
+  // ingin mati
   "pengen mati",
+  "pengin mati",
+  "pgn mati",
   "ingin mati",
+  "mau mati",
+  "mati aja",
+  "lebih baik mati",
+  "mending mati",
+  "baik mati",
+  // tidak sanggup / tidak mau hidup
   "gak mau hidup",
   "ga mau hidup",
+  "nggak mau hidup",
+  "ga sanggup hidup",
+  "gak sanggup hidup",
+  "ga kuat hidup",
+  "capek hidup",
+  "lelah hidup",
+  "capek idup",
+  // pergi / menghilang selamanya
+  "pergi selamanya",
+  "menghilang selamanya",
+  // menyakiti diri
   "menyakiti diri",
   "melukai diri",
+  "nyakitin diri",
+  "lukain diri",
+  "menyayat",
+  "nyayat",
+  "self harm",
+  "selfharm",
+  "overdosis",
 ];
 
 export class PostsService {
