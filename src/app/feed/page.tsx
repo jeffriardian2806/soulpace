@@ -6,6 +6,7 @@ import { FeedList } from "@/components/FeedList";
 import { guestAction } from "@/app/auth/actions";
 import { getDailyQuote } from "@/lib/dailyQuote";
 import { BellIcon, UserIcon, GearIcon, LogoutIcon } from "@/components/icons";
+import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 
 export default async function FeedPage({
   searchParams,
@@ -35,10 +36,13 @@ export default async function FeedPage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
-      {/* STICKY HEADER WRAPPER - stays on top when scrolling */}
+      {/* STICKY HEADER - header + horizontal scroll categories */}
       <div className="sticky top-0 z-50 -mx-5 -mt-6 flex flex-col gap-4 bg-white px-5 py-6 shadow-sm">
+        {/* Top bar with logo and icons */}
         <header className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-ink">Soulpace</h1>
+          {/* Soulpace - clickable to scroll to top */}
+          <ScrollToTopButton /> 
+
           {user ? (
             <div className="flex items-center gap-5 text-ink/55">
               <Link
@@ -87,32 +91,43 @@ export default async function FeedPage({
           )}
         </header>
 
-        <nav className="flex flex-wrap gap-2">
-          <Link
-            href="/feed"
-            className={`rounded-full px-3 py-1 text-xs ${
-              !sp.cat ? "bg-sky-500 text-white" : "glass text-ink/70"
-            }`}
-          >
-            Semua
-          </Link>
-          {categories.map((c) => (
+        {/* Horizontal scrollable categories with gradient fade */}
+        <div className="relative -mx-5 px-5">
+          <nav className="flex gap-2 overflow-x-auto pb-2 pr-6 
+            [-webkit-overflow-scrolling:touch]
+            [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <Link
-              key={c.id}
-              href={`/feed?cat=${c.slug}`}
-              className={`rounded-full px-3 py-1 text-xs ${
-                sp.cat === c.slug ? "bg-sky-500 text-white" : "glass text-ink/70"
+              href="/feed"
+              className={`rounded-full px-3 py-1 text-xs flex-shrink-0 transition-colors ${
+                !sp.cat ? "bg-sky-500 text-white" : "glass text-ink/70 hover:bg-sky-100"
               }`}
             >
-              {c.name}
+              Semua
             </Link>
-          ))}
-        </nav>
+            {categories.map((c) => (
+              <Link
+                key={c.id}
+                href={`/feed?cat=${c.slug}`}
+                className={`rounded-full px-3 py-1 text-xs flex-shrink-0 transition-colors ${
+                  sp.cat === c.slug ? "bg-sky-500 text-white" : "glass text-ink/70 hover:bg-sky-100"
+                }`}
+              >
+                {c.name}
+              </Link>
+            ))}
+          </nav>
 
-        <div className="rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 p-4 text-white">
-          <p className="text-xs uppercase tracking-wide text-white/70">Pesan hari ini</p>
-          <p className="mt-1 text-sm font-medium leading-relaxed">{quote}</p>
+          {/* Smooth gradient fade on right edge - hints scrollable content */}
+          <div className="absolute right-0 top-0 h-full w-12 
+            bg-gradient-to-l from-white via-white/40 to-transparent 
+            pointer-events-none" />
         </div>
+      </div>
+
+      {/* Quote box - non-sticky, visible on top */}
+      <div className="rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 p-4 text-white">
+        <p className="text-xs uppercase tracking-wide text-white/70">Pesan hari ini</p>
+        <p className="mt-1 text-sm font-medium leading-relaxed">{quote}</p>
       </div>
 
       {!user && (
