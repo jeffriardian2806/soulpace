@@ -45,7 +45,7 @@ export default function PrivacyPage() {
         </div>
         <div>
           <h2 className="mb-1 font-semibold text-ink">8. Perubahan & kontak</h2>
-          <p>Kebijakan ini bisa diperbarui sewaktu-waktu. Pertanyaan: <b>[EMAIL_KONTAK_KAMU]</b>.</p>
+          <p>Kebijakan ini bisa diperbarui sewaktu-waktu. Pertanyaan: <b>jeffriardian.kuningan@gmail.com</b>.</p>
         </div>
       </section>
 

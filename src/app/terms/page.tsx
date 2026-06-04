@@ -49,7 +49,7 @@ export default function TermsPage() {
         </div>
         <div>
           <h2 className="mb-1 font-semibold text-ink">9. Perubahan & kontak</h2>
-          <p>Ketentuan ini bisa diperbarui sewaktu-waktu. Pertanyaan bisa disampaikan ke: <b>[EMAIL_KONTAK_KAMU]</b>.</p>
+          <p>Ketentuan ini bisa diperbarui sewaktu-waktu. Pertanyaan bisa disampaikan ke: <b>jeffriardian.kuningan@gmail.com</b>.</p>
         </div>
       </section>
 
