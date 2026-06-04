@@ -178,6 +178,12 @@ export function FeedShell({
       <div className="rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 p-4 text-white">
         <p className="text-xs uppercase tracking-wide text-white/70">Pesan hari ini</p>
         <p className="mt-1 text-sm font-medium leading-relaxed">{quote}</p>
+        <Link
+          href="/edukasi"
+          className="mt-3 inline-block text-xs font-medium text-white/90 underline"
+        >
+          Tips relaksasi &amp; kesehatan mental →
+        </Link>
       </div>
 
       {!isLoggedIn && (
