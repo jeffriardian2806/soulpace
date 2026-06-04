@@ -3,10 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { getPostsService } from "@/modules/posts";
 import { getNotificationsService } from "@/modules/notifications";
 import { FeedList } from "@/components/FeedList";
+import { ScrollToTopButton } from "@/components/ScrollToTopButton";
+import { CategoryButton } from "@/components/CategoryButton";
 import { guestAction } from "@/app/auth/actions";
 import { getDailyQuote } from "@/lib/dailyQuote";
 import { BellIcon, UserIcon, GearIcon, LogoutIcon } from "@/components/icons";
-import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 
 export default async function FeedPage({
   searchParams,
@@ -21,8 +22,12 @@ export default async function FeedPage({
 
   const svc = await getPostsService();
   const { categories, posts } = await svc.getFeed({ categorySlug: sp.cat });
-  const peluked = await svc.pelukedIds(
-    posts.map((p) => p.id),
+
+  // OPTIMIZED: Use combined query for posts + peluked
+  const { peluked } = await svc.feedPage(
+    sp.cat,
+    0,
+    20,
     user?.id ?? null
   );
 
@@ -40,8 +45,8 @@ export default async function FeedPage({
       <div className="sticky top-0 z-50 -mx-5 -mt-6 flex flex-col gap-4 bg-white px-5 py-6 shadow-sm">
         {/* Top bar with logo and icons */}
         <header className="flex items-center justify-between">
-          {/* Soulpace - clickable to scroll to top */}
-          <ScrollToTopButton /> 
+          {/* Scroll to top button - Client Component */}
+          <ScrollToTopButton />
 
           {user ? (
             <div className="flex items-center gap-5 text-ink/55">
@@ -91,7 +96,7 @@ export default async function FeedPage({
           )}
         </header>
 
-        {/* Horizontal scrollable categories with gradient fade */}
+        {/* Horizontal scrollable categories with gradient fade + prefetch on hover */}
         <div className="relative -mx-5 px-5">
           <nav className="flex gap-2 overflow-x-auto pb-2 pr-6 
             [-webkit-overflow-scrolling:touch]
@@ -105,15 +110,12 @@ export default async function FeedPage({
               Semua
             </Link>
             {categories.map((c) => (
-              <Link
+              <CategoryButton
                 key={c.id}
-                href={`/feed?cat=${c.slug}`}
-                className={`rounded-full px-3 py-1 text-xs flex-shrink-0 transition-colors ${
-                  sp.cat === c.slug ? "bg-sky-500 text-white" : "glass text-ink/70 hover:bg-sky-100"
-                }`}
-              >
-                {c.name}
-              </Link>
+                category={c}
+                isActive={sp.cat === c.slug}
+                currentCat={sp.cat}
+              />
             ))}
           </nav>
 

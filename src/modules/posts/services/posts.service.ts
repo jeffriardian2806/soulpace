@@ -78,14 +78,22 @@ export class PostsService {
   async feedPage(
     categorySlug: string | undefined,
     offset: number,
-    limit: number
-  ): Promise<FeedPost[]> {
+    limit: number,
+    userId: string | null = null
+  ): Promise<{ posts: FeedPost[]; peluked: string[] }> {
     let categoryId: number | undefined;
     if (categorySlug) {
       const categories = await this.repo.listCategories();
       categoryId = categories.find((c) => c.slug === categorySlug)?.id;
     }
-    return this.repo.listPosts({ categoryId, limit, offset });
+
+    // Use optimized query that combines posts + peluked in single DB operation
+    const { posts, pelukedIds } = await this.repo.listPostsWithUserReactions(
+      { categoryId, limit, offset },
+      userId
+    );
+
+    return { posts, peluked: [...pelukedIds] };
   }
 
   getPost(id: string): Promise<FeedPost | null> {

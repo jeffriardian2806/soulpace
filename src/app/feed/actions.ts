@@ -66,6 +66,7 @@ export async function pelukAction(
 }
 
 // Ambil halaman feed berikutnya (infinite scroll).
+// OPTIMIZED: Uses combined query for posts + peluked in single DB operation
 export async function loadMoreFeed(
   cat: string | null,
   offset: number,
@@ -77,10 +78,19 @@ export async function loadMoreFeed(
   } = await supabase.auth.getUser();
 
   const svc = await getPostsService();
-  const posts = await svc.feedPage(cat ?? undefined, offset, limit);
-  const peluked = await svc.pelukedIds(
-    posts.map((p) => p.id),
-    user?.id ?? null
-  );
-  return { posts, peluked: [...peluked] };
+  // This now combines posts + peluked in single query via feedPage method
+  return svc.feedPage(cat ?? undefined, offset, limit, user?.id ?? null);
+}
+
+// Prefetch category data in background (no-op if already cached)
+// This runs silently on hover, improving perceived performance
+export async function prefetchFeedCategory(slug: string): Promise<void> {
+  try {
+    const svc = await getPostsService();
+    // Simply call getFeed to populate service cache
+    // Categories are cached at repository level (1 hour TTL)
+    await svc.getFeed({ categorySlug: slug });
+  } catch {
+    // Silently fail, this is just a prefetch hint
+  }
 }

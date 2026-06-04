@@ -4,6 +4,10 @@ import type { CreatePostInput, ListPostsOptions } from "../domain/post.types";
 export interface PostsRepository {
   listCategories(): Promise<Category[]>;
   listPosts(opts: ListPostsOptions): Promise<FeedPost[]>;
+  listPostsWithUserReactions(
+    opts: ListPostsOptions,
+    userId: string | null
+  ): Promise<{ posts: FeedPost[]; pelukedIds: Set<string> }>;
   getPost(id: string): Promise<FeedPost | null>;
   listByAuthor(authorId: string): Promise<FeedPost[]>;
   createPost(input: CreatePostInput): Promise<void>;

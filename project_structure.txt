@@ -52,6 +52,7 @@
 │   │   ├── sitemap.ts
 │   ├── [components]
 │   │   ├── AuthForm.tsx
+│   │   ├── CategoryButton.tsx
 │   │   ├── ComposeForm.tsx
 │   │   ├── FeedList.tsx
 │   │   ├── HandleForm.tsx
@@ -60,6 +61,7 @@
 │   │   ├── PostCard.tsx
 │   │   ├── ReplyForm.tsx
 │   │   ├── ReportButton.tsx
+│   │   ├── ScrollToTopButton.tsx
 │   │   ├── ServiceWorkerRegister.tsx
 │   │   ├── ShareCard.tsx
 │   ├── [core]
