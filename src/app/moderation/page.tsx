@@ -52,6 +52,9 @@ export default async function ModerationPage() {
           ← Kembali
         </Link>
         <h1 className="text-xl font-bold text-ink">Moderasi</h1>
+        <Link href="/admin/skrining" className="ml-auto text-xs font-medium text-sky-600 underline">
+          Kelola skrining
+        </Link>
       </header>
 
       <p className="text-sm text-ink/55">

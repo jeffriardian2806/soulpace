@@ -2,26 +2,30 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  SCREENING_INSTRUMENTS,
-  SCREENING_DISCLAIMER,
-} from "@/config/screening";
+import { SCREENING_DISCLAIMER } from "@/config/screening";
+import type { ScreeningInstrument } from "@/config/screening";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 
 type Answers = Record<string, (number | null)[]>;
 
-function emptyAnswers(): Answers {
+function emptyAnswers(instruments: ScreeningInstrument[]): Answers {
   return Object.fromEntries(
-    SCREENING_INSTRUMENTS.map((i) => [i.id, i.items.map(() => null)])
+    instruments.map((i) => [i.id, i.items.map(() => null)])
   );
 }
 
-export function ScreeningTool() {
-  const [answers, setAnswers] = useState<Answers>(emptyAnswers);
+export function ScreeningTool({
+  instruments,
+}: {
+  instruments: ScreeningInstrument[];
+}) {
+  const [answers, setAnswers] = useState<Answers>(() =>
+    emptyAnswers(instruments)
+  );
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
 
-  const allAnswered = SCREENING_INSTRUMENTS.every((inst) =>
+  const allAnswered = instruments.every((inst) =>
     answers[inst.id].every((a) => a !== null)
   );
 
@@ -44,22 +48,29 @@ export function ScreeningTool() {
   }
 
   function reset() {
-    setAnswers(emptyAnswers());
+    setAnswers(emptyAnswers(instruments));
     setSubmitted(false);
     setError(false);
     window.scrollTo({ top: 0 });
   }
 
+  if (instruments.length === 0) {
+    return (
+      <p className="py-10 text-center text-sm text-ink/40">
+        Skrining belum tersedia saat ini.
+      </p>
+    );
+  }
+
   if (submitted) {
-    const results = SCREENING_INSTRUMENTS.map((inst) => {
+    const results = instruments.map((inst) => {
       const vals = answers[inst.id].map((v) => v ?? 0);
       const score = vals.reduce((s, v) => s + v, 0);
       const band = inst.bands.find((b) => score >= b.min && score <= b.max);
       const maxVal = Math.max(...inst.options.map((o) => o.value));
       const max = inst.items.length * maxVal;
       const crisis =
-        inst.crisisItemIndex !== undefined &&
-        vals[inst.crisisItemIndex] > 0;
+        inst.crisisItemIndex !== undefined && vals[inst.crisisItemIndex] > 0;
       return { inst, score, max, band, crisis };
     });
     const anyCrisis = results.some((r) => r.crisis);
@@ -99,9 +110,7 @@ export function ScreeningTool() {
             <p className="mt-1 text-sm font-semibold text-sky-700">
               {r.band?.label ?? "-"}
             </p>
-            <p className="mt-1 text-sm leading-relaxed text-ink/75">
-              {r.band?.advice}
-            </p>
+            <p className="mt-1 text-sm leading-relaxed text-ink/75">{r.band?.advice}</p>
           </div>
         ))}
 
@@ -141,7 +150,7 @@ export function ScreeningTool() {
         </p>
       )}
 
-      {SCREENING_INSTRUMENTS.map((inst) => (
+      {instruments.map((inst) => (
         <section key={inst.id} className="glass rounded-2xl p-4">
           <h2 className="text-sm font-bold text-ink">
             {inst.name} · {inst.subtitle}
