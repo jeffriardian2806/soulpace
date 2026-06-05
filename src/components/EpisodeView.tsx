@@ -23,10 +23,12 @@ export function EpisodeView({ episodeId }: { episodeId: string }) {
   useEffect(() => {
     const supabase = createClient();
     // login -> dihitung per akun; belum login -> per perangkat (p_key)
-    void supabase.rpc("record_episode_view", {
-      p_episode: episodeId,
-      p_key: deviceId(),
-    });
+    // WAJIB .then() supaya request-nya benar-benar dikirim (builder Supabase itu lazy)
+    supabase
+      .rpc("record_episode_view", { p_episode: episodeId, p_key: deviceId() })
+      .then(({ error }) => {
+        if (error) console.error("record_episode_view error:", error.message);
+      });
   }, [episodeId]);
   return null;
 }
