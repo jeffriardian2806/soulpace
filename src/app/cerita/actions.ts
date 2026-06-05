@@ -149,3 +149,74 @@ export async function deleteStoryAction(formData: FormData): Promise<void> {
   revalidatePath("/cerita");
   redirect("/cerita");
 }
+
+export async function updateStoryAction(formData: FormData): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const id = String(formData.get("id") ?? "");
+  const title = String(formData.get("title") ?? "").trim();
+  const cw = String(formData.get("content_warning") ?? "").trim();
+  if (!id || !title) redirect(`/cerita/${id}/edit`);
+
+  // RLS memastikan hanya pemilik yang bisa update
+  await supabase
+    .from("stories")
+    .update({
+      title: title.slice(0, 200),
+      content_warning: cw ? cw.slice(0, 200) : null,
+    })
+    .eq("id", id);
+
+  revalidatePath(`/cerita/${id}`);
+  revalidatePath("/cerita");
+  revalidatePath("/feed");
+  redirect(`/cerita/${id}`);
+}
+
+export async function updateEpisodeAction(formData: FormData): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const episodeId = String(formData.get("episode_id") ?? "");
+  const storyId = String(formData.get("story_id") ?? "");
+  const title = String(formData.get("title") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+  if (!episodeId || !body) redirect(`/cerita/${storyId}/${episodeId}/edit`);
+
+  const { data: ep } = await supabase
+    .from("story_episodes")
+    .select("episode_number")
+    .eq("id", episodeId)
+    .maybeSingle();
+
+  // RLS memastikan hanya pemilik yang bisa update
+  await supabase
+    .from("story_episodes")
+    .update({
+      title: title.slice(0, 200),
+      body: body.slice(0, 20000),
+      crisis_flag: await detectCrisis(body),
+    })
+    .eq("id", episodeId);
+
+  // kalau episode 1, sinkronkan ringkasan preview cerita
+  if (ep?.episode_number === 1) {
+    await supabase
+      .from("stories")
+      .update({ summary: body.replace(/\s+/g, " ").slice(0, 180) })
+      .eq("id", storyId);
+  }
+
+  revalidatePath(`/cerita/${storyId}`);
+  revalidatePath(`/cerita/${storyId}/${episodeId}`);
+  revalidatePath("/cerita");
+  revalidatePath("/feed");
+  redirect(`/cerita/${storyId}/${episodeId}`);
+}

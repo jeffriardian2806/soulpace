@@ -95,10 +95,18 @@ export default async function CeritaDetailPage({
       <header className="flex items-center justify-between">
         <Link href="/cerita" className="text-sm text-ink/50">← Semua cerita</Link>
         {isOwner && (
-          <form action={deleteStoryAction}>
-            <input type="hidden" name="id" value={story.id} />
-            <button className="text-xs font-medium text-rose-500 hover:underline">Hapus cerita</button>
-          </form>
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/cerita/${story.id}/edit`}
+              className="text-xs font-medium text-sky-600 hover:underline"
+            >
+              Edit
+            </Link>
+            <form action={deleteStoryAction}>
+              <input type="hidden" name="id" value={story.id} />
+              <button className="text-xs font-medium text-rose-500 hover:underline">Hapus</button>
+            </form>
+          </div>
         )}
       </header>
 

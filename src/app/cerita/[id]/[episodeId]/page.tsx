@@ -11,10 +11,13 @@ export default async function EpisodePage({
 }) {
   const { id, episodeId } = await params;
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { data: ep } = await supabase
     .from("story_episodes")
-    .select("id, episode_number, title, body, crisis_flag, story_id")
+    .select("id, episode_number, title, body, crisis_flag, story_id, author_id")
     .eq("id", episodeId)
     .eq("story_id", id)
     .maybeSingle();
@@ -40,8 +43,16 @@ export default async function EpisodePage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
-      <header className="flex items-center gap-3">
+      <header className="flex items-center justify-between gap-3">
         <Link href={`/cerita/${id}`} className="text-sm text-ink/50">← Daftar episode</Link>
+        {!!user && user.id === ep.author_id && (
+          <Link
+            href={`/cerita/${id}/${ep.id}/edit`}
+            className="text-xs font-medium text-sky-600 hover:underline"
+          >
+            Edit episode
+          </Link>
+        )}
       </header>
 
       <div>
