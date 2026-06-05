@@ -1,8 +1,31 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
+import { ShareButton } from "@/components/ShareButton";
+import { EpisodeView } from "@/components/EpisodeView";
 
 export const metadata = { title: "Episode — Soulpace" };
+
+function fmt(iso: string): string {
+  return new Date(iso).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+type Ep = {
+  id: string;
+  episode_number: number;
+  title: string;
+  body: string;
+  crisis_flag: boolean;
+  story_id: string;
+  author_id: string;
+  created_at: string;
+  views: number;
+  profiles: { handle: string } | null;
+};
 
 export default async function EpisodePage({
   params,
@@ -15,14 +38,16 @@ export default async function EpisodePage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: ep } = await supabase
+  const { data: epData } = await supabase
     .from("story_episodes")
-    .select("id, episode_number, title, body, crisis_flag, story_id, author_id")
+    .select(
+      "id, episode_number, title, body, crisis_flag, story_id, author_id, created_at, views, profiles!inner(handle)"
+    )
     .eq("id", episodeId)
     .eq("story_id", id)
     .maybeSingle();
 
-  if (!ep) {
+  if (!epData) {
     return (
       <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
         <Link href={`/cerita/${id}`} className="text-sm text-ink/50">← Kembali</Link>
@@ -30,6 +55,7 @@ export default async function EpisodePage({
       </main>
     );
   }
+  const ep = epData as unknown as Ep;
 
   const { data: siblings } = await supabase
     .from("story_episodes")
@@ -41,23 +67,32 @@ export default async function EpisodePage({
   const prev = idx > 0 ? list[idx - 1] : null;
   const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
 
+  const isOwner = !!user && user.id === ep.author_id;
+
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
+      <EpisodeView episodeId={ep.id} />
       <header className="flex items-center justify-between gap-3">
         <Link href={`/cerita/${id}`} className="text-sm text-ink/50">← Daftar episode</Link>
-        {!!user && user.id === ep.author_id && (
-          <Link
-            href={`/cerita/${id}/${ep.id}/edit`}
-            className="text-xs font-medium text-sky-600 hover:underline"
-          >
-            Edit episode
-          </Link>
-        )}
+        <div className="flex items-center gap-3">
+          <ShareButton path={`/cerita/${id}/${ep.id}`} title={ep.title || `Episode ${ep.episode_number}`} />
+          {isOwner && (
+            <Link
+              href={`/cerita/${id}/${ep.id}/edit`}
+              className="text-xs font-medium text-sky-600 hover:underline"
+            >
+              Edit episode
+            </Link>
+          )}
+        </div>
       </header>
 
       <div>
         <p className="text-xs font-medium text-sky-600">Episode {ep.episode_number}</p>
-        {ep.title && <h1 className="mt-0.5 text-xl font-bold text-ink">{ep.title as string}</h1>}
+        {ep.title && <h1 className="mt-0.5 text-xl font-bold text-ink">{ep.title}</h1>}
+        <p className="mt-1 text-xs text-ink/45">
+          oleh {ep.profiles?.handle ?? "Anonim"} · {fmt(ep.created_at)} · {ep.views} dibaca
+        </p>
       </div>
 
       {ep.crisis_flag && (
@@ -78,7 +113,7 @@ export default async function EpisodePage({
       )}
 
       <article className="whitespace-pre-wrap text-sm leading-relaxed text-ink/85">
-        {ep.body as string}
+        {ep.body}
       </article>
 
       <div className="mt-2 flex items-center justify-between border-t border-ink/5 pt-4 text-sm">

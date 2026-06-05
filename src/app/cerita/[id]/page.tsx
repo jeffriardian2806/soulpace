@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { StoryPeluk } from "@/components/StoryPeluk";
+import { ShareButton } from "@/components/ShareButton";
 import { commentStoryAction, deleteStoryAction } from "@/app/cerita/actions";
 
 export const metadata = { title: "Cerita — Soulpace" };
@@ -23,7 +24,7 @@ type Story = {
   created_at: string;
   profiles: { handle: string } | null;
 };
-type Episode = { id: string; episode_number: number; title: string };
+type Episode = { id: string; episode_number: number; title: string; views: number };
 type Comment = {
   id: string;
   body: string;
@@ -62,7 +63,7 @@ export default async function CeritaDetailPage({
 
   const { data: epsData } = await supabase
     .from("story_episodes")
-    .select("id, episode_number, title")
+    .select("id, episode_number, title, views")
     .eq("story_id", id)
     .order("episode_number", { ascending: true });
   const episodes = (epsData ?? []) as Episode[];
@@ -129,6 +130,7 @@ export default async function CeritaDetailPage({
 
       <div className="flex items-center gap-3">
         <StoryPeluk storyId={story.id} initialPeluked={peluked} initialCount={pelukCount ?? 0} />
+        <ShareButton path={`/cerita/${story.id}`} title={story.title} />
         {isOwner && (
           <Link
             href={`/cerita/${story.id}/tulis`}
@@ -153,6 +155,7 @@ export default async function CeritaDetailPage({
             >
               <span className="font-medium text-ink">Episode {e.episode_number}</span>
               {e.title && <span className="text-ink/70"> · {e.title}</span>}
+              <span className="ml-1 text-xs text-ink/40">· {e.views} dibaca</span>
             </Link>
           ))
         )}
