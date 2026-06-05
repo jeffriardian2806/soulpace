@@ -20,6 +20,7 @@ export function FeedShell({
   initialCat,
   pageSize,
   quote,
+  stories,
 }: {
   isLoggedIn: boolean;
   unread: number;
@@ -29,6 +30,14 @@ export function FeedShell({
   initialCat?: string;
   pageSize: number;
   quote: string;
+  stories: {
+    id: string;
+    title: string;
+    snippet: string;
+    contentWarning: string | null;
+    handle: string;
+    episodes: number;
+  }[];
 }) {
   const [cat, setCat] = useState<string | undefined>(initialCat);
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
@@ -272,6 +281,39 @@ export function FeedShell({
         <p className="text-xs uppercase tracking-wide text-white/70">Pesan hari ini</p>
         <p className="mt-1 text-sm font-medium leading-relaxed">{quote}</p>
       </div>
+
+      {stories.length > 0 && (
+        <section className="rounded-2xl border border-sky-100 bg-white/70 p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-ink">📖 Cerita</h2>
+            <Link href="/cerita" className="text-xs font-medium text-sky-600 hover:underline">
+              Lihat semua →
+            </Link>
+          </div>
+          <div className="flex flex-col divide-y divide-ink/5">
+            {stories.map((s) => (
+              <Link
+                key={s.id}
+                href={`/cerita/${s.id}`}
+                className="group block py-2.5 first:pt-0 last:pb-0"
+              >
+                <p className="text-sm font-semibold text-ink group-hover:text-sky-600">
+                  {s.title}
+                </p>
+                {s.contentWarning && (
+                  <p className="text-[11px] font-medium text-amber-700">⚠ {s.contentWarning}</p>
+                )}
+                <p className="mt-0.5 line-clamp-2 text-sm leading-relaxed text-ink/65">
+                  {s.snippet}
+                </p>
+                <p className="mt-0.5 text-xs text-sky-600">
+                  oleh {s.handle} · {s.episodes} episode · Baca selengkapnya →
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {!isLoggedIn && (
         <div className="glass rounded-2xl p-3 text-sm text-ink/70">

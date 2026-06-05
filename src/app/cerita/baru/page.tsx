@@ -19,7 +19,8 @@ export default async function CeritaBaruPage() {
         <h1 className="text-xl font-medium text-ink">Tulis Cerita</h1>
       </header>
       <p className="text-sm leading-relaxed text-ink/60">
-        Buat dulu judul & ringkasannya. Habis ini kamu bisa nambah episode satu per satu.
+        Tulis langsung apa yang ada di kepalamu. Nanti kalau mau dilanjutin, kamu bisa tambah
+        episode lagi kapan saja.
       </p>
       <form action={createStoryAction} className="flex flex-col gap-3">
         <input
@@ -27,23 +28,23 @@ export default async function CeritaBaruPage() {
           required
           maxLength={200}
           placeholder="Judul cerita"
-          className="rounded-xl border border-ink/10 bg-white/60 p-3 text-sm text-ink outline-none focus:border-sky-300"
+          className="rounded-xl border border-ink/10 bg-white/60 p-3 text-base font-semibold text-ink outline-none focus:border-sky-300"
         />
         <textarea
-          name="summary"
-          rows={3}
-          maxLength={500}
-          placeholder="Ringkasan singkat (opsional)"
+          name="body"
+          required
+          rows={16}
+          placeholder="Tulis ceritamu di sini... sepanjang yang kamu mau."
           className="rounded-xl border border-ink/10 bg-white/60 p-3 text-sm leading-relaxed text-ink outline-none focus:border-sky-300"
         />
         <input
           name="content_warning"
           maxLength={200}
-          placeholder="Peringatan isi sensitif, mis. 'kekerasan, self-harm' (opsional)"
-          className="rounded-xl border border-ink/10 bg-white/60 p-3 text-sm text-ink outline-none focus:border-sky-300"
+          placeholder="Peringatan isi sensitif (opsional), mis. 'kekerasan, self-harm'"
+          className="rounded-xl border border-ink/10 bg-white/60 p-2.5 text-xs text-ink outline-none focus:border-sky-300"
         />
         <button className="rounded-xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white">
-          Buat cerita
+          Terbitkan
         </button>
       </form>
     </main>

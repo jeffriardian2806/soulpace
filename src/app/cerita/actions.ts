@@ -18,23 +18,37 @@ export async function createStoryAction(formData: FormData): Promise<void> {
   if (!user) redirect("/login");
 
   const title = String(formData.get("title") ?? "").trim();
-  const summary = String(formData.get("summary") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
   const cw = String(formData.get("content_warning") ?? "").trim();
-  if (!title) redirect("/cerita/baru");
+  if (!title || !body) redirect("/cerita/baru");
+
+  // ringkasan preview diambil otomatis dari isi (user ga perlu nulis sinopsis)
+  const summary = body.replace(/\s+/g, " ").slice(0, 180);
 
   const { data, error } = await supabase
     .from("stories")
     .insert({
       author_id: user.id,
       title: title.slice(0, 200),
-      summary: summary.slice(0, 500),
+      summary,
       content_warning: cw ? cw.slice(0, 200) : null,
     })
     .select("id")
     .single();
   if (error || !data) redirect("/cerita/baru");
 
+  // langsung jadiin episode 1 dari isi yang ditulis
+  await supabase.from("story_episodes").insert({
+    story_id: data.id,
+    author_id: user.id,
+    episode_number: 1,
+    title: "",
+    body: body.slice(0, 20000),
+    crisis_flag: await detectCrisis(body),
+  });
+
   revalidatePath("/cerita");
+  revalidatePath("/feed");
   redirect(`/cerita/${data.id}`);
 }
 

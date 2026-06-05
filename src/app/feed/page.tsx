@@ -25,6 +25,32 @@ export default async function FeedPage({
     unread = await notif.unreadCount(user.id);
   }
 
+  const { data: storyData } = await supabase
+    .from("stories")
+    .select(
+      "id, title, summary, content_warning, profiles!inner(handle), story_episodes(count)"
+    )
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(3);
+  const stories = (
+    (storyData ?? []) as unknown as {
+      id: string;
+      title: string;
+      summary: string;
+      content_warning: string | null;
+      profiles: { handle: string } | null;
+      story_episodes: { count: number }[];
+    }[]
+  ).map((s) => ({
+    id: s.id,
+    title: s.title,
+    snippet: s.summary,
+    contentWarning: s.content_warning,
+    handle: s.profiles?.handle ?? "Anonim",
+    episodes: s.story_episodes?.[0]?.count ?? 0,
+  }));
+
   const quote = getDailyQuote();
 
   return (
@@ -37,6 +63,7 @@ export default async function FeedPage({
       initialCat={sp.cat}
       pageSize={20}
       quote={quote}
+      stories={stories}
     />
   );
 }
