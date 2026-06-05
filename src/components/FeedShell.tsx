@@ -35,8 +35,12 @@ export function FeedShell({
     title: string;
     snippet: string;
     contentWarning: string | null;
+    date: string;
     handle: string;
     episodes: number;
+    views: number;
+    peluk: number;
+    comments: number;
   }[];
 }) {
   const [cat, setCat] = useState<string | undefined>(initialCat);
@@ -306,9 +310,15 @@ export function FeedShell({
                 <p className="mt-0.5 line-clamp-2 text-sm leading-relaxed text-ink/65">
                   {s.snippet}
                 </p>
-                <p className="mt-0.5 text-xs text-sky-600">
-                  oleh {s.handle} · {s.episodes} episode · Baca selengkapnya →
-                </p>
+                <div className="mt-1.5 flex items-end justify-between gap-3">
+                  <p className="text-xs leading-relaxed text-ink/45">
+                    oleh {s.handle} · {s.date} · {s.episodes} episode · {s.views} dibaca ·{" "}
+                    {s.peluk} peluk · {s.comments} komentar
+                  </p>
+                  <span className="shrink-0 text-xs font-medium text-sky-600 group-hover:underline">
+                    Baca selengkapnya →
+                  </span>
+                </div>
               </Link>
             ))}
           </div>

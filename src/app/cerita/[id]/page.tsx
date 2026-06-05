@@ -49,7 +49,7 @@ type Story = {
   peluk_boost: number;
   profiles: { handle: string } | null;
 };
-type Episode = { id: string; episode_number: number; title: string; views: number };
+type Episode = { id: string; episode_number: number; title: string; views: number; created_at: string };
 type Comment = {
   id: string;
   body: string;
@@ -88,7 +88,7 @@ export default async function CeritaDetailPage({
 
   const { data: epsData } = await supabase
     .from("story_episodes")
-    .select("id, episode_number, title, views")
+    .select("id, episode_number, title, views, created_at")
     .eq("story_id", id)
     .order("episode_number", { ascending: true });
   const episodes = (epsData ?? []) as Episode[];
@@ -178,9 +178,11 @@ export default async function CeritaDetailPage({
               href={`/cerita/${story.id}/${e.id}`}
               className="glass block rounded-xl p-3 text-sm transition-colors hover:bg-sky-50"
             >
-              <span className="font-medium text-ink">Episode {e.episode_number}</span>
-              {e.title && <span className="text-ink/70"> · {e.title}</span>}
-              <span className="ml-1 text-xs text-ink/40">· {e.views} dibaca</span>
+              <p className="text-sm">
+                <span className="font-medium text-ink">Episode {e.episode_number}</span>
+                {e.title && <span className="text-ink/70"> · {e.title}</span>}
+              </p>
+              <p className="mt-0.5 text-xs text-ink/40">{fmt(e.created_at)} · {e.views} dibaca</p>
             </Link>
           ))
         )}

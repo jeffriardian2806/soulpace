@@ -4,6 +4,14 @@ import { getNotificationsService } from "@/modules/notifications";
 import { FeedShell } from "@/components/FeedShell";
 import { getDailyQuote } from "@/lib/dailyQuote";
 
+function fmtDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 export default async function FeedPage({
   searchParams,
 }: {
@@ -28,7 +36,7 @@ export default async function FeedPage({
   const { data: storyData } = await supabase
     .from("stories")
     .select(
-      "id, title, summary, content_warning, profiles!inner(handle), story_episodes(count)"
+      "id, title, summary, content_warning, created_at, peluk_boost, profiles!inner(handle), story_episodes(views), story_peluk(count), story_comments(count)"
     )
     .eq("status", "published")
     .order("created_at", { ascending: false })
@@ -39,16 +47,24 @@ export default async function FeedPage({
       title: string;
       summary: string;
       content_warning: string | null;
+      created_at: string;
+      peluk_boost: number;
       profiles: { handle: string } | null;
-      story_episodes: { count: number }[];
+      story_episodes: { views: number }[];
+      story_peluk: { count: number }[];
+      story_comments: { count: number }[];
     }[]
   ).map((s) => ({
     id: s.id,
     title: s.title,
     snippet: s.summary,
     contentWarning: s.content_warning,
+    date: fmtDate(s.created_at),
     handle: s.profiles?.handle ?? "Anonim",
-    episodes: s.story_episodes?.[0]?.count ?? 0,
+    episodes: s.story_episodes?.length ?? 0,
+    views: (s.story_episodes ?? []).reduce((sum, e) => sum + (e.views ?? 0), 0),
+    peluk: (s.story_peluk?.[0]?.count ?? 0) + (s.peluk_boost ?? 0),
+    comments: s.story_comments?.[0]?.count ?? 0,
   }));
 
   const quote = getDailyQuote();
