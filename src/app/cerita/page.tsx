@@ -17,6 +17,7 @@ type Row = {
   profiles: { handle: string } | null;
   story_episodes: { count: number }[];
   story_peluk: { count: number }[];
+  peluk_boost: number;
 };
 
 export default async function CeritaPage() {
@@ -28,7 +29,7 @@ export default async function CeritaPage() {
   const { data } = await supabase
     .from("stories")
     .select(
-      "id, title, summary, content_warning, created_at, profiles!inner(handle), story_episodes(count), story_peluk(count)"
+      "id, title, summary, content_warning, created_at, peluk_boost, profiles!inner(handle), story_episodes(count), story_peluk(count)"
     )
     .eq("status", "published")
     .order("created_at", { ascending: false })
@@ -84,7 +85,7 @@ export default async function CeritaPage() {
               <p className="mt-2 text-xs text-ink/45">
                 oleh {s.profiles?.handle ?? "Anonim"} ·{" "}
                 {s.story_episodes?.[0]?.count ?? 0} episode ·{" "}
-                {s.story_peluk?.[0]?.count ?? 0} peluk
+                {(s.story_peluk?.[0]?.count ?? 0) + (s.peluk_boost ?? 0)} peluk
               </p>
             </Link>
           ))}

@@ -1,10 +1,39 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { ShareButton } from "@/components/ShareButton";
 import { EpisodeView } from "@/components/EpisodeView";
 
-export const metadata = { title: "Episode — Soulpace" };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string; episodeId: string }>;
+}): Promise<Metadata> {
+  const { id, episodeId } = await params;
+  const supabase = createPublicClient();
+  const { data } = await supabase
+    .from("story_episodes")
+    .select("title, episode_number, body, stories(title)")
+    .eq("id", episodeId)
+    .maybeSingle();
+  if (!data) return { title: "Episode", robots: { index: false, follow: true } };
+  const storyTitle =
+    ((data as { stories?: { title?: string } }).stories?.title as string) ?? "Cerita";
+  const epExtra = (data.title as string) ? `: ${data.title}` : "";
+  const title = `${storyTitle} · Episode ${data.episode_number}${epExtra}`;
+  const desc =
+    ((data.body as string) ?? "").replace(/\s+/g, " ").slice(0, 160) || "Cerita di Soulpace.";
+  const url = `https://soulpace.vercel.app/cerita/${id}/${episodeId}`;
+  return {
+    title,
+    description: desc,
+    robots: { index: true, follow: true },
+    alternates: { canonical: url },
+    openGraph: { title, description: desc, type: "article", url },
+  };
+}
 
 function fmt(iso: string): string {
   return new Date(iso).toLocaleDateString("id-ID", {

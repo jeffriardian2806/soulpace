@@ -1,11 +1,35 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { StoryPeluk } from "@/components/StoryPeluk";
 import { ShareButton } from "@/components/ShareButton";
 import { commentStoryAction, deleteStoryAction } from "@/app/cerita/actions";
 
-export const metadata = { title: "Cerita — Soulpace" };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = createPublicClient();
+  const { data } = await supabase
+    .from("stories")
+    .select("title, summary")
+    .eq("id", id)
+    .maybeSingle();
+  if (!data) return { title: "Cerita", robots: { index: false, follow: true } };
+  const desc = ((data.summary as string) ?? "").slice(0, 160) || "Cerita di Soulpace.";
+  const url = `https://soulpace.vercel.app/cerita/${id}`;
+  return {
+    title: data.title as string,
+    description: desc,
+    robots: { index: true, follow: true },
+    alternates: { canonical: url },
+    openGraph: { title: data.title as string, description: desc, type: "article", url },
+  };
+}
 
 function fmt(iso: string): string {
   return new Date(iso).toLocaleDateString("id-ID", {
@@ -22,6 +46,7 @@ type Story = {
   summary: string;
   content_warning: string | null;
   created_at: string;
+  peluk_boost: number;
   profiles: { handle: string } | null;
 };
 type Episode = { id: string; episode_number: number; title: string; views: number };
@@ -46,7 +71,7 @@ export default async function CeritaDetailPage({
 
   const { data: storyData } = await supabase
     .from("stories")
-    .select("id, author_id, title, summary, content_warning, created_at, profiles!inner(handle)")
+    .select("id, author_id, title, summary, content_warning, created_at, peluk_boost, profiles!inner(handle)")
     .eq("id", id)
     .maybeSingle();
 
@@ -129,7 +154,7 @@ export default async function CeritaDetailPage({
       )}
 
       <div className="flex items-center gap-3">
-        <StoryPeluk storyId={story.id} initialPeluked={peluked} initialCount={pelukCount ?? 0} />
+        <StoryPeluk storyId={story.id} initialPeluked={peluked} initialCount={(pelukCount ?? 0) + (story.peluk_boost ?? 0)} />
         <ShareButton path={`/cerita/${story.id}`} title={story.title} />
         {isOwner && (
           <Link
