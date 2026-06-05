@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MoodTracker } from "@/components/MoodTracker";
+import { MoodInsight } from "@/components/MoodInsight";
 
 export const metadata = { title: "Mood Tracker — Soulpace" };
 
@@ -17,7 +18,7 @@ export default async function MoodPage() {
     .select("entry_date, mood, note")
     .eq("user_id", user.id)
     .order("entry_date", { ascending: false })
-    .limit(35);
+    .limit(150);
 
   const initialEntries = (data ?? []).map((r) => ({
     date: r.entry_date as string,
@@ -37,6 +38,7 @@ export default async function MoodPage() {
         Catat perasaanmu tiap hari. Cuma kamu yang bisa lihat ini.
       </p>
       <MoodTracker initialEntries={initialEntries} />
+      <MoodInsight entries={initialEntries} />
     </main>
   );
 }

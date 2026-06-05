@@ -240,10 +240,11 @@ export function FeedShell({
         </header>
 
         {/* Tools wellness: gaya shortcut (ikon + label) biar beda jelas dari filter */}
-        <div className="grid grid-cols-6 gap-1">
+        <div className="flex gap-1 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             { href: "/cerita", icon: "📖", label: "Cerita" },
             { href: "/mood", icon: "🙂", label: "Mood" },
+            { href: "/syukur", icon: "🙏", label: "Syukur" },
             { href: "/jurnal", icon: "📓", label: "Jurnal" },
             { href: "/surat", icon: "✉️", label: "Surat" },
             { href: "/edukasi", icon: "💡", label: "Tips" },
@@ -252,7 +253,7 @@ export function FeedShell({
             <Link
               key={t.href}
               href={t.href}
-              className="flex flex-col items-center gap-1 rounded-xl py-1.5 text-ink/70 transition-colors hover:bg-sky-50"
+              className="flex w-[60px] shrink-0 flex-col items-center gap-1 rounded-xl py-1.5 text-ink/70 transition-colors hover:bg-sky-50"
             >
               <span className="text-lg leading-none">{t.icon}</span>
               <span className="text-[10px] font-medium">{t.label}</span>
@@ -310,12 +311,12 @@ export function FeedShell({
                 <p className="mt-0.5 line-clamp-2 text-sm leading-relaxed text-ink/65">
                   {s.snippet}
                 </p>
-                <div className="mt-1.5 flex items-end justify-between gap-3">
+                <div className="mt-1.5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
                   <p className="text-xs leading-relaxed text-ink/45">
-                    oleh {s.handle} · {s.date} · {s.episodes} episode · {s.views} dibaca ·{" "}
-                    {s.peluk} peluk · {s.comments} komentar
+                    oleh {s.handle} · {s.date} · {s.episodes} episode · {s.views} dibaca · {s.peluk}{" "}
+                    peluk · {s.comments} komentar
                   </p>
-                  <span className="shrink-0 text-xs font-medium text-sky-600 group-hover:underline">
+                  <span className="shrink-0 self-end text-xs font-medium text-sky-600 group-hover:underline sm:self-auto">
                     Baca selengkapnya →
                   </span>
                 </div>
