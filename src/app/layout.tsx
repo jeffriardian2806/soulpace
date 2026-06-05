@@ -21,6 +21,8 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "Soulpace", statusBarStyle: "default" },
   // Default: JANGAN index apa pun (privasi curhat). Landing di-override jadi index.
   robots: { index: false, follow: true },
+  // Verifikasi Google Search Console: isi token lewat env GOOGLE_SITE_VERIFICATION di Vercel.
+  verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
 };
 
 export const viewport: Viewport = {
