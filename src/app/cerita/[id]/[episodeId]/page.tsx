@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createPublicClient } from "@/lib/supabase/public";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { ShareButton } from "@/components/ShareButton";
+import { Markdown } from "@/components/Markdown";
 import { EpisodeView } from "@/components/EpisodeView";
 
 export async function generateMetadata({
@@ -141,8 +142,8 @@ export default async function EpisodePage({
         </div>
       )}
 
-      <article className="whitespace-pre-wrap text-sm leading-relaxed text-ink/85">
-        {ep.body}
+      <article className="text-sm leading-relaxed text-ink/85">
+        <Markdown>{ep.body}</Markdown>
       </article>
 
       <div className="mt-2 flex items-center justify-between border-t border-ink/5 pt-4 text-sm">
