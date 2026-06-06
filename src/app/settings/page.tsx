@@ -32,6 +32,24 @@ export default async function SettingsPage() {
         <HandleForm current={profile?.handle ?? ""} action={updateHandleAction} />
       </section>
 
+      <section className="glass rounded-2xl p-2">
+        <h2 className="px-2 py-1 text-sm font-semibold text-ink">Bantuan &amp; Lainnya</h2>
+        <Link
+          href="/panduan"
+          className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+        >
+          <span>📖 Panduan &amp; FAQ</span>
+          <span className="text-ink/40">→</span>
+        </Link>
+        <Link
+          href="/masukan"
+          className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+        >
+          <span>⭐ Kritik &amp; Saran</span>
+          <span className="text-ink/40">→</span>
+        </Link>
+      </section>
+
       {profile?.role === "moderator" && (
         <section className="glass rounded-2xl p-2">
           <h2 className="px-2 py-1 text-sm font-semibold text-ink">Admin</h2>
@@ -47,6 +65,13 @@ export default async function SettingsPage() {
             className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
           >
             <span>⚙️ Kelola skrining</span>
+            <span className="text-ink/40">→</span>
+          </Link>
+          <Link
+            href="/admin/masukan"
+            className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+          >
+            <span>💬 Masukan pengguna</span>
             <span className="text-ink/40">→</span>
           </Link>
         </section>
