@@ -194,6 +194,18 @@ export function FeedShell({
           {isLoggedIn ? (
             <div className="flex items-center gap-5 text-ink/55">
               <Link
+                href="/panduan"
+                aria-label="Panduan & FAQ"
+                title="Panduan & FAQ"
+                className="transition-colors hover:text-sky-600"
+              >
+                <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </Link>
+              <Link
                 href="/notifications"
                 aria-label="Notifikasi"
                 title="Notifikasi"
