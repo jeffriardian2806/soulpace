@@ -257,6 +257,7 @@ export function FeedShell({
             { href: "/cerita", icon: "📖", label: "Cerita" },
             { href: "/mood", icon: "🙂", label: "Mood" },
             { href: "/syukur", icon: "🙏", label: "Syukur" },
+            { href: "/hening", icon: "🌙", label: "Hening" },
             { href: "/jurnal", icon: "📓", label: "Jurnal" },
             { href: "/surat", icon: "✉️", label: "Surat" },
             { href: "/edukasi", icon: "💡", label: "Tips" },
