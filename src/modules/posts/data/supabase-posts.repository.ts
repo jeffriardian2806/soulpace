@@ -50,6 +50,7 @@ export class SupabasePostsRepository implements PostsRepository {
       .order("created_at", { ascending: false })
       .range(opts.offset, opts.offset + opts.limit - 1);
     if (opts.categoryId) q = q.eq("category_id", opts.categoryId);
+    if (opts.onlyUnanswered) q = q.eq("reply_count", 0);
     const { data, error } = await q;
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapPost);
@@ -66,6 +67,7 @@ export class SupabasePostsRepository implements PostsRepository {
       .order("created_at", { ascending: false })
       .range(opts.offset, opts.offset + opts.limit - 1);
     if (opts.categoryId) q = q.eq("category_id", opts.categoryId);
+    if (opts.onlyUnanswered) q = q.eq("reply_count", 0);
 
     const { data: postsData, error: postsError } = await q;
     if (postsError) throw new Error(postsError.message);

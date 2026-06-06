@@ -9,4 +9,5 @@ export interface ListPostsOptions {
   categoryId?: number;
   limit: number;
   offset: number;
+  onlyUnanswered?: boolean;
 }

@@ -53,7 +53,8 @@ export async function pelukAction(
 export async function loadMoreFeed(
   cat: string | null,
   offset: number,
-  limit: number
+  limit: number,
+  onlyUnanswered = false
 ): Promise<{ posts: FeedPost[]; peluked: string[] }> {
   const supabase = await createClient();
   const {
@@ -61,5 +62,5 @@ export async function loadMoreFeed(
   } = await supabase.auth.getUser();
 
   const svc = await getPostsService();
-  return svc.feedPage(cat ?? undefined, offset, limit, user?.id ?? null);
+  return svc.feedPage(cat ?? undefined, offset, limit, user?.id ?? null, onlyUnanswered);
 }

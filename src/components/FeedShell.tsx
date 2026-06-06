@@ -44,6 +44,7 @@ export function FeedShell({
   }[];
 }) {
   const [cat, setCat] = useState<string | undefined>(initialCat);
+  const [unanswered, setUnanswered] = useState(false);
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
   const [peluked, setPeluked] = useState<Set<string>>(new Set(initialPeluked));
   const [offset, setOffset] = useState(initialPosts.length);
@@ -52,16 +53,15 @@ export function FeedShell({
   const [switching, setSwitching] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  // Ganti kategori TANPA navigasi halaman (instan, ala IG).
-  const selectCat = useCallback(
-    async (next?: string) => {
-      if (next === cat || switching) return;
+  // Reload feed dari awal (ganti kategori / mode) TANPA navigasi halaman.
+  const reload = useCallback(
+    async (nextCat: string | undefined, nextUnanswered: boolean) => {
       setSwitching(true);
-      setCat(next);
-      // sinkron URL tanpa reload (shareable + aman saat di-refresh)
-      window.history.replaceState(null, "", next ? `/feed?cat=${next}` : "/feed");
+      setCat(nextCat);
+      setUnanswered(nextUnanswered);
+      window.history.replaceState(null, "", nextCat ? `/feed?cat=${nextCat}` : "/feed");
       try {
-        const res = await loadMoreFeed(next ?? null, 0, pageSize);
+        const res = await loadMoreFeed(nextCat ?? null, 0, pageSize, nextUnanswered);
         setPosts(res.posts);
         setPeluked(new Set(res.peluked));
         setOffset(res.posts.length);
@@ -73,14 +73,30 @@ export function FeedShell({
         setSwitching(false);
       }
     },
-    [cat, switching, pageSize]
+    [pageSize]
+  );
+
+  const selectCat = useCallback(
+    (next?: string) => {
+      if (next === cat || switching) return;
+      reload(next, unanswered);
+    },
+    [cat, switching, unanswered, reload]
+  );
+
+  const selectMode = useCallback(
+    (next: boolean) => {
+      if (next === unanswered || switching) return;
+      reload(cat, next);
+    },
+    [unanswered, switching, cat, reload]
   );
 
   const loadMore = useCallback(async () => {
     if (loading || switching || !hasMore) return;
     setLoading(true);
     try {
-      const res = await loadMoreFeed(cat ?? null, offset, pageSize);
+      const res = await loadMoreFeed(cat ?? null, offset, pageSize, unanswered);
       setPosts((prev) => [...prev, ...res.posts]);
       setPeluked((prev) => {
         const n = new Set(prev);
@@ -94,7 +110,7 @@ export function FeedShell({
     } finally {
       setLoading(false);
     }
-  }, [loading, switching, hasMore, cat, offset, pageSize]);
+  }, [loading, switching, hasMore, cat, offset, pageSize, unanswered]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -274,6 +290,16 @@ export function FeedShell({
           ))}
         </div>
 
+        {/* Mode: semua vs yang belum dibalas */}
+        <div className="flex gap-2">
+          <button type="button" onClick={() => selectMode(false)} className={pill(!unanswered)}>
+            Semua
+          </button>
+          <button type="button" onClick={() => selectMode(true)} className={pill(unanswered)}>
+            Belum dibalas
+          </button>
+        </div>
+
         {/* Kategori: tombol client (filter tanpa navigasi) */}
         <div className="relative -mx-5 px-5">
           <nav className="flex gap-2 overflow-x-auto pb-2 pr-6 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -299,6 +325,13 @@ export function FeedShell({
         <p className="text-xs uppercase tracking-wide text-white/70">Pesan hari ini</p>
         <p className="mt-1 text-sm font-medium leading-relaxed">{quote}</p>
       </div>
+
+      {unanswered && (
+        <p className="rounded-2xl bg-sky-50 px-4 py-3 text-sm leading-relaxed text-ink/70">
+          Ada yang belum didengar. Balasan kecil darimu bisa bikin hari seseorang terasa lebih
+          ringan. 💙
+        </p>
+      )}
 
       {stories.length > 0 && (
         <section className="rounded-2xl border border-sky-100 bg-white/70 p-4">

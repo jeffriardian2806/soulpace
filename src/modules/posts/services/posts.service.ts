@@ -74,7 +74,8 @@ export class PostsService {
     categorySlug: string | undefined,
     offset: number,
     limit: number,
-    userId: string | null = null
+    userId: string | null = null,
+    onlyUnanswered = false
   ): Promise<{ posts: FeedPost[]; peluked: string[] }> {
     let categoryId: number | undefined;
     if (categorySlug) {
@@ -82,7 +83,7 @@ export class PostsService {
       categoryId = categories.find((c) => c.slug === categorySlug)?.id;
     }
     const { posts, pelukedIds } = await this.repo.listPostsWithUserReactions(
-      { categoryId, limit, offset },
+      { categoryId, limit, offset, onlyUnanswered },
       userId
     );
     return { posts, peluked: [...pelukedIds] };
