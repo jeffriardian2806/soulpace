@@ -75,7 +75,8 @@ export class PostsService {
     offset: number,
     limit: number,
     userId: string | null = null,
-    onlyUnanswered = false
+    onlyUnanswered = false,
+    wish?: string
   ): Promise<{ posts: FeedPost[]; peluked: string[] }> {
     let categoryId: number | undefined;
     if (categorySlug) {
@@ -83,7 +84,7 @@ export class PostsService {
       categoryId = categories.find((c) => c.slug === categorySlug)?.id;
     }
     const { posts, pelukedIds } = await this.repo.listPostsWithUserReactions(
-      { categoryId, limit, offset, onlyUnanswered },
+      { categoryId, limit, offset, onlyUnanswered, wish },
       userId
     );
     return { posts, peluked: [...pelukedIds] };
@@ -99,21 +100,22 @@ export class PostsService {
 
   async createPost(
     authorId: string,
-    categoryId: number,
-    body: string
+    categoryId: number | null,
+    body: string,
+    mood: string | null = null,
+    wish: string | null = null
   ): Promise<void> {
     const text = body.trim();
     if (text.length < 1 || text.length > 5000) {
       throw new ValidationError("Curhat harus antara 1 sampai 5000 karakter.");
     }
-    if (!categoryId) {
-      throw new ValidationError("Pilih kategori dulu ya.");
-    }
     await this.repo.createPost({
       authorId,
-      categoryId,
+      categoryId: categoryId ?? null,
       body: text,
       crisisFlag: this.detectCrisis(text),
+      mood,
+      wish,
     });
   }
 

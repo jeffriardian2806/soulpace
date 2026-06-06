@@ -10,6 +10,16 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import { guestAction } from "@/app/auth/actions";
 import { BellIcon, UserIcon, GearIcon, LogoutIcon } from "@/components/icons";
 import type { Category, FeedPost } from "@/core/entities/post";
+import { MoodCheckIn } from "@/components/MoodCheckIn";
+
+const STATUS_OPTIONS = [
+  { slug: "semua", label: "Semua" },
+  { slug: "unanswered", label: "Belum dibalas" },
+  { slug: "didengar", label: "Butuh Didengar" },
+  { slug: "peluk", label: "Butuh Peluk" },
+  { slug: "saran", label: "Butuh Saran" },
+];
+const WISH_SLUGS = ["didengar", "peluk", "saran"];
 
 export function FeedShell({
   isLoggedIn,
@@ -18,6 +28,7 @@ export function FeedShell({
   initialPosts,
   initialPeluked,
   initialCat,
+  initialStatus,
   pageSize,
   quote,
   stories,
@@ -28,6 +39,7 @@ export function FeedShell({
   initialPosts: FeedPost[];
   initialPeluked: string[];
   initialCat?: string;
+  initialStatus?: string;
   pageSize: number;
   quote: string;
   stories: {
@@ -44,7 +56,8 @@ export function FeedShell({
   }[];
 }) {
   const [cat, setCat] = useState<string | undefined>(initialCat);
-  const [unanswered, setUnanswered] = useState(false);
+  const [status, setStatus] = useState<string>(initialStatus ?? "semua");
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
   const [peluked, setPeluked] = useState<Set<string>>(new Set(initialPeluked));
   const [offset, setOffset] = useState(initialPosts.length);
@@ -55,13 +68,16 @@ export function FeedShell({
 
   // Reload feed dari awal (ganti kategori / mode) TANPA navigasi halaman.
   const reload = useCallback(
-    async (nextCat: string | undefined, nextUnanswered: boolean) => {
+    async (nextCat: string | undefined, nextStatus: string) => {
       setSwitching(true);
       setCat(nextCat);
-      setUnanswered(nextUnanswered);
+      setStatus(nextStatus);
+      setSheetOpen(false);
       window.history.replaceState(null, "", nextCat ? `/feed?cat=${nextCat}` : "/feed");
+      const unanswered = nextStatus === "unanswered";
+      const wish = WISH_SLUGS.includes(nextStatus) ? nextStatus : undefined;
       try {
-        const res = await loadMoreFeed(nextCat ?? null, 0, pageSize, nextUnanswered);
+        const res = await loadMoreFeed(nextCat ?? null, 0, pageSize, unanswered, wish);
         setPosts(res.posts);
         setPeluked(new Set(res.peluked));
         setOffset(res.posts.length);
@@ -78,25 +94,33 @@ export function FeedShell({
 
   const selectCat = useCallback(
     (next?: string) => {
-      if (next === cat || switching) return;
-      reload(next, unanswered);
+      if (next === cat) {
+        setSheetOpen(false);
+        return;
+      }
+      reload(next, status);
     },
-    [cat, switching, unanswered, reload]
+    [cat, status, reload]
   );
 
-  const selectMode = useCallback(
-    (next: boolean) => {
-      if (next === unanswered || switching) return;
+  const selectStatus = useCallback(
+    (next: string) => {
+      if (next === status) {
+        setSheetOpen(false);
+        return;
+      }
       reload(cat, next);
     },
-    [unanswered, switching, cat, reload]
+    [status, cat, reload]
   );
 
   const loadMore = useCallback(async () => {
     if (loading || switching || !hasMore) return;
     setLoading(true);
     try {
-      const res = await loadMoreFeed(cat ?? null, offset, pageSize, unanswered);
+      const unanswered = status === "unanswered";
+      const wish = WISH_SLUGS.includes(status) ? status : undefined;
+      const res = await loadMoreFeed(cat ?? null, offset, pageSize, unanswered, wish);
       setPosts((prev) => [...prev, ...res.posts]);
       setPeluked((prev) => {
         const n = new Set(prev);
@@ -110,7 +134,7 @@ export function FeedShell({
     } finally {
       setLoading(false);
     }
-  }, [loading, switching, hasMore, cat, offset, pageSize, unanswered]);
+  }, [loading, switching, hasMore, cat, offset, pageSize, status]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -200,8 +224,13 @@ export function FeedShell({
       active ? "bg-sky-500 text-white" : "glass text-ink/70 hover:bg-sky-100"
     }`;
 
+  const statusLabel = STATUS_OPTIONS.find((o) => o.slug === status)?.label ?? "Semua";
+  const catLabel = cat
+    ? categories.find((c) => c.slug === cat)?.name ?? "Kategori"
+    : "Kategori";
+
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
+    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 pb-28 pt-6">
       {/* STICKY HEADER */}
       <div className="sticky top-0 z-50 -mx-5 -mt-6 flex flex-col gap-4 bg-white px-5 py-6 shadow-sm">
         <header className="flex items-center justify-between">
@@ -270,6 +299,7 @@ export function FeedShell({
         {/* Tools wellness: gaya shortcut (ikon + label) biar beda jelas dari filter */}
         <div className="flex gap-1 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
+            { href: "/main", icon: "✨", label: "Main" },
             { href: "/cerita", icon: "📖", label: "Cerita" },
             { href: "/mood", icon: "🙂", label: "Mood" },
             { href: "/syukur", icon: "🙏", label: "Syukur" },
@@ -290,43 +320,16 @@ export function FeedShell({
           ))}
         </div>
 
-        {/* Mode: semua vs yang belum dibalas */}
-        <div className="flex gap-2">
-          <button type="button" onClick={() => selectMode(false)} className={pill(!unanswered)}>
-            Semua
-          </button>
-          <button type="button" onClick={() => selectMode(true)} className={pill(unanswered)}>
-            Belum dibalas
-          </button>
-        </div>
-
-        {/* Kategori: tombol client (filter tanpa navigasi) */}
-        <div className="relative -mx-5 px-5">
-          <nav className="flex gap-2 overflow-x-auto pb-2 pr-6 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <button type="button" onClick={() => selectCat(undefined)} className={pill(!cat)}>
-              Semua
-            </button>
-            {categories.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => selectCat(c.slug)}
-                className={pill(cat === c.slug)}
-              >
-                {c.name}
-              </button>
-            ))}
-          </nav>
-          <div className="absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-white via-white/40 to-transparent pointer-events-none" />
-        </div>
       </div>
+
+      <MoodCheckIn onPosted={() => reload(cat, status)} />
 
       <div className="rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 p-4 text-white">
         <p className="text-xs uppercase tracking-wide text-white/70">Pesan hari ini</p>
         <p className="mt-1 text-sm font-medium leading-relaxed">{quote}</p>
       </div>
 
-      {unanswered && (
+      {status === "unanswered" && (
         <p className="rounded-2xl bg-sky-50 px-4 py-3 text-sm leading-relaxed text-ink/70">
           Ada yang belum didengar. Balasan kecil darimu bisa bikin hari seseorang terasa lebih
           ringan. 💙
@@ -414,13 +417,92 @@ export function FeedShell({
         )}
       </div>
 
-      {isLoggedIn && (
-        <Link
-          href="/compose"
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-sky-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/30"
-        >
-          + Curhat
-        </Link>
+      {/* Bottom sticky bar: filter status · curhat · filter kategori */}
+      <div className="fixed bottom-0 left-1/2 z-40 w-full max-w-2xl -translate-x-1/2 border-t border-sky-100 bg-white/95 px-5 py-3 backdrop-blur">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSheetOpen(true)}
+            className="flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full glass px-3 py-2.5 text-xs font-medium text-ink/70"
+          >
+            <span className="truncate">{statusLabel}</span>
+            <span className="text-ink/40">▾</span>
+          </button>
+          <Link
+            href="/compose"
+            className="shrink-0 rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-sky-500/30"
+          >
+            + Curhat
+          </Link>
+          <button
+            type="button"
+            onClick={() => setSheetOpen(true)}
+            className="flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full glass px-3 py-2.5 text-xs font-medium text-ink/70"
+          >
+            <span className="truncate">{catLabel}</span>
+            <span className="text-ink/40">▾</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom sheet filter */}
+      {sheetOpen && (
+        <div className="fixed inset-0 z-50">
+          <div
+            className="absolute inset-0 bg-black/30"
+            onClick={() => setSheetOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="absolute bottom-0 left-1/2 w-full max-w-2xl -translate-x-1/2 rounded-t-3xl bg-white p-5 pb-8 shadow-2xl">
+            <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-ink/15" />
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-base font-bold text-ink">Filter</h3>
+              <button
+                type="button"
+                onClick={() => setSheetOpen(false)}
+                aria-label="Tutup"
+                className="text-lg text-ink/40"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/40">
+              Status &amp; Kebutuhan
+            </p>
+            <div className="mb-5 flex flex-wrap gap-2">
+              {STATUS_OPTIONS.map((o) => (
+                <button
+                  key={o.slug}
+                  type="button"
+                  onClick={() => selectStatus(o.slug)}
+                  className={pill(status === o.slug)}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/40">
+              Kategori
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => selectCat(undefined)} className={pill(!cat)}>
+                Semua
+              </button>
+              {categories.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => selectCat(c.slug)}
+                  className={pill(cat === c.slug)}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );

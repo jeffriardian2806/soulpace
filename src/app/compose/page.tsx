@@ -5,7 +5,12 @@ import { getPostsService } from "@/modules/posts";
 import { ComposeForm } from "@/components/ComposeForm";
 import { createPostAction } from "@/app/feed/actions";
 
-export default async function ComposePage() {
+export default async function ComposePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ wish?: string }>;
+}) {
+  const sp = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -27,7 +32,7 @@ export default async function ComposePage() {
         Lepasin aja apa yang kamu rasain. Boleh marah, boleh pakai kata kasar — yang
         penting jangan menyerang atau membahayakan orang lain.
       </p>
-      <ComposeForm categories={categories} action={createPostAction} />
+      <ComposeForm categories={categories} action={createPostAction} defaultWish={sp.wish ?? ""} />
     </main>
   );
 }

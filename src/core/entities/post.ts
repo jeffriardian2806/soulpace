@@ -15,4 +15,6 @@ export interface FeedPost {
   authorHandle: string;
   pelukCount: number;
   replyCount: number;
+  mood: string | null;
+  wish: string | null;
 }

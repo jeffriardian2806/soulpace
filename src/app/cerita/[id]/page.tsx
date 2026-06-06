@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createPublicClient } from "@/lib/supabase/public";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { StoryPeluk } from "@/components/StoryPeluk";
+import { StoryReactions } from "@/components/StoryReactions";
 import { ShareButton } from "@/components/ShareButton";
 import { commentStoryAction, deleteStoryAction } from "@/app/cerita/actions";
 
@@ -165,6 +166,8 @@ export default async function CeritaDetailPage({
           </Link>
         )}
       </div>
+
+      <StoryReactions storyId={story.id} />
 
       {/* Episode */}
       <section className="space-y-2">

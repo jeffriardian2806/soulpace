@@ -6,6 +6,7 @@ import { pelukAction } from "@/app/feed/actions";
 import { createReportAction } from "@/app/_actions/report";
 import { ReportButton } from "@/components/ReportButton";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
+import { getMood, getWish } from "@/core/moods";
 import type { FeedPost } from "@/core/entities/post";
 
 function timeAgo(iso: string): string {
@@ -31,6 +32,8 @@ export function PostCard({
   onToggle?: () => void;
 }) {
   const [, startTransition] = useTransition();
+  const mood = getMood(post.mood);
+  const wish = getWish(post.wish);
   // Di feed, onToggle dikontrol FeedShell (optimistic + realtime).
   // Di halaman lain (detail/profil), fallback panggil server action langsung.
   const handleToggle =
@@ -49,10 +52,28 @@ export function PostCard({
         <div>
           <p className="text-sm font-semibold text-ink">{post.authorHandle}</p>
           <p className="text-xs text-ink/45" suppressHydrationWarning>
-            {timeAgo(post.createdAt)} · {post.categoryName}
+            {timeAgo(post.createdAt)}
+            {post.categoryName ? ` · ${post.categoryName}` : ""}
           </p>
         </div>
       </div>
+
+      {(mood || wish) && (
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          {mood && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700">
+              <span className="leading-none">{mood.emoji}</span>
+              {mood.label}
+            </span>
+          )}
+          {wish && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-sky-700">
+              <span className="leading-none">{wish.emoji}</span>
+              {wish.label}
+            </span>
+          )}
+        </div>
+      )}
 
       <p className="mb-3 whitespace-pre-wrap text-sm leading-relaxed text-ink">
         {post.body}

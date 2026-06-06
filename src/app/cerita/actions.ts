@@ -220,3 +220,31 @@ export async function updateEpisodeAction(formData: FormData): Promise<void> {
   revalidatePath("/feed");
   redirect(`/cerita/${storyId}/${episodeId}`);
 }
+
+export async function toggleStoryReactionAction(
+  storyId: string,
+  kind: string,
+  active: boolean
+): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  if (!["pernah", "sedang", "lewat", "belajar"].includes(kind)) {
+    return { error: "Reaksi tidak valid." };
+  }
+  if (active) {
+    const { error } = await supabase
+      .from("story_reactions")
+      .delete()
+      .eq("story_id", storyId)
+      .eq("user_id", user.id)
+      .eq("kind", kind);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase
+      .from("story_reactions")
+      .insert({ story_id: storyId, user_id: user.id, kind });
+    if (error && !/duplicate|unique/i.test(error.message)) return { error: error.message };
+  }
+  return { error: null };
+}

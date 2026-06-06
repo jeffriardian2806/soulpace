@@ -4,7 +4,7 @@ import type { Category, FeedPost } from "@/core/entities/post";
 import type { CreatePostInput, ListPostsOptions } from "../domain/post.types";
 
 const POST_SELECT =
-  "id, body, crisis_flag, created_at, categories!inner(name, slug), profiles!inner(handle), reactions(count), replies(count)";
+  "id, body, crisis_flag, created_at, mood, wish, categories(name, slug), profiles!inner(handle), reactions(count), replies(count)";
 
 function mapPost(r: any): FeedPost {
   return {
@@ -17,6 +17,8 @@ function mapPost(r: any): FeedPost {
     authorHandle: r.profiles?.handle ?? "Anonim",
     pelukCount: r.reactions?.[0]?.count ?? 0,
     replyCount: r.replies?.[0]?.count ?? 0,
+    mood: r.mood ?? null,
+    wish: r.wish ?? null,
   };
 }
 
@@ -51,6 +53,7 @@ export class SupabasePostsRepository implements PostsRepository {
       .range(opts.offset, opts.offset + opts.limit - 1);
     if (opts.categoryId) q = q.eq("category_id", opts.categoryId);
     if (opts.onlyUnanswered) q = q.eq("reply_count", 0);
+    if (opts.wish) q = q.eq("wish", opts.wish);
     const { data, error } = await q;
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapPost);
@@ -68,6 +71,7 @@ export class SupabasePostsRepository implements PostsRepository {
       .range(opts.offset, opts.offset + opts.limit - 1);
     if (opts.categoryId) q = q.eq("category_id", opts.categoryId);
     if (opts.onlyUnanswered) q = q.eq("reply_count", 0);
+    if (opts.wish) q = q.eq("wish", opts.wish);
 
     const { data: postsData, error: postsError } = await q;
     if (postsError) throw new Error(postsError.message);
@@ -116,9 +120,11 @@ export class SupabasePostsRepository implements PostsRepository {
   async createPost(input: CreatePostInput): Promise<void> {
     const { error } = await this.supabase.from("posts").insert({
       author_id: input.authorId,
-      category_id: input.categoryId,
+      category_id: input.categoryId ?? null,
       body: input.body,
       crisis_flag: input.crisisFlag,
+      mood: input.mood ?? null,
+      wish: input.wish ?? null,
     });
     if (error) throw new Error(error.message);
   }

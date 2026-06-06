@@ -1,8 +1,10 @@
 export interface CreatePostInput {
   authorId: string;
-  categoryId: number;
+  categoryId: number | null;
   body: string;
   crisisFlag: boolean;
+  mood?: string | null;
+  wish?: string | null;
 }
 
 export interface ListPostsOptions {
@@ -10,4 +12,5 @@ export interface ListPostsOptions {
   limit: number;
   offset: number;
   onlyUnanswered?: boolean;
+  wish?: string;
 }

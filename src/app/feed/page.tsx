@@ -15,7 +15,7 @@ function fmtDate(iso: string): string {
 export default async function FeedPage({
   searchParams,
 }: {
-  searchParams: Promise<{ cat?: string }>;
+  searchParams: Promise<{ cat?: string; status?: string }>;
 }) {
   const sp = await searchParams;
   const supabase = await createClient();
@@ -25,7 +25,17 @@ export default async function FeedPage({
 
   const svc = await getPostsService();
   const categories = await svc.listCategories();
-  const { posts, peluked } = await svc.feedPage(sp.cat, 0, 20, user?.id ?? null);
+  const status = sp.status ?? "semua";
+  const unanswered = status === "unanswered";
+  const wish = ["didengar", "peluk", "saran"].includes(status) ? status : undefined;
+  const { posts, peluked } = await svc.feedPage(
+    sp.cat,
+    0,
+    20,
+    user?.id ?? null,
+    unanswered,
+    wish
+  );
 
   let unread = 0;
   if (user) {
@@ -77,6 +87,7 @@ export default async function FeedPage({
       initialPosts={posts}
       initialPeluked={[...peluked]}
       initialCat={sp.cat}
+      initialStatus={status}
       pageSize={20}
       quote={quote}
       stories={stories}
