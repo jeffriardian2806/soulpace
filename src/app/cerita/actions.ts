@@ -10,7 +10,10 @@ async function detectCrisis(text: string): Promise<boolean> {
   return svc.detectCrisis(text);
 }
 
-export async function createStoryAction(formData: FormData): Promise<void> {
+export async function createStoryAction(
+  _prev: { error: string | null },
+  formData: FormData
+): Promise<{ error: string | null }> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -20,9 +23,22 @@ export async function createStoryAction(formData: FormData): Promise<void> {
   const title = String(formData.get("title") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
   const cw = String(formData.get("content_warning") ?? "").trim();
-  if (!title || !body) redirect("/cerita/baru");
+  if (!title || !body) return { error: "Judul & isi wajib diisi." };
 
-  // ringkasan preview diambil otomatis dari isi (user ga perlu nulis sinopsis)
+  // Anti dobel-submit: cek apakah user baru aja submit story dengan judul sama dalam 30 detik
+  const tenSecAgo = new Date(Date.now() - 30_000).toISOString();
+  const { data: recent } = await supabase
+    .from("stories")
+    .select("id")
+    .eq("author_id", user.id)
+    .eq("title", title.slice(0, 200))
+    .gte("created_at", tenSecAgo)
+    .limit(1)
+    .maybeSingle();
+  if (recent) {
+    redirect(`/cerita/${recent.id}`);
+  }
+
   const summary = body.replace(/\s+/g, " ").slice(0, 180);
 
   const { data, error } = await supabase
@@ -35,9 +51,8 @@ export async function createStoryAction(formData: FormData): Promise<void> {
     })
     .select("id")
     .single();
-  if (error || !data) redirect("/cerita/baru");
+  if (error || !data) return { error: "Gagal nyimpen cerita. Coba lagi." };
 
-  // langsung jadiin episode 1 dari isi yang ditulis
   await supabase.from("story_episodes").insert({
     story_id: data.id,
     author_id: user.id,

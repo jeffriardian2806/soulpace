@@ -1,15 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createStoryAction } from "@/app/cerita/actions";
+import { StoryForm } from "@/components/StoryForm";
 
 export const metadata = { title: "Tulis Cerita — Soulpace" };
 
 export default async function CeritaBaruPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   return (
@@ -22,31 +20,7 @@ export default async function CeritaBaruPage() {
         Tulis langsung apa yang ada di kepalamu. Nanti kalau mau dilanjutin, kamu bisa tambah
         episode lagi kapan saja.
       </p>
-      <form action={createStoryAction} className="flex flex-col gap-3">
-        <input
-          name="title"
-          required
-          maxLength={200}
-          placeholder="Judul cerita"
-          className="rounded-xl border border-ink/10 bg-white/60 p-3 text-base font-semibold text-ink outline-none focus:border-sky-300"
-        />
-        <textarea
-          name="body"
-          required
-          rows={16}
-          placeholder="Tulis ceritamu di sini... sepanjang yang kamu mau."
-          className="rounded-xl border border-ink/10 bg-white/60 p-3 text-sm leading-relaxed text-ink outline-none focus:border-sky-300"
-        />
-        <input
-          name="content_warning"
-          maxLength={200}
-          placeholder="Peringatan isi sensitif (opsional), mis. 'kekerasan, self-harm'"
-          className="rounded-xl border border-ink/10 bg-white/60 p-2.5 text-xs text-ink outline-none focus:border-sky-300"
-        />
-        <button className="rounded-xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white">
-          Terbitkan
-        </button>
-      </form>
+      <StoryForm />
     </main>
   );
 }
