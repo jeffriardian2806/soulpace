@@ -29,7 +29,7 @@ export default async function CeritaPage() {
   const { data } = await supabase
     .from("stories")
     .select(
-      "id, title, summary, content_warning, created_at, peluk_boost, profiles!inner(handle), story_episodes(count), story_peluk(count)"
+      "id, title, summary, content_warning, created_at, peluk_boost, profiles(handle), story_episodes(count), story_peluk(count)"
     )
     .eq("status", "published")
     .order("created_at", { ascending: false })

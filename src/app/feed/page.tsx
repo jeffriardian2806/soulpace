@@ -46,7 +46,7 @@ export default async function FeedPage({
   const { data: storyData } = await supabase
     .from("stories")
     .select(
-      "id, title, summary, content_warning, created_at, peluk_boost, profiles!inner(handle), story_episodes(views), story_peluk(count), story_comments(count)"
+      "id, title, summary, content_warning, created_at, peluk_boost, profiles(handle), story_episodes(views), story_peluk(count), story_comments(count)"
     )
     .eq("status", "published")
     .order("created_at", { ascending: false })
