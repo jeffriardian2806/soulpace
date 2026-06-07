@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { QUIZZES } from "@/core/quizzes";
-import { challengeOfTheDay } from "@/core/lightContent";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "Main & Kenali Diri — Soulpace" };
 
@@ -12,36 +11,54 @@ const EXTRA = [
   { href: "/main/ruang", emoji: "🪟", title: "Ruang Hari Ini", desc: "Satu kalimat bareng-bareng." },
 ];
 
-export default function MainPage() {
+export default async function MainPage() {
+  const supabase = await createClient();
+
+  const [{ data: quizzes }, { data: challenges }, { data: vibes }] = await Promise.all([
+    supabase.from("quizzes").select("slug, title, emoji, intro").eq("is_active", true).order("sort_order", { ascending: true }),
+    supabase.from("daily_challenges").select("body").eq("is_active", true).order("sort_order", { ascending: true }),
+    supabase.from("vibe_presets").select("emoji, label, href").eq("is_active", true).order("sort_order", { ascending: true }),
+  ]);
+
+  const challengeList = (challenges ?? []).map((r: { body: string }) => r.body);
+  const todaysChallenge = challengeList.length
+    ? challengeList[Math.floor(Date.now() / 86400000) % challengeList.length]
+    : null;
+
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
       <header className="flex items-center gap-3">
         <Link href="/feed" className="text-sm text-ink/50">← Kembali</Link>
-        <h1 className="text-xl font-bold text-ink">Main & Kenali Diri</h1>
+        <h1 className="text-xl font-bold text-ink">Main &amp; Kenali Diri</h1>
       </header>
       <p className="text-sm leading-relaxed text-ink/60">
         Tempat buat ngenalin diri pelan-pelan. Semua di sini refleksi, bukan diagnosis.
       </p>
 
-      <div className="rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 p-4 text-white">
-        <p className="text-xs uppercase tracking-wide text-white/70">Tantangan empati hari ini</p>
-        <p className="mt-1 text-sm font-medium leading-relaxed">{challengeOfTheDay()}</p>
-        <p className="mt-2 text-xs text-white/70">Lembut aja — kerjain kalau kamu lagi sanggup.</p>
-      </div>
-
-      <section className="glass rounded-2xl p-4">
-        <p className="mb-2 text-sm font-bold text-ink">Lagi pengen apa?</p>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/feed?status=unanswered" className="rounded-full bg-white/70 px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-50">🤝 Mau bantu yang belum didengar</Link>
-          <Link href="/feed?status=didengar" className="rounded-full bg-white/70 px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-50">👂 Nemenin yang butuh didengar</Link>
-          <Link href="/cerita" className="rounded-full bg-white/70 px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-50">📖 Baca cerita perjuangan</Link>
-          <Link href="/hening" className="rounded-full bg-white/70 px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-50">🌙 Mau yang menenangkan</Link>
+      {todaysChallenge && (
+        <div className="rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 p-4 text-white">
+          <p className="text-xs uppercase tracking-wide text-white/70">Tantangan empati hari ini</p>
+          <p className="mt-1 text-sm font-medium leading-relaxed">{todaysChallenge}</p>
+          <p className="mt-2 text-xs text-white/70">Lembut aja — kerjain kalau kamu lagi sanggup.</p>
         </div>
-      </section>
+      )}
+
+      {(vibes?.length ?? 0) > 0 && (
+        <section className="glass rounded-2xl p-4">
+          <p className="mb-2 text-sm font-bold text-ink">Lagi pengen apa?</p>
+          <div className="flex flex-wrap gap-2">
+            {(vibes ?? []).map((v: { emoji: string; label: string; href: string }, i: number) => (
+              <Link key={i} href={v.href} className="rounded-full bg-white/70 px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-50">
+                {v.emoji} {v.label}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {QUIZZES.map((q) => (
-          <Link key={q.key} href={`/main/${q.key}`} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
+        {(quizzes ?? []).map((q: { slug: string; title: string; emoji: string; intro: string }) => (
+          <Link key={q.slug} href={`/main/${q.slug}`} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
             <p className="text-2xl">{q.emoji}</p>
             <p className="mt-1 text-sm font-bold text-ink">{q.title}</p>
             <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{q.intro}</p>

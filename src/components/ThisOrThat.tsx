@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { THIS_OR_THAT, thisOrThatInsight } from "@/core/lightContent";
+import { thisOrThatInsight } from "@/core/lightContent";
 
-export function ThisOrThat() {
+export function ThisOrThat({ prompts }: { prompts: { a: string; b: string }[] }) {
   const [i, setI] = useState(0);
   const [bCount, setBCount] = useState(0);
   const [done, setDone] = useState(false);
 
   function pick(isB: boolean) {
     if (isB) setBCount((c) => c + 1);
-    if (i + 1 >= THIS_OR_THAT.length) setDone(true);
+    if (i + 1 >= prompts.length) setDone(true);
     else setI((x) => x + 1);
   }
 
@@ -20,7 +20,7 @@ export function ThisOrThat() {
       <div className="glass rounded-2xl p-5 text-center">
         <p className="text-2xl">🌙</p>
         <p className="mt-2 text-sm leading-relaxed text-ink/75">
-          {thisOrThatInsight(bCount, THIS_OR_THAT.length)}
+          {thisOrThatInsight(bCount, prompts.length)}
         </p>
         <div className="mt-4 flex justify-center gap-2">
           <button
@@ -36,10 +36,10 @@ export function ThisOrThat() {
     );
   }
 
-  const c = THIS_OR_THAT[i];
+  const c = prompts[i];
   return (
     <div className="glass rounded-2xl p-5">
-      <p className="mb-4 text-center text-xs text-ink/45">{i + 1}/{THIS_OR_THAT.length} · pilih yang lebih kamu rasain</p>
+      <p className="mb-4 text-center text-xs text-ink/45">{i + 1}/{prompts.length} · pilih yang lebih kamu rasain</p>
       <div className="flex flex-col gap-3 sm:flex-row">
         <button
           type="button"

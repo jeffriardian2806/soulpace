@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { EMPATHY_SCENARIOS } from "@/core/empathyScenarios";
+import type { EmpathyScenario } from "@/core/empathyScenarios";
 
-export function EmpathyGame() {
+export function EmpathyGame({ scenarios }: { scenarios: EmpathyScenario[] }) {
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [safeCount, setSafeCount] = useState(0);
   const [answered, setAnswered] = useState(0);
 
-  const s = EMPATHY_SCENARIOS[i];
-  const last = i + 1 >= EMPATHY_SCENARIOS.length;
+  const s = scenarios[i];
+  const last = i + 1 >= scenarios.length;
 
   function choose(idx: number) {
     if (picked !== null) return;
@@ -24,7 +24,7 @@ export function EmpathyGame() {
     setI((x) => x + 1);
   }
 
-  if (i >= EMPATHY_SCENARIOS.length) {
+  if (i >= scenarios.length) {
     return (
       <div className="glass rounded-2xl p-5 text-center">
         <p className="text-3xl">💙</p>

@@ -1,9 +1,19 @@
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import type { EmpathyScenario } from "@/core/empathyScenarios";
 import { EmpathyGame } from "@/components/EmpathyGame";
 
 export const metadata = { title: "Pilih Respons Terbaik — Soulpace" };
 
-export default function EmpatiPage() {
+export default async function EmpatiPage() {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("empathy_scenarios")
+    .select("id, topic, situation, options")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+  const scenarios = (data ?? []) as EmpathyScenario[];
+
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-4 px-5 py-6">
       <header className="flex items-center gap-3">
@@ -13,7 +23,11 @@ export default function EmpatiPage() {
       <p className="text-sm leading-relaxed text-ink/60">
         Latihan bales curhat orang dengan cara yang aman & nggak menghakimi.
       </p>
-      <EmpathyGame />
+      {scenarios.length === 0 ? (
+        <p className="py-10 text-center text-sm text-ink/40">Belum ada skenario. Cek lagi nanti ya.</p>
+      ) : (
+        <EmpathyGame scenarios={scenarios} />
+      )}
     </main>
   );
 }

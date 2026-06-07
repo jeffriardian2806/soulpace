@@ -74,6 +74,20 @@ export default async function SettingsPage() {
             <span>💬 Masukan pengguna</span>
             <span className="text-ink/40">→</span>
           </Link>
+          <Link
+            href="/admin/games"
+            className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+          >
+            <span>🎮 Game &amp; Kuis</span>
+            <span className="text-ink/40">→</span>
+          </Link>
+          <Link
+            href="/admin/playground"
+            className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+          >
+            <span>📊 Polling &amp; Ruang</span>
+            <span className="text-ink/40">→</span>
+          </Link>
         </section>
       )}
     </main>

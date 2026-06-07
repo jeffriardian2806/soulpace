@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { QUEST_PROMPTS } from "@/core/lightContent";
 import { saveQuestDayAction } from "@/app/main/actions";
 
-export function QuestSeven({ initial }: { initial: Record<number, string> }) {
+export function QuestSeven({ initial, prompts }: { initial: Record<number, string>; prompts: string[] }) {
   const [entries, setEntries] = useState<Record<number, string>>(initial);
   const [open, setOpen] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
@@ -30,7 +29,7 @@ export function QuestSeven({ initial }: { initial: Record<number, string> }) {
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm text-ink/60">{doneCount}/7 hari kamu isi. Pelan-pelan aja, ga ada hukuman kalau bolong.</p>
-      {QUEST_PROMPTS.map((p, idx) => {
+      {prompts.map((p, idx) => {
         const day = idx + 1;
         const filled = !!entries[day];
         return (

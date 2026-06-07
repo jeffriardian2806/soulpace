@@ -1,12 +1,27 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getQuiz } from "@/core/quizzes";
+import { createClient } from "@/lib/supabase/server";
+import type { Quiz } from "@/core/quizzes";
 import { QuizRunner } from "@/components/QuizRunner";
 
 export default async function QuizPage({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
-  const quiz = getQuiz(key);
-  if (!quiz) notFound();
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("quizzes")
+    .select("slug, title, emoji, intro, questions, results")
+    .eq("slug", key)
+    .eq("is_active", true)
+    .maybeSingle();
+  if (!data) notFound();
+  const quiz: Quiz = {
+    key: data.slug,
+    title: data.title,
+    emoji: data.emoji,
+    intro: data.intro,
+    questions: data.questions,
+    results: data.results,
+  };
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-4 px-5 py-6">
       <header className="flex items-center gap-3">

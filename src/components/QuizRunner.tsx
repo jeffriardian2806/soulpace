@@ -34,7 +34,7 @@ export function QuizRunner({ quiz }: { quiz: Quiz }) {
 
   if (done) {
     const r = quiz.results[done];
-    const wish = quiz.wishOf?.[done];
+    const wish = r.wish;
     return (
       <div className="glass rounded-2xl p-5">
         <p className="text-xs font-medium uppercase tracking-wide text-sky-600">Hasil refleksi</p>
