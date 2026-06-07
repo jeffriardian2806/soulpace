@@ -16,12 +16,16 @@ export async function generateMetadata({
   const supabase = createPublicClient();
   const { data } = await supabase
     .from("story_episodes")
-    .select("title, episode_number, body, stories(title)")
+    .select("title, episode_number, body, story_id")
     .eq("id", episodeId)
     .maybeSingle();
   if (!data) return { title: "Episode", robots: { index: false, follow: true } };
-  const storyTitle =
-    ((data as { stories?: { title?: string } }).stories?.title as string) ?? "Cerita";
+  const { data: storyMeta } = await supabase
+    .from("stories")
+    .select("title")
+    .eq("id", data.story_id)
+    .maybeSingle();
+  const storyTitle = (storyMeta?.title as string) ?? "Cerita";
   const epExtra = (data.title as string) ? `: ${data.title}` : "";
   const title = `${storyTitle} · Episode ${data.episode_number}${epExtra}`;
   const desc =
@@ -68,14 +72,15 @@ export default async function EpisodePage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: epData } = await supabase
+  const { data: epData, error: epErr } = await supabase
     .from("story_episodes")
     .select(
-      "id, episode_number, title, body, crisis_flag, story_id, author_id, created_at, views, profiles!inner(handle)"
+      "id, episode_number, title, body, crisis_flag, story_id, author_id, created_at, views"
     )
     .eq("id", episodeId)
     .eq("story_id", id)
     .maybeSingle();
+  if (epErr) console.error("[episode] error:", epErr.message);
 
   if (!epData) {
     return (
@@ -85,7 +90,12 @@ export default async function EpisodePage({
       </main>
     );
   }
-  const ep = epData as unknown as Ep;
+  const { data: epAuthor } = await supabase
+    .from("profiles")
+    .select("handle")
+    .eq("id", epData.author_id)
+    .maybeSingle();
+  const ep = { ...epData, profiles: epAuthor ?? null } as unknown as Ep;
 
   const { data: siblings } = await supabase
     .from("story_episodes")

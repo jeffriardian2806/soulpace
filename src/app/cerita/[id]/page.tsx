@@ -70,11 +70,12 @@ export default async function CeritaDetailPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: storyData } = await supabase
+  const { data: storyData, error: storyErr } = await supabase
     .from("stories")
-    .select("id, author_id, title, summary, content_warning, created_at, peluk_boost, profiles!inner(handle)")
+    .select("id, author_id, title, summary, content_warning, created_at, peluk_boost")
     .eq("id", id)
     .maybeSingle();
+  if (storyErr) console.error("[cerita-detail] story error:", storyErr.message);
 
   if (!storyData) {
     return (
@@ -84,7 +85,12 @@ export default async function CeritaDetailPage({
       </main>
     );
   }
-  const story = storyData as unknown as Story;
+  const { data: authorProf } = await supabase
+    .from("profiles")
+    .select("handle")
+    .eq("id", storyData.author_id)
+    .maybeSingle();
+  const story = { ...storyData, profiles: authorProf ?? null } as unknown as Story;
   const isOwner = !!user && user.id === story.author_id;
 
   const { data: epsData } = await supabase
@@ -94,12 +100,20 @@ export default async function CeritaDetailPage({
     .order("episode_number", { ascending: true });
   const episodes = (epsData ?? []) as Episode[];
 
-  const { data: cmtData } = await supabase
+  const { data: cmtData, error: cmtErr } = await supabase
     .from("story_comments")
-    .select("id, body, crisis_flag, created_at, profiles!inner(handle)")
+    .select("id, body, crisis_flag, created_at, author_id")
     .eq("story_id", id)
     .order("created_at", { ascending: true });
-  const comments = (cmtData ?? []) as unknown as Comment[];
+  if (cmtErr) console.error("[cerita-detail] comments error:", cmtErr.message);
+  const cmtRows = (cmtData ?? []) as { id: string; body: string; crisis_flag: boolean; created_at: string; author_id: string }[];
+  const cmtAuthorIds = Array.from(new Set(cmtRows.map((c) => c.author_id)));
+  const cmtHandles: Record<string, string> = {};
+  if (cmtAuthorIds.length > 0) {
+    const { data: cmtProfs } = await supabase.from("profiles").select("id, handle").in("id", cmtAuthorIds);
+    (cmtProfs ?? []).forEach((p: { id: string; handle: string }) => { cmtHandles[p.id] = p.handle; });
+  }
+  const comments = cmtRows.map((c) => ({ ...c, profiles: cmtHandles[c.author_id] ? { handle: cmtHandles[c.author_id] } : null })) as unknown as Comment[];
 
   const { count: pelukCount } = await supabase
     .from("story_peluk")
