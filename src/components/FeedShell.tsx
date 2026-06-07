@@ -57,7 +57,7 @@ export function FeedShell({
 }) {
   const [cat, setCat] = useState<string | undefined>(initialCat);
   const [status, setStatus] = useState<string>(initialStatus ?? "semua");
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetMode, setSheetMode] = useState<"status" | "kategori" | null>(null);
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
   const [peluked, setPeluked] = useState<Set<string>>(new Set(initialPeluked));
   const [offset, setOffset] = useState(initialPosts.length);
@@ -72,7 +72,7 @@ export function FeedShell({
       setSwitching(true);
       setCat(nextCat);
       setStatus(nextStatus);
-      setSheetOpen(false);
+      setSheetMode(null);
       window.history.replaceState(null, "", nextCat ? `/feed?cat=${nextCat}` : "/feed");
       const unanswered = nextStatus === "unanswered";
       const wish = WISH_SLUGS.includes(nextStatus) ? nextStatus : undefined;
@@ -95,7 +95,7 @@ export function FeedShell({
   const selectCat = useCallback(
     (next?: string) => {
       if (next === cat) {
-        setSheetOpen(false);
+        setSheetMode(null);
         return;
       }
       reload(next, status);
@@ -106,7 +106,7 @@ export function FeedShell({
   const selectStatus = useCallback(
     (next: string) => {
       if (next === status) {
-        setSheetOpen(false);
+        setSheetMode(null);
         return;
       }
       reload(cat, next);
@@ -322,12 +322,12 @@ export function FeedShell({
 
       </div>
 
-      <MoodCheckIn onPosted={() => reload(cat, status)} />
-
       <div className="rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 p-4 text-white">
         <p className="text-xs uppercase tracking-wide text-white/70">Pesan hari ini</p>
         <p className="mt-1 text-sm font-medium leading-relaxed">{quote}</p>
       </div>
+
+      <MoodCheckIn onPosted={() => reload(cat, status)} />
 
       {status === "unanswered" && (
         <p className="rounded-2xl bg-sky-50 px-4 py-3 text-sm leading-relaxed text-ink/70">
@@ -422,7 +422,7 @@ export function FeedShell({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setSheetOpen(true)}
+            onClick={() => setSheetMode("status")}
             className="flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full glass px-3 py-2.5 text-xs font-medium text-ink/70"
           >
             <span className="truncate">{statusLabel}</span>
@@ -436,7 +436,7 @@ export function FeedShell({
           </Link>
           <button
             type="button"
-            onClick={() => setSheetOpen(true)}
+            onClick={() => setSheetMode("kategori")}
             className="flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full glass px-3 py-2.5 text-xs font-medium text-ink/70"
           >
             <span className="truncate">{catLabel}</span>
@@ -446,20 +446,22 @@ export function FeedShell({
       </div>
 
       {/* Bottom sheet filter */}
-      {sheetOpen && (
+      {sheetMode && (
         <div className="fixed inset-0 z-50">
           <div
             className="absolute inset-0 bg-black/30"
-            onClick={() => setSheetOpen(false)}
+            onClick={() => setSheetMode(null)}
             aria-hidden="true"
           />
           <div className="absolute bottom-0 left-1/2 w-full max-w-2xl -translate-x-1/2 rounded-t-3xl bg-white p-5 pb-8 shadow-2xl">
             <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-ink/15" />
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-bold text-ink">Filter</h3>
+              <h3 className="text-base font-bold text-ink">
+                {sheetMode === "status" ? "Status & Kebutuhan" : "Kategori"}
+              </h3>
               <button
                 type="button"
-                onClick={() => setSheetOpen(false)}
+                onClick={() => setSheetMode(null)}
                 aria-label="Tutup"
                 className="text-lg text-ink/40"
               >
@@ -467,40 +469,36 @@ export function FeedShell({
               </button>
             </div>
 
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/40">
-              Status &amp; Kebutuhan
-            </p>
-            <div className="mb-5 flex flex-wrap gap-2">
-              {STATUS_OPTIONS.map((o) => (
-                <button
-                  key={o.slug}
-                  type="button"
-                  onClick={() => selectStatus(o.slug)}
-                  className={pill(status === o.slug)}
-                >
-                  {o.label}
+            {sheetMode === "status" ? (
+              <div className="flex flex-wrap gap-2">
+                {STATUS_OPTIONS.map((o) => (
+                  <button
+                    key={o.slug}
+                    type="button"
+                    onClick={() => selectStatus(o.slug)}
+                    className={pill(status === o.slug)}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={() => selectCat(undefined)} className={pill(!cat)}>
+                  Semua
                 </button>
-              ))}
-            </div>
-
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/40">
-              Kategori
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => selectCat(undefined)} className={pill(!cat)}>
-                Semua
-              </button>
-              {categories.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => selectCat(c.slug)}
-                  className={pill(cat === c.slug)}
-                >
-                  {c.name}
-                </button>
-              ))}
-            </div>
+                {categories.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => selectCat(c.slug)}
+                    className={pill(cat === c.slug)}
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
