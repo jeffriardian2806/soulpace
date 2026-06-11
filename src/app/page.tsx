@@ -92,7 +92,9 @@ export default async function Home() {
                 <Stars value={r.rating} />
                 <span className="text-xs text-ink/45">{r.handle}</span>
               </div>
-              <p className="mt-1 text-sm leading-relaxed text-ink/80">{r.comment}</p>
+              {r.comment && r.comment.trim() && (
+                <p className="mt-1 text-sm leading-relaxed text-ink/80">{r.comment}</p>
+              )}
             </div>
           ))}
         </section>

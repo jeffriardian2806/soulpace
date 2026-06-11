@@ -76,7 +76,9 @@ export default async function UlasanPage() {
                   {r.handle} · {fmt(r.created_at)}
                 </span>
               </div>
+              {r.comment && r.comment.trim() && (
               <p className="mt-1.5 text-sm leading-relaxed text-ink/80">{r.comment}</p>
+            )}
             </div>
           ))}
         </div>
