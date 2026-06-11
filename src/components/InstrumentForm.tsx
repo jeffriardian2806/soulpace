@@ -25,7 +25,7 @@ function blank(): InstrumentPayload {
     isActive: true,
     sortOrder: 0,
     options: DEFAULT_OPTIONS.map((o) => ({ ...o })),
-    items: [""],
+    items: [{ text: "", reverse: false }],
     bands: [{ min: 0, max: 0, label: "", advice: "" }],
   };
 }
@@ -112,11 +112,27 @@ export function InstrumentForm({ initial }: { initial?: InstrumentPayload }) {
         {f.items.map((it, i) => (
           <div key={i} className="flex items-start gap-2">
             <span className="pt-2.5 text-xs text-ink/40">{i + 1}.</span>
-            <textarea className={inputCls} rows={2} placeholder="Teks pertanyaan" value={it} onChange={(e) => set("items", f.items.map((x, j) => (j === i ? e.target.value : x)))} />
+            <div className="flex flex-1 flex-col gap-1">
+              <textarea
+                className={inputCls}
+                rows={2}
+                placeholder="Teks pertanyaan"
+                value={it.text}
+                onChange={(e) => set("items", f.items.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)))}
+              />
+              <label className="flex items-center gap-1.5 text-[11px] text-ink/55">
+                <input
+                  type="checkbox"
+                  checked={it.reverse}
+                  onChange={(e) => set("items", f.items.map((x, j) => (j === i ? { ...x, reverse: e.target.checked } : x)))}
+                />
+                Reverse (skor di-invert untuk item ini)
+              </label>
+            </div>
             <button type="button" onClick={() => set("items", f.items.filter((_, j) => j !== i))} className="pt-2.5 text-rose-500">✕</button>
           </div>
         ))}
-        <button type="button" onClick={() => set("items", [...f.items, ""])} className="text-xs font-medium text-sky-600">+ Tambah pertanyaan</button>
+        <button type="button" onClick={() => set("items", [...f.items, { text: "", reverse: false }])} className="text-xs font-medium text-sky-600">+ Tambah pertanyaan</button>
       </section>
 
       {/* Band skor */}

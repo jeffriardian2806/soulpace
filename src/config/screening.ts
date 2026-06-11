@@ -14,7 +14,7 @@ export type ScreeningInstrument = {
   subtitle: string;
   prompt: string;
   options: ScreeningOption[];
-  items: string[];
+  items: { text: string; reverse: boolean }[];
   bands: ScreeningBand[];
   // index item (0-based) yang memicu peringatan krisis bila dijawab > 0
   crisisItemIndex?: number;

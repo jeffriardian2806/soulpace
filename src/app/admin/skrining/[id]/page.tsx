@@ -27,7 +27,7 @@ export default async function AdminSkriningEditPage({
   const { data } = await supabase
     .from("screening_instruments")
     .select(
-      "id, slug, name, subtitle, prompt, crisis_item_position, sort_order, is_active, screening_items(position, text), screening_options(label, value, sort_order), screening_bands(min_score, max_score, label, advice)"
+      "id, slug, name, subtitle, prompt, crisis_item_position, sort_order, is_active, screening_items(position, text, reverse), screening_options(label, value, sort_order), screening_bands(min_score, max_score, label, advice)"
     )
     .eq("id", id)
     .maybeSingle();
@@ -50,7 +50,7 @@ export default async function AdminSkriningEditPage({
     crisis_item_position: number | null;
     sort_order: number;
     is_active: boolean;
-    screening_items: { position: number; text: string }[];
+    screening_items: { position: number; text: string; reverse: boolean }[];
     screening_options: { label: string; value: number; sort_order: number }[];
     screening_bands: { min_score: number; max_score: number; label: string; advice: string }[];
   };
@@ -69,7 +69,7 @@ export default async function AdminSkriningEditPage({
       .map((o) => ({ label: o.label, value: o.value })),
     items: [...d.screening_items]
       .sort((a, b) => a.position - b.position)
-      .map((i) => i.text),
+      .map((i: { position: number; text: string; reverse: boolean }) => ({ text: i.text, reverse: i.reverse })),
     bands: [...d.screening_bands]
       .sort((a, b) => a.min_score - b.min_score)
       .map((b) => ({ min: b.min_score, max: b.max_score, label: b.label, advice: b.advice })),

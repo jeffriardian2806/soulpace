@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-type DbItem = { position: number; text: string };
+type DbItem = { position: number; text: string; reverse: boolean };
 type DbOption = { label: string; value: number; sort_order: number };
 type DbBand = { min_score: number; max_score: number; label: string; advice: string };
 type DbInstrument = {
@@ -36,7 +36,7 @@ function mapInstrument(d: DbInstrument): ScreeningInstrument {
       .map((o) => ({ label: o.label, value: o.value })),
     items: [...d.screening_items]
       .sort((a, b) => a.position - b.position)
-      .map((i) => i.text),
+      .map((i) => ({ text: i.text, reverse: i.reverse })),
     bands: [...d.screening_bands]
       .sort((a, b) => a.min_score - b.min_score)
       .map((b) => ({ min: b.min_score, max: b.max_score, label: b.label, advice: b.advice })),
@@ -50,7 +50,7 @@ export default async function SkriningPage() {
   const { data } = await supabase
     .from("screening_instruments")
     .select(
-      "slug, name, subtitle, prompt, crisis_item_position, screening_items(position, text), screening_options(label, value, sort_order), screening_bands(min_score, max_score, label, advice)"
+      "slug, name, subtitle, prompt, crisis_item_position, screening_items(position, text, reverse), screening_options(label, value, sort_order), screening_bands(min_score, max_score, label, advice)"
     )
     .eq("is_active", true)
     .order("sort_order", { ascending: true });

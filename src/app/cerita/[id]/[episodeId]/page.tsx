@@ -8,6 +8,7 @@ import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { ShareButton } from "@/components/ShareButton";
 import { Markdown } from "@/components/Markdown";
 import { EpisodeView } from "@/components/EpisodeView";
+import { GuestPrompt } from "@/components/GuestPrompt";
 
 export async function generateMetadata({
   params,
@@ -70,9 +71,7 @@ export default async function EpisodePage({
 }) {
   const { id, episodeId } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   const { data: epData, error: epErr } = await supabase
     .from("story_episodes")
@@ -174,6 +173,7 @@ export default async function EpisodePage({
           <span className="text-ink/40">Tamat</span>
         )}
       </div>
+      <GuestPrompt isGuest={!user} />
     </main>
   );
 }

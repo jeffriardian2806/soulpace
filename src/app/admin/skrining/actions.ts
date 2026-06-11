@@ -24,7 +24,7 @@ export async function saveInstrumentAction(
   const { supabase, ok } = await requireAdmin();
   if (!ok) return { ok: false, error: "Akses ditolak (khusus admin)." };
 
-  const items = p.items.map((t) => t.trim()).filter(Boolean);
+  const items = p.items.map((x) => ({ text: x.text.trim(), reverse: x.reverse })).filter((x) => x.text);
   const options = p.options.filter((o) => o.label.trim());
   const bands = p.bands.filter((b) => b.label.trim());
 
@@ -70,10 +70,11 @@ export async function saveInstrumentAction(
     instrumentId = data.id as string;
   }
 
-  const itemRows = items.map((text, i) => ({
+  const itemRows = items.map((it, i) => ({
     instrument_id: instrumentId,
     position: i + 1,
-    text,
+    text: it.text,
+    reverse: it.reverse,
   }));
   const optionRows = options.map((o, i) => ({
     instrument_id: instrumentId,

@@ -8,6 +8,6 @@ export type InstrumentPayload = {
   isActive: boolean;
   sortOrder: number;
   options: { label: string; value: number }[];
-  items: string[];
+  items: { text: string; reverse: boolean }[];
   bands: { min: number; max: number; label: string; advice: string }[];
 };

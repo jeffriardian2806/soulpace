@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPostsService } from "@/modules/posts";
 import { getNotificationsService } from "@/modules/notifications";
 import { FeedShell } from "@/components/FeedShell";
+import { GuestPrompt } from "@/components/GuestPrompt";
 import { getDailyQuote } from "@/lib/dailyQuote";
 
 function fmtDate(iso: string): string {
@@ -86,8 +87,10 @@ export default async function FeedPage({
 
   const quote = getDailyQuote();
 
+  const isGuest = !user;
   return (
-    <FeedShell
+    <>
+      <FeedShell
       isLoggedIn={!!user}
       unread={unread}
       categories={categories}
@@ -99,5 +102,7 @@ export default async function FeedPage({
       quote={quote}
       stories={stories}
     />
+      <GuestPrompt isGuest={isGuest} trackOpen={false} />
+    </>
   );
 }

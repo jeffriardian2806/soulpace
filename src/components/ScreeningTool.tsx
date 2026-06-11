@@ -65,9 +65,15 @@ export function ScreeningTool({
   if (submitted) {
     const results = instruments.map((inst) => {
       const vals = answers[inst.id].map((v) => v ?? 0);
-      const score = vals.reduce((s, v) => s + v, 0);
+      // reverse scoring: kalau item.reverse=true, invert pakai (maxVal + minVal - v)
+      const optVals = inst.options.map((o) => o.value);
+      const minVal = Math.min(...optVals);
+      const maxVal = Math.max(...optVals);
+      const score = vals.reduce(
+        (sum, v, idx) => sum + (inst.items[idx]?.reverse ? maxVal + minVal - v : v),
+        0
+      );
       const band = inst.bands.find((b) => score >= b.min && score <= b.max);
-      const maxVal = Math.max(...inst.options.map((o) => o.value));
       const max = inst.items.length * maxVal;
       const crisis =
         inst.crisisItemIndex !== undefined && vals[inst.crisisItemIndex] > 0;
@@ -161,7 +167,7 @@ export function ScreeningTool({
             {inst.items.map((item, idx) => (
               <div key={idx} className="border-t border-ink/5 pt-3 first:border-0 first:pt-0">
                 <p className="text-sm leading-relaxed text-ink">
-                  {idx + 1}. {item}
+                  {idx + 1}. {item.text}
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {inst.options.map((opt) => {

@@ -29,7 +29,7 @@ export async function registerAction(
   } = await supabase.auth.getUser();
   revalidatePath("/", "layout");
   if (user) {
-    redirect("/welcome");
+    redirect("/feed");
   }
   return { error: null, success: true };
 }
