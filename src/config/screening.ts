@@ -21,4 +21,4 @@ export type ScreeningInstrument = {
 };
 
 export const SCREENING_DISCLAIMER =
-  "Skrining ini alat bantu untuk mengenali gejala, BUKAN diagnosis. Hasilnya tidak menggantikan pemeriksaan oleh psikolog atau psikiater. Kalau ragu atau merasa berat, temui profesional.";
+  "Hasil skrining tidak menggantikan pemeriksaan atau penilaian profesional oleh psikolog maupun psikiater. Jika Anda merasa ragu, mengalami keluhan yang mengganggu, atau merasa kondisi semakin berat, disarankan untuk berkonsultasi dengan tenaga profesional.";

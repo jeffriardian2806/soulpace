@@ -12,6 +12,7 @@ export const MOODS: MoodOption[] = [
   { slug: "senang", label: "Senang", emoji: "😊" },
   { slug: "bersyukur", label: "Bersyukur", emoji: "🙏" },
   { slug: "tenang", label: "Tenang", emoji: "😌" },
+  { slug: "naksir", label: "Naksir", emoji: "🥰" },
   { slug: "biasa", label: "Biasa aja", emoji: "😐" },
   { slug: "lelah", label: "Lelah", emoji: "😮‍💨" },
   { slug: "hampa", label: "Kosong", emoji: "🫥" },

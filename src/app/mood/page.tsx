@@ -35,7 +35,7 @@ export default async function MoodPage() {
         </Link>
       </header>
       <p className="text-sm leading-relaxed text-ink/60">
-        Catat perasaanmu tiap hari. Cuma kamu yang bisa lihat ini.
+        Catat perasaanmu setiap hari untuk memahami perjalanan emosimu. Hanya kamu yang dapat melihatnya.
       </p>
       <MoodTracker initialEntries={initialEntries} />
       <MoodInsight entries={initialEntries} />

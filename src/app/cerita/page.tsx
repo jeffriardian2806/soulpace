@@ -59,7 +59,7 @@ export default async function CeritaPage() {
         <Link href="/feed" className="text-xs font-medium text-sky-600 underline">Kembali ke beranda</Link>
       </header>
       <p className="text-sm leading-relaxed text-ink/60">
-        Kisah & perjalanan hidup yang dibagikan secara anonim.
+        Bagikan kisah dan perjalanan hidup Anda secara anonim dalam ruang yang aman dan suportif.
       </p>
 
       {user && (
