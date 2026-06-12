@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import Link from "next/link";
 import { pelukAction } from "@/app/feed/actions";
 import { createReportAction } from "@/app/_actions/report";
-import { ReportButton } from "@/components/ReportButton";
+import { PostMenu } from "@/components/PostMenu";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { getMood, getWish } from "@/core/moods";
 import type { FeedPost } from "@/core/entities/post";
@@ -50,11 +50,11 @@ export function PostCard({
     });
   return (
     <div className="glass rounded-2xl p-4">
-      <div className="mb-2 flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-xs font-semibold text-sky-700">
+      <div className="mb-2 flex items-start gap-3">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-100 text-xs font-semibold text-sky-700">
           {post.authorHandle.charAt(0)}
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-ink">{post.authorHandle}</p>
           <p className="text-xs text-ink/45" suppressHydrationWarning>
             {timeAgo(post.createdAt)}
@@ -62,6 +62,12 @@ export function PostCard({
             {post.editedAt ? " · diedit" : ""}
           </p>
         </div>
+        <PostMenu
+          postId={post.id}
+          canEdit={canEdit}
+          canReport={canReport}
+          reportAction={createReportAction}
+        />
       </div>
 
       {(mood || wish) && (
@@ -102,19 +108,19 @@ export function PostCard({
         </div>
       )}
 
-      <div className="flex items-center gap-4 text-sm text-ink/60">
+      <div className="flex items-center gap-5 text-sm text-ink/55">
         <button
           type="button"
           onClick={handleToggle}
           aria-pressed={peluked}
           aria-label={peluked ? "Batalkan peluk" : "Beri peluk"}
           className={`flex items-center gap-1.5 transition-colors ${
-            peluked ? "font-semibold text-sky-600" : "text-ink/60 hover:text-sky-600"
+            peluked ? "font-semibold text-sky-600" : "hover:text-sky-600"
           }`}
         >
           <svg
             viewBox="0 0 24 24"
-            className="h-4 w-4"
+            className="h-5 w-5"
             fill={peluked ? "currentColor" : "none"}
             stroke="currentColor"
             strokeWidth="2"
@@ -124,30 +130,49 @@ export function PostCard({
           >
             <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z" />
           </svg>
-          <span>
-            {peluked ? "Dipeluk" : "Peluk"} · {post.pelukCount}
-          </span>
+          <span className="tabular-nums">{post.pelukCount}</span>
         </button>
-        <Link href={`/post/${post.id}`} className="hover:underline">
-          {post.replyCount} balasan
+
+        <Link
+          href={`/post/${post.id}`}
+          aria-label={`${post.replyCount} balasan`}
+          className="flex items-center gap-1.5 hover:text-sky-600"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <span className="tabular-nums">{post.replyCount}</span>
         </Link>
-        <Link href={`/share/${post.id}`} className="hover:underline">
-          Bagikan
+
+        <Link
+          href={`/share/${post.id}`}
+          aria-label="Bagikan"
+          className="flex items-center gap-1.5 hover:text-sky-600"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+            <polyline points="16 6 12 2 8 6" />
+            <line x1="12" y1="2" x2="12" y2="15" />
+          </svg>
         </Link>
-        {canEdit && (
-          <Link href={`/curhat/${post.id}/edit`} className="hover:underline">
-            Edit
-          </Link>
-        )}
-        {canReport && (
-          <span className="ml-auto">
-            <ReportButton
-              targetType="post"
-              targetId={post.id}
-              action={createReportAction}
-            />
-          </span>
-        )}
       </div>
     </div>
   );
