@@ -1,10 +1,11 @@
+import { ValidationError } from "@/core/errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { PostsRepository } from "./posts.repository";
 import type { Category, FeedPost } from "@/core/entities/post";
 import type { CreatePostInput, ListPostsOptions } from "../domain/post.types";
 
 const POST_SELECT =
-  "id, body, crisis_flag, created_at, mood, wish, categories(name, slug), profiles!inner(handle), reactions(count), replies(count)";
+  "id, body, crisis_flag, created_at, mood, wish, edited_at, author_id, categories(name, slug), profiles!inner(handle), reactions(count), replies(count)";
 
 function mapPost(r: any): FeedPost {
   return {
@@ -19,6 +20,8 @@ function mapPost(r: any): FeedPost {
     replyCount: r.replies?.[0]?.count ?? 0,
     mood: r.mood ?? null,
     wish: r.wish ?? null,
+    authorId: r.author_id,
+    editedAt: r.edited_at ?? null,
   };
 }
 
@@ -167,5 +170,57 @@ export class SupabasePostsRepository implements PostsRepository {
       .eq("post_id", postId)
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
+  }
+
+  async updatePost(
+    postId: string,
+    userId: string,
+    input: { body: string; mood: string | null; wish: string | null; crisisFlag: boolean }
+  ): Promise<void> {
+    // SECURITY: cek owner + window 15 menit + belum ada reply
+    const { data: row, error: gerr } = await this.supabase
+      .from("posts")
+      .select("author_id, created_at, reply_count")
+      .eq("id", postId)
+      .maybeSingle();
+    if (gerr) throw gerr;
+    if (!row) throw new ValidationError("Curhat tidak ditemukan.");
+    if (row.author_id !== userId) throw new ValidationError("Bukan curhat kamu.");
+    const ageMin = (Date.now() - new Date(row.created_at).getTime()) / 60000;
+    if (ageMin > 15) throw new ValidationError("Sudah lewat batas edit (15 menit).");
+    if ((row.reply_count ?? 0) > 0) throw new ValidationError("Sudah ada balasan, ga bisa diedit lagi.");
+
+    const { error } = await this.supabase
+      .from("posts")
+      .update({
+        body: input.body,
+        mood: input.mood,
+        wish: input.wish,
+        crisis_flag: input.crisisFlag,
+        edited_at: new Date().toISOString(),
+      })
+      .eq("id", postId)
+      .eq("author_id", userId);
+    if (error) throw error;
+  }
+
+  async getPostForEdit(
+    postId: string,
+    userId: string
+  ): Promise<{
+    body: string; mood: string | null; wish: string | null;
+    createdAt: string; replyCount: number; authorId: string;
+  } | null> {
+    const { data, error } = await this.supabase
+      .from("posts")
+      .select("body, mood, wish, created_at, reply_count, author_id")
+      .eq("id", postId)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data || data.author_id !== userId) return null;
+    return {
+      body: data.body, mood: data.mood ?? null, wish: data.wish ?? null,
+      createdAt: data.created_at, replyCount: data.reply_count ?? 0, authorId: data.author_id,
+    };
   }
 }

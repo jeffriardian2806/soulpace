@@ -15,4 +15,20 @@ export interface PostsRepository {
   getPelukedPostIds(postIds: string[], userId: string | null): Promise<Set<string>>;
   addPeluk(postId: string, userId: string): Promise<void>;
   removePeluk(postId: string, userId: string): Promise<void>;
+  updatePost(
+    postId: string,
+    userId: string,
+    input: { body: string; mood: string | null; wish: string | null; crisisFlag: boolean }
+  ): Promise<void>;
+  getPostForEdit(
+    postId: string,
+    userId: string
+  ): Promise<{
+    body: string;
+    mood: string | null;
+    wish: string | null;
+    createdAt: string;
+    replyCount: number;
+    authorId: string;
+  } | null>;
 }

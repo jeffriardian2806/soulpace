@@ -92,6 +92,7 @@ export default async function FeedPage({
     <>
       <FeedShell
       isLoggedIn={!!user}
+      currentUserId={user?.id ?? null}
       unread={unread}
       categories={categories}
       initialPosts={posts}

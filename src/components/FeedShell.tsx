@@ -23,6 +23,7 @@ const WISH_SLUGS = ["didengar", "peluk", "saran"];
 
 export function FeedShell({
   isLoggedIn,
+  currentUserId,
   unread,
   categories,
   initialPosts,
@@ -34,6 +35,7 @@ export function FeedShell({
   stories,
 }: {
   isLoggedIn: boolean;
+  currentUserId: string | null;
   unread: number;
   categories: Category[];
   initialPosts: FeedPost[];
@@ -402,6 +404,7 @@ export function FeedShell({
               post={p}
               peluked={peluked.has(p.id)}
               canReport={isLoggedIn}
+              currentUserId={currentUserId}
               onToggle={() => onToggle(p.id)}
             />
           ))

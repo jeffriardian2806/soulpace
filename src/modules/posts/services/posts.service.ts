@@ -70,6 +70,32 @@ export class PostsService {
     return { categories, posts };
   }
 
+  async updatePost(
+    postId: string,
+    userId: string,
+    body: string,
+    mood: string | null,
+    wish: string | null
+  ): Promise<void> {
+    const text = body.trim();
+    if (text.length < 1 || text.length > 5000) {
+      throw new ValidationError("Curhat harus antara 1 sampai 5000 karakter.");
+    }
+    await this.repo.updatePost(postId, userId, {
+      body: text,
+      mood,
+      wish,
+      crisisFlag: this.detectCrisis(text),
+    });
+  }
+
+  async getPostForEdit(postId: string, userId: string): Promise<{
+    body: string; mood: string | null; wish: string | null;
+    createdAt: string; replyCount: number; authorId: string;
+  } | null> {
+    return this.repo.getPostForEdit(postId, userId);
+  }
+
   async feedPage(
     categorySlug: string | undefined,
     offset: number,

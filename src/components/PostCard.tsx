@@ -25,15 +25,20 @@ export function PostCard({
   peluked,
   canReport = false,
   onToggle,
+  currentUserId = null,
 }: {
   post: FeedPost;
   peluked: boolean;
   canReport?: boolean;
   onToggle?: () => void;
+  currentUserId?: string | null;
 }) {
   const [, startTransition] = useTransition();
   const mood = getMood(post.mood);
   const wish = getWish(post.wish);
+  const isOwner = !!currentUserId && currentUserId === post.authorId;
+  const ageMin = (Date.now() - new Date(post.createdAt).getTime()) / 60000;
+  const canEdit = isOwner && ageMin <= 15 && post.replyCount === 0;
   // Di feed, onToggle dikontrol FeedShell (optimistic + realtime).
   // Di halaman lain (detail/profil), fallback panggil server action langsung.
   const handleToggle =
@@ -54,6 +59,7 @@ export function PostCard({
           <p className="text-xs text-ink/45" suppressHydrationWarning>
             {timeAgo(post.createdAt)}
             {post.categoryName ? ` · ${post.categoryName}` : ""}
+            {post.editedAt ? " · diedit" : ""}
           </p>
         </div>
       </div>
@@ -128,6 +134,11 @@ export function PostCard({
         <Link href={`/share/${post.id}`} className="hover:underline">
           Bagikan
         </Link>
+        {canEdit && (
+          <Link href={`/curhat/${post.id}/edit`} className="hover:underline">
+            Edit
+          </Link>
+        )}
         {canReport && (
           <span className="ml-auto">
             <ReportButton

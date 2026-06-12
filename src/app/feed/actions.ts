@@ -93,3 +93,25 @@ export async function loadMoreFeed(
   const svc = await getPostsService();
   return svc.feedPage(cat ?? undefined, offset, limit, user?.id ?? null, onlyUnanswered, wish);
 }
+
+export async function editPostAction(
+  _prev: { error: string | null },
+  formData: FormData
+): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const postId = String(formData.get("post_id") ?? "");
+  const body = String(formData.get("body") ?? "");
+  const mood = (formData.get("mood") as string) || null;
+  const wish = (formData.get("wish") as string) || null;
+  if (!postId) return { error: "Post tidak valid." };
+  try {
+    const svc = await getPostsService();
+    await svc.updatePost(postId, user.id, body, mood, wish);
+  } catch (e) {
+    return { error: e instanceof DomainError ? e.message : "Gagal nyimpen perubahan." };
+  }
+  revalidatePath("/feed");
+  redirect("/feed");
+}

@@ -17,4 +17,6 @@ export interface FeedPost {
   replyCount: number;
   mood: string | null;
   wish: string | null;
+  authorId: string;
+  editedAt: string | null;
 }
