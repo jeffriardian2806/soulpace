@@ -325,3 +325,305 @@ function DailyMessageRow({ item, isNew }: { item: { id: string; body: string; so
     </div>
   );
 }
+
+// ==================== Round-2 game editors ====================
+import {
+  saveMirrorProfileAction, deleteMirrorProfileAction,
+  saveMirrorScenarioAction, deleteMirrorScenarioAction,
+  saveDetectiveAction, deleteDetectiveAction,
+  saveVoiceAction, deleteVoiceAction,
+  saveBatteryAction, deleteBatteryAction,
+  saveEmotionAction, deleteEmotionAction,
+  saveTarotAction, deleteTarotAction,
+  saveMonsterAction, deleteMonsterAction,
+} from "@/app/admin/games/actions";
+
+// ---------- Mirror Profiles ----------
+type MirrorProfile = { id: string; slug: string; name: string; emoji: string; description: string; insight: string; sort_order: number; is_active: boolean };
+export function MirrorProfileEditor({ items }: { items: MirrorProfile[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🪞 Pikiran Mirror — Profil</h2>
+      <p className="mb-3 text-xs text-ink/55">Archetype profil hasil quiz Pikiran Mirror.</p>
+      <ul className="mb-3 flex flex-col gap-2">
+        {items.map((it) => <li key={it.id}><MirrorProfileRow item={it} /></li>)}
+      </ul>
+      <MirrorProfileRow item={{ id: "", slug: "", name: "", emoji: "✨", description: "", insight: "", sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+function MirrorProfileRow({ item, isNew }: { item: MirrorProfile; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-col gap-1.5 rounded-xl border border-sky-100 bg-white/60 p-2">
+      <div className="flex flex-wrap gap-1.5">
+        <input value={v.emoji} onChange={(e) => setV({ ...v, emoji: e.target.value })} className="w-12 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-center text-base" />
+        <input value={v.slug} onChange={(e) => setV({ ...v, slug: e.target.value })} placeholder="slug" className="w-24 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+        <input value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} placeholder="Nama profil" className="flex-1 min-w-[140px] rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      </div>
+      <textarea value={v.description} onChange={(e) => setV({ ...v, description: e.target.value })} placeholder="Deskripsi singkat" rows={2} className="rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      <textarea value={v.insight} onChange={(e) => setV({ ...v, insight: e.target.value })} placeholder="Insight (kelebihan + tantangan + tip)" rows={2} className="rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await saveMirrorProfileAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteMirrorProfileAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}
+
+// ---------- Mirror Scenarios ----------
+type MOption = { text: string; profile_slug: string };
+type MirrorScenario = { id: string; category: string; situation: string; options: MOption[]; sort_order: number; is_active: boolean };
+export function MirrorScenarioEditor({ items, profiles }: { items: MirrorScenario[]; profiles: { slug: string; name: string }[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🪞 Pikiran Mirror — Skenario</h2>
+      <p className="mb-3 text-xs text-ink/55">Situasi + 4 opsi respons, masing-masing nge-link ke profil tertentu.</p>
+      <ul className="mb-3 flex flex-col gap-3">{items.map((it) => <li key={it.id}><MirrorScenarioRow item={it} profiles={profiles} /></li>)}</ul>
+      <MirrorScenarioRow item={{ id: "", category: "umum", situation: "", options: [{ text: "", profile_slug: profiles[0]?.slug ?? "" }], sort_order: items.length + 1, is_active: true }} profiles={profiles} isNew />
+    </section>
+  );
+}
+function MirrorScenarioRow({ item, profiles, isNew }: { item: MirrorScenario; profiles: { slug: string; name: string }[]; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-sky-100 bg-white/60 p-3">
+      <div className="flex flex-wrap gap-2">
+        <input value={v.category} onChange={(e) => setV({ ...v, category: e.target.value })} placeholder="kategori" className="w-32 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <textarea value={v.situation} onChange={(e) => setV({ ...v, situation: e.target.value })} placeholder="Situasi" rows={2} className="flex-1 min-w-[240px] rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      </div>
+      <div className="flex flex-col gap-1.5 pl-2">
+        {v.options.map((o, i) => (
+          <div key={i} className="flex flex-wrap items-start gap-1.5 rounded-lg bg-sky-50/50 p-1.5">
+            <span className="pt-1 text-xs text-ink/40">{i + 1}.</span>
+            <input value={o.text} onChange={(e) => setV({ ...v, options: v.options.map((x, j) => j === i ? { ...x, text: e.target.value } : x) })} placeholder="Teks opsi" className="flex-1 min-w-[180px] rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+            <select value={o.profile_slug} onChange={(e) => setV({ ...v, options: v.options.map((x, j) => j === i ? { ...x, profile_slug: e.target.value } : x) })} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs">
+              {profiles.map((p) => <option key={p.slug} value={p.slug}>{p.name}</option>)}
+            </select>
+            <button onClick={() => setV({ ...v, options: v.options.filter((_, j) => j !== i) })} className="text-xs text-rose-500">✕</button>
+          </div>
+        ))}
+        <button onClick={() => setV({ ...v, options: [...v.options, { text: "", profile_slug: profiles[0]?.slug ?? "" }] })} type="button" className="self-start text-xs text-sky-600">+ Tambah opsi</button>
+      </div>
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await saveMirrorScenarioAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus skenario?")) await deleteMirrorScenarioAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}
+
+// ---------- Detective ----------
+type DOption = { slug: string; label: string; explanation: string };
+type DCase = { id: string; content: string; correct: string; options: DOption[]; sort_order: number; is_active: boolean };
+export function DetectiveEditor({ items }: { items: DCase[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🔍 Detektif Emosi</h2>
+      <ul className="mb-3 flex flex-col gap-3">{items.map((it) => <li key={it.id}><DetectiveRow item={it} /></li>)}</ul>
+      <DetectiveRow item={{ id: "", content: "", correct: "", options: [{ slug: "", label: "", explanation: "" }], sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+function DetectiveRow({ item, isNew }: { item: DCase; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-sky-100 bg-white/60 p-3">
+      <textarea value={v.content} onChange={(e) => setV({ ...v, content: e.target.value })} placeholder='Chat / situasi (mis. &apos;"Gapapa kok, aku baik-baik aja."&apos;)' rows={2} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <input value={v.correct} onChange={(e) => setV({ ...v, correct: e.target.value })} placeholder="Slug emosi yang benar (mis. sedih)" className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <div className="flex flex-col gap-1.5 pl-2">
+        {v.options.map((o, i) => (
+          <div key={i} className="flex flex-wrap items-start gap-1.5 rounded-lg bg-sky-50/50 p-1.5">
+            <input value={o.slug} onChange={(e) => setV({ ...v, options: v.options.map((x, j) => j === i ? { ...x, slug: e.target.value } : x) })} placeholder="slug" className="w-20 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+            <input value={o.label} onChange={(e) => setV({ ...v, options: v.options.map((x, j) => j === i ? { ...x, label: e.target.value } : x) })} placeholder="Label" className="w-28 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+            <input value={o.explanation} onChange={(e) => setV({ ...v, options: v.options.map((x, j) => j === i ? { ...x, explanation: e.target.value } : x) })} placeholder="Penjelasan" className="flex-1 min-w-[160px] rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+            <button onClick={() => setV({ ...v, options: v.options.filter((_, j) => j !== i) })} className="text-xs text-rose-500">✕</button>
+          </div>
+        ))}
+        <button onClick={() => setV({ ...v, options: [...v.options, { slug: "", label: "", explanation: "" }] })} type="button" className="self-start text-xs text-sky-600">+ Tambah opsi</button>
+      </div>
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await saveDetectiveAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteDetectiveAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}
+
+// ---------- Voice (Inner Voices) ----------
+type Voice = { id: string; situation: string; critic_text: string; supportive_text: string; outcome_critic: string; outcome_supportive: string; sort_order: number; is_active: boolean };
+export function VoiceEditor({ items }: { items: Voice[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🗣️ Suara Dalam Kepala</h2>
+      <ul className="mb-3 flex flex-col gap-3">{items.map((it) => <li key={it.id}><VoiceRow item={it} /></li>)}</ul>
+      <VoiceRow item={{ id: "", situation: "", critic_text: "", supportive_text: "", outcome_critic: "", outcome_supportive: "", sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+function VoiceRow({ item, isNew }: { item: Voice; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-sky-100 bg-white/60 p-3">
+      <textarea value={v.situation} onChange={(e) => setV({ ...v, situation: e.target.value })} placeholder="Situasi pemicu" rows={2} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <textarea value={v.critic_text} onChange={(e) => setV({ ...v, critic_text: e.target.value })} placeholder="😠 Yang dikatakan suara kritis" rows={2} className="rounded border border-rose-200 bg-rose-50/40 px-2 py-1 text-xs" />
+      <textarea value={v.outcome_critic} onChange={(e) => setV({ ...v, outcome_critic: e.target.value })} placeholder="Akibat kalau lo dengerin yang kritis" rows={2} className="rounded border border-rose-200 bg-rose-50/40 px-2 py-1 text-xs" />
+      <textarea value={v.supportive_text} onChange={(e) => setV({ ...v, supportive_text: e.target.value })} placeholder="🌿 Yang dikatakan suara supportive" rows={2} className="rounded border border-emerald-200 bg-emerald-50/40 px-2 py-1 text-xs" />
+      <textarea value={v.outcome_supportive} onChange={(e) => setV({ ...v, outcome_supportive: e.target.value })} placeholder="Akibat kalau lo dengerin yang supportive" rows={2} className="rounded border border-emerald-200 bg-emerald-50/40 px-2 py-1 text-xs" />
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await saveVoiceAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteVoiceAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}
+
+// ---------- Battery ----------
+type Battery = { id: string; emoji: string; label: string; description: string; social_delta: number; energy_delta: number; productivity_delta: number; sort_order: number; is_active: boolean };
+export function BatteryEditor({ items }: { items: Battery[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🔋 Energi Sosial — Aktivitas</h2>
+      <ul className="mb-3 flex flex-col gap-2">{items.map((it) => <li key={it.id}><BatteryRow item={it} /></li>)}</ul>
+      <BatteryRow item={{ id: "", emoji: "✨", label: "", description: "", social_delta: 0, energy_delta: 0, productivity_delta: 0, sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+function BatteryRow({ item, isNew }: { item: Battery; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 rounded-xl border border-sky-100 bg-white/60 p-2">
+      <input value={v.emoji} onChange={(e) => setV({ ...v, emoji: e.target.value })} className="w-12 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-center text-base" />
+      <input value={v.label} onChange={(e) => setV({ ...v, label: e.target.value })} placeholder="Label" className="w-32 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      <input value={v.description} onChange={(e) => setV({ ...v, description: e.target.value })} placeholder="Deskripsi singkat" className="flex-1 min-w-[160px] rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      <div className="flex gap-1">
+        <label className="flex flex-col text-[10px] text-ink/55"><span>Sosial</span><input type="number" value={v.social_delta} onChange={(e) => setV({ ...v, social_delta: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/70 px-1 py-0.5 text-xs" /></label>
+        <label className="flex flex-col text-[10px] text-ink/55"><span>Energi</span><input type="number" value={v.energy_delta} onChange={(e) => setV({ ...v, energy_delta: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/70 px-1 py-0.5 text-xs" /></label>
+        <label className="flex flex-col text-[10px] text-ink/55"><span>Prod</span><input type="number" value={v.productivity_delta} onChange={(e) => setV({ ...v, productivity_delta: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/70 px-1 py-0.5 text-xs" /></label>
+      </div>
+      <button onClick={() => start(async () => { const r = await saveBatteryAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item, label: "", description: "" }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+      {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteBatteryAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+    </div>
+  );
+}
+
+// ---------- Emotion ----------
+type Emotion = { id: string; content: string; correct: string; options: string[]; sort_order: number; is_active: boolean };
+export function EmotionEditor({ items }: { items: Emotion[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🎯 Tebak Emosi</h2>
+      <ul className="mb-3 flex flex-col gap-2">{items.map((it) => <li key={it.id}><EmotionRow item={it} /></li>)}</ul>
+      <EmotionRow item={{ id: "", content: "", correct: "", options: [], sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+function EmotionRow({ item, isNew }: { item: Emotion; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [optsStr, setOptsStr] = useState(item.options.join(", "));
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-col gap-1.5 rounded-xl border border-sky-100 bg-white/60 p-2">
+      <input value={v.content} onChange={(e) => setV({ ...v, content: e.target.value })} placeholder='Konten (mis. &apos;😅 "Gapapa kok"&apos;)' className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <div className="flex flex-wrap gap-1.5">
+        <input value={v.correct} onChange={(e) => setV({ ...v, correct: e.target.value })} placeholder="Jawaban benar" className="w-32 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <input value={optsStr} onChange={(e) => { setOptsStr(e.target.value); setV({ ...v, options: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) }); }} placeholder="Opsi (pisah koma)" className="flex-1 min-w-[200px] rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      </div>
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await saveEmotionAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) { setV({ ...item }); setOptsStr(""); } })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteEmotionAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}
+
+// ---------- Tarot ----------
+type Tarot = { id: string; name: string; emoji: string; meaning_situation: string; meaning_feeling: string; meaning_action: string; sort_order: number; is_active: boolean };
+export function TarotEditor({ items }: { items: Tarot[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🎴 Tarot Refleksi</h2>
+      <ul className="mb-3 flex flex-col gap-2">{items.map((it) => <li key={it.id}><TarotRow item={it} /></li>)}</ul>
+      <TarotRow item={{ id: "", name: "", emoji: "🌙", meaning_situation: "", meaning_feeling: "", meaning_action: "", sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+function TarotRow({ item, isNew }: { item: Tarot; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-col gap-1.5 rounded-xl border border-sky-100 bg-white/60 p-2">
+      <div className="flex flex-wrap gap-1.5">
+        <input value={v.emoji} onChange={(e) => setV({ ...v, emoji: e.target.value })} className="w-12 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-center text-base" />
+        <input value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} placeholder="Nama kartu" className="flex-1 min-w-[140px] rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      </div>
+      <textarea value={v.meaning_situation} onChange={(e) => setV({ ...v, meaning_situation: e.target.value })} placeholder="Makna slot Situasi" rows={2} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <textarea value={v.meaning_feeling} onChange={(e) => setV({ ...v, meaning_feeling: e.target.value })} placeholder="Makna slot Perasaan" rows={2} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <textarea value={v.meaning_action} onChange={(e) => setV({ ...v, meaning_action: e.target.value })} placeholder="Makna slot Aksi" rows={2} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await saveTarotAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteTarotAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}
+
+// ---------- Monster ----------
+type MonsterResp = { text: string; effect: "grow" | "shrink" | "stay"; insight: string };
+type Monster = { id: string; situation: string; responses: MonsterResp[]; sort_order: number; is_active: boolean };
+export function MonsterEditor({ items }: { items: Monster[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">👹 Monster Cemas</h2>
+      <ul className="mb-3 flex flex-col gap-3">{items.map((it) => <li key={it.id}><MonsterRow item={it} /></li>)}</ul>
+      <MonsterRow item={{ id: "", situation: "", responses: [{ text: "", effect: "stay", insight: "" }], sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+function MonsterRow({ item, isNew }: { item: Monster; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-sky-100 bg-white/60 p-3">
+      <textarea value={v.situation} onChange={(e) => setV({ ...v, situation: e.target.value })} placeholder='Yang dikatakan monster (mis. "Mereka pasti benci kamu")' rows={2} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <div className="flex flex-col gap-1.5 pl-2">
+        {v.responses.map((r, i) => (
+          <div key={i} className="flex flex-wrap items-start gap-1.5 rounded-lg bg-sky-50/50 p-1.5">
+            <input value={r.text} onChange={(e) => setV({ ...v, responses: v.responses.map((x, j) => j === i ? { ...x, text: e.target.value } : x) })} placeholder="Respons user" className="flex-1 min-w-[180px] rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+            <select value={r.effect} onChange={(e) => setV({ ...v, responses: v.responses.map((x, j) => j === i ? { ...x, effect: e.target.value as "grow" | "shrink" | "stay" } : x) })} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs">
+              <option value="grow">🔺 grow</option>
+              <option value="stay">➡ stay</option>
+              <option value="shrink">🔻 shrink</option>
+            </select>
+            <input value={r.insight} onChange={(e) => setV({ ...v, responses: v.responses.map((x, j) => j === i ? { ...x, insight: e.target.value } : x) })} placeholder="Insight" className="flex-1 min-w-[180px] rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+            <button onClick={() => setV({ ...v, responses: v.responses.filter((_, j) => j !== i) })} className="text-xs text-rose-500">✕</button>
+          </div>
+        ))}
+        <button onClick={() => setV({ ...v, responses: [...v.responses, { text: "", effect: "stay", insight: "" }] })} type="button" className="self-start text-xs text-sky-600">+ Tambah respons</button>
+      </div>
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await saveMonsterAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteMonsterAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}

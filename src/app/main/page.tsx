@@ -5,10 +5,17 @@ export const metadata = { title: "Main & Kenali Diri — Soulpace" };
 
 // Permainan interaktif — visual & tactile, taruh di atas biar narik mata user
 const INTERACTIVE = [
+  { href: "/main/cermin", emoji: "🪞", title: "Pikiran Mirror", desc: "10 situasi hidup, dapet profil cara kamu menghadapi." },
+  { href: "/main/tarot", emoji: "🎴", title: "Tarot Refleksi", desc: "Tarik 3 kartu: situasi, perasaan, aksi. Cermin diri." },
   { href: "/main/napas", emoji: "🫧", title: "Tarik Napas", desc: "Latihan napas 4-7-8. Ikutin lingkaran biar tenang." },
+  { href: "/main/baterai", emoji: "🔋", title: "Energi Sosial", desc: "Simulasi 7 hari: jaga balance sosial, energi, produktivitas." },
+  { href: "/main/monster", emoji: "👹", title: "Monster Cemas", desc: "Pilih respons ke pikiran negatif — liat monster mengecil." },
+  { href: "/main/detektif", emoji: "🔍", title: "Detektif Emosi", desc: "Tebak emosi di balik chat. Latihan EQ ringan." },
+  { href: "/main/suara", emoji: "🗣️", title: "Suara Dalam Kepala", desc: "Suara kritis vs supportive. Pilih mana yang didenger." },
+  { href: "/main/emosi", emoji: "🎯", title: "Tebak Emosi", desc: "Rapid-fire: lihat kartu, tebak emosi. Seru & cepet." },
   { href: "/main/lepas", emoji: "💨", title: "Lepasin Pikiran", desc: "Tulis, tap balon, pecahin. Lepasin pelan-pelan." },
   { href: "/main/warna", emoji: "🎨", title: "Warna Hari Ini", desc: "Pilih warna yang match vibe kamu. Tanpa kata." },
-  { href: "/main/tantang", emoji: "🌀", title: "Tantang Pikiran", desc: "Latihan CBT singkat: pisahkan distorsi dari pikiran sehat." },
+  { href: "/main/tantang", emoji: "🌀", title: "Tantang Pikiran", desc: "Latihan CBT: pisahkan distorsi dari pikiran sehat." },
   { href: "/main/grounding", emoji: "🧭", title: "Grounding 5-4-3-2-1", desc: "Cemas? Balik ke sekarang lewat indra." },
 ];
 

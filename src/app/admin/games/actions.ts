@@ -314,3 +314,161 @@ export async function deleteDailyMessageAction(id: string): Promise<{ error: str
   revalidatePath("/admin/games"); revalidatePath("/feed");
   return { error: null };
 }
+
+// ==================== Round-2 interactive games (Mirror, Detektif, Suara, Baterai, Emosi, Tarot, Monster) ====================
+
+// --- Mirror profiles ---
+type MirrorProfilePayload = { id?: string; slug: string; name: string; emoji: string; description: string; insight: string; sort_order: number; is_active: boolean };
+export async function saveMirrorProfileAction(p: MirrorProfilePayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.slug.trim() || !p.name.trim()) return { error: "Slug & nama wajib." };
+  const row = { slug: p.slug.trim(), name: p.name.trim(), emoji: p.emoji, description: p.description, insight: p.insight, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("mirror_profiles").update(row).eq("id", p.id) : supabase.from("mirror_profiles").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/cermin");
+  return { error: null };
+}
+export async function deleteMirrorProfileAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("mirror_profiles").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/cermin");
+  return { error: null };
+}
+
+// --- Mirror scenarios ---
+type MirrorScenarioPayload = { id?: string; category: string; situation: string; options: { text: string; profile_slug: string }[]; sort_order: number; is_active: boolean };
+export async function saveMirrorScenarioAction(p: MirrorScenarioPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.situation.trim()) return { error: "Situasi wajib." };
+  if (p.options.length < 2) return { error: "Minimal 2 opsi." };
+  const row = { category: p.category || "umum", situation: p.situation.trim(), options: p.options, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("mirror_scenarios").update(row).eq("id", p.id) : supabase.from("mirror_scenarios").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/cermin");
+  return { error: null };
+}
+export async function deleteMirrorScenarioAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("mirror_scenarios").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/cermin");
+  return { error: null };
+}
+
+// --- Detective cases ---
+type DetectivePayload = { id?: string; content: string; correct: string; options: { slug: string; label: string; explanation: string }[]; sort_order: number; is_active: boolean };
+export async function saveDetectiveAction(p: DetectivePayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.content.trim() || !p.correct.trim()) return { error: "Konten & jawaban benar wajib." };
+  if (p.options.length < 2) return { error: "Minimal 2 opsi." };
+  const row = { content: p.content.trim(), correct: p.correct.trim(), options: p.options, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("detective_cases").update(row).eq("id", p.id) : supabase.from("detective_cases").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/detektif");
+  return { error: null };
+}
+export async function deleteDetectiveAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("detective_cases").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/detektif");
+  return { error: null };
+}
+
+// --- Voice scenarios ---
+type VoicePayload = { id?: string; situation: string; critic_text: string; supportive_text: string; outcome_critic: string; outcome_supportive: string; sort_order: number; is_active: boolean };
+export async function saveVoiceAction(p: VoicePayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.situation.trim() || !p.critic_text.trim() || !p.supportive_text.trim()) return { error: "Situasi & kedua suara wajib." };
+  const row = { situation: p.situation.trim(), critic_text: p.critic_text.trim(), supportive_text: p.supportive_text.trim(), outcome_critic: p.outcome_critic, outcome_supportive: p.outcome_supportive, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("voice_scenarios").update(row).eq("id", p.id) : supabase.from("voice_scenarios").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/suara");
+  return { error: null };
+}
+export async function deleteVoiceAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("voice_scenarios").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/suara");
+  return { error: null };
+}
+
+// --- Battery actions ---
+type BatteryPayload = { id?: string; emoji: string; label: string; description: string; social_delta: number; energy_delta: number; productivity_delta: number; sort_order: number; is_active: boolean };
+export async function saveBatteryAction(p: BatteryPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.label.trim()) return { error: "Label wajib." };
+  const row = { emoji: p.emoji, label: p.label.trim(), description: p.description, social_delta: p.social_delta, energy_delta: p.energy_delta, productivity_delta: p.productivity_delta, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("battery_actions").update(row).eq("id", p.id) : supabase.from("battery_actions").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/baterai");
+  return { error: null };
+}
+export async function deleteBatteryAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("battery_actions").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/baterai");
+  return { error: null };
+}
+
+// --- Emotion cards ---
+type EmotionPayload = { id?: string; content: string; correct: string; options: string[]; sort_order: number; is_active: boolean };
+export async function saveEmotionAction(p: EmotionPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.content.trim() || !p.correct.trim()) return { error: "Konten & jawaban wajib." };
+  if (p.options.length < 2) return { error: "Minimal 2 opsi." };
+  const row = { content: p.content.trim(), correct: p.correct.trim(), options: p.options, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("emotion_cards").update(row).eq("id", p.id) : supabase.from("emotion_cards").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/emosi");
+  return { error: null };
+}
+export async function deleteEmotionAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("emotion_cards").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/emosi");
+  return { error: null };
+}
+
+// --- Tarot cards ---
+type TarotPayload = { id?: string; name: string; emoji: string; meaning_situation: string; meaning_feeling: string; meaning_action: string; sort_order: number; is_active: boolean };
+export async function saveTarotAction(p: TarotPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.name.trim()) return { error: "Nama kartu wajib." };
+  const row = { name: p.name.trim(), emoji: p.emoji, meaning_situation: p.meaning_situation, meaning_feeling: p.meaning_feeling, meaning_action: p.meaning_action, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("tarot_cards").update(row).eq("id", p.id) : supabase.from("tarot_cards").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/tarot");
+  return { error: null };
+}
+export async function deleteTarotAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("tarot_cards").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/tarot");
+  return { error: null };
+}
+
+// --- Monster situations ---
+type MonsterPayload = { id?: string; situation: string; responses: { text: string; effect: "grow"|"shrink"|"stay"; insight: string }[]; sort_order: number; is_active: boolean };
+export async function saveMonsterAction(p: MonsterPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.situation.trim()) return { error: "Pikiran monster wajib." };
+  if (p.responses.length < 2) return { error: "Minimal 2 respons." };
+  const row = { situation: p.situation.trim(), responses: p.responses, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("monster_situations").update(row).eq("id", p.id) : supabase.from("monster_situations").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/monster");
+  return { error: null };
+}
+export async function deleteMonsterAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("monster_situations").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/monster");
+  return { error: null };
+}

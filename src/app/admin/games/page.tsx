@@ -6,7 +6,7 @@ import type { Quiz } from "@/core/quizzes";
 import type { EmpathyScenario } from "@/core/empathyScenarios";
 import { QuizEditor } from "@/components/admin/QuizEditor";
 import { ScenarioEditor } from "@/components/admin/ScenarioEditor";
-import { TotEditor, DcEditor, QuestPromptsEditor, VibeEditor, BreathingEditor, MoodColorEditor, GroundingEditor, CbtScenarioEditor, DailyMessageEditor } from "@/components/admin/MiscEditors";
+import { TotEditor, DcEditor, QuestPromptsEditor, VibeEditor, BreathingEditor, MoodColorEditor, GroundingEditor, CbtScenarioEditor, DailyMessageEditor, MirrorProfileEditor, MirrorScenarioEditor, DetectiveEditor, VoiceEditor, BatteryEditor, EmotionEditor, TarotEditor, MonsterEditor } from "@/components/admin/MiscEditors";
 
 export const metadata = { title: "Admin · Game & Kuis — Soulpace" };
 
@@ -26,7 +26,7 @@ export default async function AdminGamesPage() {
     .from("empathy_scenarios")
     .select("id, topic, situation, options, is_active")
     .order("sort_order", { ascending: true });
-  const [{ data: totRows }, { data: dcRows }, { data: qpRows }, { data: vpRows }, { data: brRows }, { data: mcRows }, { data: grRows }, { data: cbtRows }, { data: dmRows }] = await Promise.all([
+  const [{ data: totRows }, { data: dcRows }, { data: qpRows }, { data: vpRows }, { data: brRows }, { data: mcRows }, { data: grRows }, { data: cbtRows }, { data: dmRows }, { data: mpRows }, { data: msRows }, { data: dcCaseRows }, { data: vsRows }, { data: baRows }, { data: ecRows }, { data: tcRows }, { data: monsRows }] = await Promise.all([
     supabase.from("this_or_that").select("id, prompt_a, prompt_b").order("sort_order"),
     supabase.from("daily_challenges").select("id, body").order("sort_order"),
     supabase.from("quest_prompts").select("day, prompt").order("day"),
@@ -36,6 +36,14 @@ export default async function AdminGamesPage() {
     supabase.from("grounding_steps").select("id, count, sense, instr, emoji, sort_order, is_active").order("sort_order"),
     supabase.from("cbt_scenarios").select("id, context, thoughts, sort_order, is_active").order("sort_order"),
     supabase.from("daily_messages").select("id, body, sort_order, is_active").order("sort_order"),
+    supabase.from("mirror_profiles").select("id, slug, name, emoji, description, insight, sort_order, is_active").order("sort_order"),
+    supabase.from("mirror_scenarios").select("id, category, situation, options, sort_order, is_active").order("sort_order"),
+    supabase.from("detective_cases").select("id, content, correct, options, sort_order, is_active").order("sort_order"),
+    supabase.from("voice_scenarios").select("id, situation, critic_text, supportive_text, outcome_critic, outcome_supportive, sort_order, is_active").order("sort_order"),
+    supabase.from("battery_actions").select("id, emoji, label, description, social_delta, energy_delta, productivity_delta, sort_order, is_active").order("sort_order"),
+    supabase.from("emotion_cards").select("id, content, correct, options, sort_order, is_active").order("sort_order"),
+    supabase.from("tarot_cards").select("id, name, emoji, meaning_situation, meaning_feeling, meaning_action, sort_order, is_active").order("sort_order"),
+    supabase.from("monster_situations").select("id, situation, responses, sort_order, is_active").order("sort_order"),
   ]);
 
   const quizzes = (quizRows ?? []).map((q) => ({
@@ -71,6 +79,14 @@ export default async function AdminGamesPage() {
       <MoodColorEditor items={(mcRows ?? []) as { id: string; hex: string; label: string; note: string; sort_order: number; is_active: boolean }[]} />
       <GroundingEditor items={(grRows ?? []) as { id: string; count: number; sense: string; instr: string; emoji: string; sort_order: number; is_active: boolean }[]} />
       <DailyMessageEditor items={(dmRows ?? []) as { id: string; body: string; sort_order: number; is_active: boolean }[]} />
+      <MirrorProfileEditor items={(mpRows ?? []) as { id: string; slug: string; name: string; emoji: string; description: string; insight: string; sort_order: number; is_active: boolean }[]} />
+      <MirrorScenarioEditor items={(msRows ?? []) as { id: string; category: string; situation: string; options: { text: string; profile_slug: string }[]; sort_order: number; is_active: boolean }[]} profiles={(mpRows ?? []).map((p: { slug: string; name: string }) => ({ slug: p.slug, name: p.name }))} />
+      <DetectiveEditor items={(dcCaseRows ?? []) as { id: string; content: string; correct: string; options: { slug: string; label: string; explanation: string }[]; sort_order: number; is_active: boolean }[]} />
+      <VoiceEditor items={(vsRows ?? []) as { id: string; situation: string; critic_text: string; supportive_text: string; outcome_critic: string; outcome_supportive: string; sort_order: number; is_active: boolean }[]} />
+      <BatteryEditor items={(baRows ?? []) as { id: string; emoji: string; label: string; description: string; social_delta: number; energy_delta: number; productivity_delta: number; sort_order: number; is_active: boolean }[]} />
+      <EmotionEditor items={(ecRows ?? []) as { id: string; content: string; correct: string; options: string[]; sort_order: number; is_active: boolean }[]} />
+      <TarotEditor items={(tcRows ?? []) as { id: string; name: string; emoji: string; meaning_situation: string; meaning_feeling: string; meaning_action: string; sort_order: number; is_active: boolean }[]} />
+      <MonsterEditor items={(monsRows ?? []) as { id: string; situation: string; responses: { text: string; effect: "grow" | "shrink" | "stay"; insight: string }[]; sort_order: number; is_active: boolean }[]} />
       <CbtScenarioEditor items={(cbtRows ?? []) as { id: string; context: string; thoughts: { text: string; correct: "distorsi" | "netral" | "sehat"; insight: string; distortion_type?: string | null }[]; sort_order: number; is_active: boolean }[]} />
     </main>
   );
