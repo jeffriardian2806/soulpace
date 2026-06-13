@@ -227,7 +227,7 @@ export function FeedShell({
       active ? "bg-sky-500 text-white" : "glass text-ink/70 hover:bg-sky-100"
     }`;
 
-  const statusLabel = STATUS_OPTIONS.find((o) => o.slug === status)?.label ?? "Semua";
+  const statusLabel = status === "semua" ? "Status" : STATUS_OPTIONS.find((o) => o.slug === status)?.label ?? "Status";
   const catLabel = cat
     ? categories.find((c) => c.slug === cat)?.name ?? "Kategori"
     : "Kategori";
@@ -403,6 +403,11 @@ export function FeedShell({
           </form>
         </div>
       )}
+
+      <div className="mt-3">
+        <h2 className="text-sm font-bold text-ink">💬 Curhat</h2>
+        <p className="mt-0.5 text-xs text-ink/45">Cerita orang lain hari ini</p>
+      </div>
 
       <div
         className={`flex flex-col gap-3 transition-opacity duration-150 ${
