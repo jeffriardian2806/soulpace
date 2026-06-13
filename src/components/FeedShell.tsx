@@ -46,6 +46,7 @@ export function FeedShell({
   quote: string;
   stories: {
     id: string;
+    label: string;
     title: string;
     snippet: string;
     contentWarning: string | null;
@@ -340,7 +341,7 @@ export function FeedShell({
 
       {stories.length > 0 && (
         <section className="rounded-2xl border border-sky-100 bg-white/70 p-4">
-          <div className="mb-2 flex items-center justify-between">
+          <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-bold text-ink">📖 Cerita</h2>
             <Link href="/cerita" className="text-xs font-medium text-sky-600 hover:underline">
               Lihat semua →
@@ -351,25 +352,34 @@ export function FeedShell({
               <Link
                 key={s.id}
                 href={`/cerita/${s.id}`}
-                className="group block py-2.5 first:pt-0 last:pb-0"
+                className="group block py-3 first:pt-0 last:pb-0"
               >
+                <span className="mb-1.5 inline-block rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sky-600">
+                  {s.label}
+                </span>
                 <p className="text-sm font-semibold text-ink group-hover:text-sky-600">
                   {s.title}
                 </p>
+                <div className="mt-1 flex flex-wrap justify-between gap-x-3 gap-y-0.5 text-xs text-ink/45">
+                  <span>oleh {s.handle}</span>
+                  <span>{s.date}</span>
+                  <span>{s.episodes} episode</span>
+                </div>
                 {s.contentWarning && (
-                  <p className="text-[11px] font-medium text-amber-700">⚠ {s.contentWarning}</p>
+                  <p className="mt-1.5 text-[11px] font-medium text-amber-700">
+                    ⚠ {s.contentWarning}
+                  </p>
                 )}
-                <p className="mt-0.5 line-clamp-2 text-sm leading-relaxed text-ink/65">
+                <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-ink/65">
                   {s.snippet}
                 </p>
-                <div className="mt-1.5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
-                  <p className="text-xs leading-relaxed text-ink/45">
-                    oleh {s.handle} · {s.date} · {s.episodes} episode · {s.views} dibaca · {s.peluk}{" "}
-                    peluk · {s.comments} komentar
-                  </p>
-                  <span className="shrink-0 self-end text-xs font-medium text-sky-600 group-hover:underline sm:self-auto">
-                    Baca selengkapnya →
-                  </span>
+                <p className="mt-1 text-xs font-medium text-sky-600 group-hover:underline">
+                  Baca selengkapnya →
+                </p>
+                <div className="mt-1.5 flex flex-wrap justify-between gap-x-3 gap-y-0.5 text-xs text-ink/45">
+                  <span>{s.views} dibaca</span>
+                  <span>{s.peluk} peluk</span>
+                  <span>{s.comments} komentar</span>
                 </div>
               </Link>
             ))}

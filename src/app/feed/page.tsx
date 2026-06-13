@@ -44,12 +44,15 @@ export default async function FeedPage({
     unread = await notif.unreadCount(user.id);
   }
 
+  // Hybrid feed Cerita: 1 paling populer (by peluk) + 1 cerita terbaru, semua dari 30 hari terakhir.
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400 * 1000).toISOString();
   const { data: storyRows, error: storyErr } = await supabase
     .from("stories")
     .select("id, title, summary, content_warning, created_at, peluk_boost, author_id")
     .eq("status", "published")
+    .gte("created_at", thirtyDaysAgo)
     .order("created_at", { ascending: false })
-    .limit(3);
+    .limit(30);
   if (storyErr) console.error("[feed] stories error:", storyErr.message);
 
   type SR = { id: string; title: string; summary: string; content_warning: string | null; created_at: string; peluk_boost: number; author_id: string };
@@ -72,18 +75,27 @@ export default async function FeedPage({
     (plks ?? []).forEach((r: { story_id: string }) => { sPlk[r.story_id] = (sPlk[r.story_id] ?? 0) + 1; });
     (cmts ?? []).forEach((r: { story_id: string }) => { sCmt[r.story_id] = (sCmt[r.story_id] ?? 0) + 1; });
   }
-  const stories = srows.map((s) => ({
+  // Hybrid pick: 1 popular by peluk + 1 latest by created_at (deduped).
+  const ranked = srows.map((s) => ({
     id: s.id,
     title: s.title,
     snippet: s.summary,
     contentWarning: s.content_warning,
     date: fmtDate(s.created_at),
+    createdAt: s.created_at,
     handle: sHandles[s.author_id] ?? "Anonim",
     episodes: (sEps[s.id] ?? []).length,
     views: (sEps[s.id] ?? []).reduce((sum, e) => sum + (e.views ?? 0), 0),
     peluk: (sPlk[s.id] ?? 0) + (s.peluk_boost ?? 0),
     comments: sCmt[s.id] ?? 0,
   }));
+  const picks: { label: string; story: typeof ranked[number] }[] = [];
+  const byPeluk = [...ranked].sort((a, b) => b.peluk - a.peluk || +new Date(b.createdAt) - +new Date(a.createdAt));
+  const topPopular = byPeluk[0];
+  if (topPopular) picks.push({ label: "Paling banyak peluk", story: topPopular });
+  const byLatest = ranked.filter((r) => r.id !== topPopular?.id);
+  if (byLatest[0]) picks.push({ label: "Cerita terbaru", story: byLatest[0] });
+  const stories = picks.map((p) => ({ label: p.label, ...p.story }));
 
   const quote = getDailyQuote();
 

@@ -56,10 +56,10 @@ export function PostCard({
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-ink">{post.authorHandle}</p>
-          <p className="text-xs text-ink/45" suppressHydrationWarning>
-            {timeAgo(post.createdAt)}
-            {post.categoryName ? ` · ${post.categoryName}` : ""}
-            {post.editedAt ? " · diedit" : ""}
+          <p className="flex flex-wrap gap-x-3 text-xs text-ink/45" suppressHydrationWarning>
+            <span>{timeAgo(post.createdAt)}</span>
+            {post.categoryName && <span>{post.categoryName}</span>}
+            {post.editedAt && <span>diedit</span>}
           </p>
         </div>
         <PostMenu

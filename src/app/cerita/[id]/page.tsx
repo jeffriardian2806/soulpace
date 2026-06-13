@@ -156,8 +156,9 @@ export default async function CeritaDetailPage({
 
       <div>
         <h1 className="text-2xl font-bold text-ink">{story.title}</h1>
-        <p className="mt-1 text-xs text-ink/45">
-          oleh {story.profiles?.handle ?? "Anonim"} · {fmt(story.created_at)}
+        <p className="mt-1 flex flex-wrap gap-x-3 text-xs text-ink/45">
+          <span>oleh {story.profiles?.handle ?? "Anonim"}</span>
+          <span>{fmt(story.created_at)}</span>
         </p>
       </div>
 
@@ -174,21 +175,21 @@ export default async function CeritaDetailPage({
       <div className="flex items-center gap-3">
         <StoryPeluk storyId={story.id} initialPeluked={peluked} initialCount={(pelukCount ?? 0) + (story.peluk_boost ?? 0)} />
         <ShareButton path={`/cerita/${story.id}`} title={story.title} />
-        {isOwner && (
-          <Link
-            href={`/cerita/${story.id}/tulis`}
-            className="rounded-full bg-sky-500 px-3 py-1.5 text-sm font-medium text-white"
-          >
-            + Tambah episode
-          </Link>
-        )}
       </div>
-
-      <StoryReactions storyId={story.id} />
 
       {/* Episode */}
       <section className="space-y-2">
-        <h2 className="text-sm font-bold text-ink">Episode</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-ink">Episode</h2>
+          {isOwner && (
+            <Link
+              href={`/cerita/${story.id}/tulis`}
+              className="rounded-full bg-sky-500 px-3 py-1.5 text-xs font-medium text-white"
+            >
+              + Tambah episode
+            </Link>
+          )}
+        </div>
         {episodes.length === 0 ? (
           <p className="text-sm text-ink/40">Belum ada episode.</p>
         ) : (
@@ -200,13 +201,18 @@ export default async function CeritaDetailPage({
             >
               <p className="text-sm">
                 <span className="font-medium text-ink">Episode {e.episode_number}</span>
-                {e.title && <span className="text-ink/70"> · {e.title}</span>}
+                {e.title && <span className="text-ink/70">  {e.title}</span>}
               </p>
-              <p className="mt-0.5 text-xs text-ink/40">{fmt(e.created_at)} · {e.views} dibaca</p>
+              <p className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-ink/40">
+                <span>{fmt(e.created_at)}</span>
+                <span>{e.views} dibaca</span>
+              </p>
             </Link>
           ))
         )}
       </section>
+
+      <StoryReactions storyId={story.id} />
 
       {/* Komentar */}
       <section className="space-y-3">
@@ -234,8 +240,9 @@ export default async function CeritaDetailPage({
 
         {comments.map((c) => (
           <div key={c.id} className="glass rounded-xl p-3">
-            <p className="text-xs text-ink/45">
-              {c.profiles?.handle ?? "Anonim"} · {fmt(c.created_at)}
+            <p className="flex flex-wrap gap-x-3 text-xs text-ink/45">
+              <span>{c.profiles?.handle ?? "Anonim"}</span>
+              <span>{fmt(c.created_at)}</span>
             </p>
             <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-ink/85">{c.body}</p>
             {c.crisis_flag && (

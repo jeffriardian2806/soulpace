@@ -20,7 +20,13 @@ type Story = {
   author_id: string;
 };
 
-export default async function CeritaPage() {
+export default async function CeritaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string }>;
+}) {
+  const sp = await searchParams;
+  const sort = sp.sort === 'oldest' || sp.sort === 'popular' ? sp.sort : 'latest';
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -28,7 +34,7 @@ export default async function CeritaPage() {
     .from("stories")
     .select("id, title, summary, content_warning, created_at, peluk_boost, author_id")
     .eq("status", "published")
-    .order("created_at", { ascending: false })
+    .order("created_at", { ascending: sort === "oldest" })
     .limit(50);
 
   if (error) console.error("[cerita] query error:", error.message, error.details);
@@ -52,6 +58,14 @@ export default async function CeritaPage() {
     (plks ?? []).forEach((r: { story_id: string }) => { plkCount[r.story_id] = (plkCount[r.story_id] ?? 0) + 1; });
   }
 
+  if (sort === "popular") {
+    stories.sort((a, b) => {
+      const pa = (plkCount[a.id] ?? 0) + (a.peluk_boost ?? 0);
+      const pb = (plkCount[b.id] ?? 0) + (b.peluk_boost ?? 0);
+      return pb - pa || +new Date(b.created_at) - +new Date(a.created_at);
+    });
+  }
+
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
       <header className="flex items-center justify-between">
@@ -68,6 +82,34 @@ export default async function CeritaPage() {
         </Link>
       )}
 
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className="text-ink/45">Urutkan</span>
+        <Link
+          href="/cerita"
+          className={`rounded-full px-3 py-1 transition-colors ${
+            sort === "latest" ? "bg-sky-500 text-white" : "bg-white/70 text-ink/70 hover:bg-sky-50"
+          }`}
+        >
+          Terbaru
+        </Link>
+        <Link
+          href="/cerita?sort=oldest"
+          className={`rounded-full px-3 py-1 transition-colors ${
+            sort === "oldest" ? "bg-sky-500 text-white" : "bg-white/70 text-ink/70 hover:bg-sky-50"
+          }`}
+        >
+          Terlama
+        </Link>
+        <Link
+          href="/cerita?sort=popular"
+          className={`rounded-full px-3 py-1 transition-colors ${
+            sort === "popular" ? "bg-sky-500 text-white" : "bg-white/70 text-ink/70 hover:bg-sky-50"
+          }`}
+        >
+          Paling banyak peluk
+        </Link>
+      </div>
+
       {stories.length === 0 ? (
         <p className="py-10 text-center text-sm text-ink/40">Belum ada cerita. Jadi yang pertama berbagi.</p>
       ) : (
@@ -81,9 +123,11 @@ export default async function CeritaPage() {
               {s.summary && (
                 <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-ink/70">{s.summary}</p>
               )}
-              <p className="mt-2 text-xs text-ink/45">
-                oleh {handles[s.author_id] ?? "Anonim"} · {epCount[s.id] ?? 0} episode · {(plkCount[s.id] ?? 0) + (s.peluk_boost ?? 0)} peluk
-              </p>
+              <div className="mt-2 flex flex-wrap justify-between gap-x-3 gap-y-0.5 text-xs text-ink/45">
+                <span>oleh {handles[s.author_id] ?? "Anonim"}</span>
+                <span>{epCount[s.id] ?? 0} episode</span>
+                <span>{(plkCount[s.id] ?? 0) + (s.peluk_boost ?? 0)} peluk</span>
+              </div>
             </Link>
           ))}
         </div>
