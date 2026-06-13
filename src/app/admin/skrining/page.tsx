@@ -52,7 +52,7 @@ export default async function AdminSkriningPage() {
             <span>
               <span className="text-sm font-semibold text-ink">{i.name}</span>
               <span className="block text-xs text-ink/55">
-                {i.subtitle} · /{i.slug}
+                <span>{i.subtitle}</span>{"  "}<span>/{i.slug}</span>
               </span>
             </span>
             <span

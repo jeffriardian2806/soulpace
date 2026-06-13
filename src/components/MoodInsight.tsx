@@ -106,7 +106,7 @@ export function MoodInsight({ entries }: { entries: Entry[] }) {
           <p className="text-xs text-ink/45">Rata-rata 30 hari</p>
           <p className="mt-0.5 text-sm font-semibold text-ink">
             {avg != null
-              ? `${avg.toFixed(1)}/5 · ${MOOD_LABEL[Math.round(avg)]}`
+              ? `${avg.toFixed(1)}/5  ${MOOD_LABEL[Math.round(avg)]}`
               : "Belum ada data"}
           </p>
         </div>
@@ -135,7 +135,7 @@ export function MoodInsight({ entries }: { entries: Entry[] }) {
           {cells.map((c, i) => (
             <div
               key={i}
-              title={c ? `${c.date}${c.mood ? " · " + MOOD_LABEL[c.mood] : ""}` : ""}
+              title={c ? `${c.date}${c.mood ? "  " + MOOD_LABEL[c.mood] : ""}` : ""}
               className={`h-3.5 w-3.5 rounded-sm ${
                 c == null ? "bg-transparent" : c.mood ? MOOD_BG[c.mood] : "bg-ink/5"
               }`}

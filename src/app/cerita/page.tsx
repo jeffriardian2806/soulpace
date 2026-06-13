@@ -125,8 +125,11 @@ export default async function CeritaPage({
               )}
               <div className="mt-2 flex flex-wrap justify-between gap-x-3 gap-y-0.5 text-xs text-ink/45">
                 <span>oleh {handles[s.author_id] ?? "Anonim"}</span>
-                <span>{epCount[s.id] ?? 0} episode</span>
-                <span>{(plkCount[s.id] ?? 0) + (s.peluk_boost ?? 0)} peluk</span>
+                <span className="inline-flex items-center gap-1"><span aria-hidden="true">📖</span> {epCount[s.id] ?? 0}</span>
+                <span className="inline-flex items-center gap-1">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5" fill="currentColor"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>
+                  {(plkCount[s.id] ?? 0) + (s.peluk_boost ?? 0)}
+                </span>
               </div>
             </Link>
           ))}

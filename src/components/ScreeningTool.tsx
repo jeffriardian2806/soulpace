@@ -107,7 +107,7 @@ export function ScreeningTool({
           <div key={r.inst.id} className="glass rounded-2xl p-4">
             <div className="flex items-baseline justify-between">
               <h2 className="text-sm font-bold text-ink">
-                {r.inst.name} · {r.inst.subtitle}
+                {r.inst.name}  {r.inst.subtitle}
               </h2>
               <span className="text-xs text-ink/50">
                 Skor {r.score}/{r.max}
@@ -159,7 +159,7 @@ export function ScreeningTool({
       {instruments.map((inst) => (
         <section key={inst.id} className="glass rounded-2xl p-4">
           <h2 className="text-sm font-bold text-ink">
-            {inst.name} · {inst.subtitle}
+            {inst.name}  {inst.subtitle}
           </h2>
           <p className="mt-1 text-xs leading-relaxed text-ink/60">{inst.prompt}</p>
 

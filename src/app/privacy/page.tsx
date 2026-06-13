@@ -12,7 +12,7 @@ export default function PrivacyPage() {
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-5 px-6 py-10">
       <Link href="/" className="text-sm text-ink/50">← Kembali</Link>
       <h1 className="text-2xl font-bold text-ink">Kebijakan Privasi</h1>
-      <p className="text-xs text-ink/45">Terakhir diperbarui: Juni 2026 · Versi beta</p>
+      <p className="text-xs text-ink/45">Terakhir diperbarui: Juni 2026  Versi beta</p>
 
       <section className="flex flex-col gap-4 text-sm leading-relaxed text-ink/75">
         <div>

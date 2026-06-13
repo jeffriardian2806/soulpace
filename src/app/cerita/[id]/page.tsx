@@ -203,9 +203,12 @@ export default async function CeritaDetailPage({
                 <span className="font-medium text-ink">Episode {e.episode_number}</span>
                 {e.title && <span className="text-ink/70">  {e.title}</span>}
               </p>
-              <p className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-ink/40">
+              <p className="mt-0.5 flex flex-wrap items-center gap-x-3 text-xs text-ink/40">
                 <span>{fmt(e.created_at)}</span>
-                <span>{e.views} dibaca</span>
+                <span className="inline-flex items-center gap-1">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                  {e.views}
+                </span>
               </p>
             </Link>
           ))

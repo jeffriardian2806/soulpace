@@ -132,7 +132,7 @@ export default async function EpisodePage({
         <p className="text-xs font-medium text-sky-600">Episode {ep.episode_number}</p>
         {ep.title && <h1 className="mt-0.5 text-xl font-bold text-ink">{ep.title}</h1>}
         <p className="mt-1 text-xs text-ink/45">
-          oleh {ep.profiles?.handle ?? "Anonim"} · {fmt(ep.created_at)} · {ep.views} dibaca
+          <span>oleh {ep.profiles?.handle ?? "Anonim"}</span>{"  "}<span>{fmt(ep.created_at)}</span>{"  "}<span aria-label="dibaca"><svg viewBox="0 0 24 24" className="inline-block h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> {ep.views}</span>
         </p>
       </div>
 

@@ -68,7 +68,7 @@ export default async function PostDetailPage({
                   </span>
                 )}
                 <span className="text-xs text-ink/40">
-                  · {timeAgo(r.createdAt)}
+                  <span className='ml-2'>{timeAgo(r.createdAt)}</span>
                 </span>
                 {user && (
                   <span className="ml-auto">

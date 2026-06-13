@@ -51,7 +51,7 @@ export default async function SuratPage() {
           {arrived.map((l) => (
             <div key={l.id} className="glass rounded-2xl p-4">
               <p className="text-xs text-ink/45">
-                Ditulis {fmt(l.created_at as string)} · tiba {fmt(l.deliver_at as string)}
+                <span>Ditulis {fmt(l.created_at as string)}</span>{"  "}<span>Tiba {fmt(l.deliver_at as string)}</span>
               </p>
               <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink/85">
                 {l.body as string}

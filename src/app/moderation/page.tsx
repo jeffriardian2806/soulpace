@@ -69,7 +69,7 @@ export default async function ModerationPage() {
         enriched.map((r) => (
           <div key={r.id} className="glass rounded-2xl p-4">
             <p className="mb-1 text-xs text-ink/45">
-              {r.targetType === "post" ? "Curhat" : "Balasan"} · {r.handle}
+              <span>{r.targetType === "post" ? "Curhat" : "Balasan"}</span>{"  "}<span>{r.handle}</span>
             </p>
             <p className="mb-3 whitespace-pre-wrap text-sm leading-relaxed text-ink">
               {r.body}

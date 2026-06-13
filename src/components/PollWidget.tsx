@@ -51,7 +51,7 @@ export function PollWidget({
                 />
               )}
               <span className="relative flex justify-between">
-                <span>{o}{voted === idx ? " ·  kamu" : ""}</span>
+                <span>{o}{voted === idx ? "  (kamu)" : ""}</span>
                 {show && <span className="font-medium text-ink/60">{pct}%</span>}
               </span>
             </button>

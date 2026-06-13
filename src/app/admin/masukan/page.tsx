@@ -58,7 +58,7 @@ export default async function AdminMasukanPage() {
         <p className="mt-0.5 flex items-center gap-2 text-sm font-semibold text-ink">
           {visible.length ? `${avg.toFixed(1)}/5` : "Belum ada"}
           {visible.length > 0 && <Stars value={Math.round(avg)} />}
-          <span className="font-normal text-ink/45">· {visible.length} tampil · {rows.length - visible.length} disembunyikan</span>
+          <span className="font-normal text-ink/45">  {visible.length} tampil  {rows.length - visible.length} disembunyikan</span>
         </p>
         <p className="mt-2 text-xs leading-relaxed text-ink/50">
           Semua ulasan tampil publik apa adanya. Sembunyikan hanya yang spam atau serangan, bukan
@@ -78,7 +78,7 @@ export default async function AdminMasukanPage() {
               <div className="flex items-center justify-between">
                 <Stars value={r.rating} />
                 <p className="text-xs text-ink/45">
-                  {r.profiles?.handle ?? "Anonim"} · {fmt(r.created_at)}
+                  <span>{r.profiles?.handle ?? "Anonim"}</span>{"  "}<span>{fmt(r.created_at)}</span>
                 </p>
               </div>
               {r.comment && (
