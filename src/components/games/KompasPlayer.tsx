@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { saveGameResultAction } from "@/app/main/saveResult";
 
 export type CompassQuestion = { id: string; text: string; letter: string };
 export type CompassType = { letter: string; name: string; tagline: string; description: string; traits: string };
@@ -18,6 +19,7 @@ const LETTER_EMOJI: Record<string, string> = { R: "🔧", I: "🔬", A: "🎨", 
 export function KompasPlayer({ questions, types, majors }: { questions: CompassQuestion[]; types: CompassType[]; majors: CompassMajor[] }) {
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<{ letter: string; score: number }[]>([]);
+  const savedRef = useRef(false);
 
   if (questions.length === 0 || types.length === 0) {
     return <p className="text-sm text-ink/50">Konten belum tersedia.</p>;
@@ -25,19 +27,31 @@ export function KompasPlayer({ questions, types, majors }: { questions: CompassQ
 
   const done = idx >= questions.length;
 
+  // Tally untuk save + render
+  const totals: Record<string, number> = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
   if (done) {
-    // Tally per letter
-    const totals: Record<string, number> = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
     answers.forEach((a) => { totals[a.letter] = (totals[a.letter] ?? 0) + a.score; });
+  }
+  const ranked = (Object.keys(totals) as string[])
+    .map((l) => ({ letter: l, score: totals[l] }))
+    .sort((a, b) => b.score - a.score);
+  const top3 = ranked.slice(0, 3);
+  const hollandCode = top3.map((t) => t.letter).join("");
 
-    // Sort letters by score desc
-    const ranked = (Object.keys(totals) as string[])
-      .map((l) => ({ letter: l, score: totals[l] }))
-      .sort((a, b) => b.score - a.score);
+  useEffect(() => {
+    if (done && !savedRef.current) {
+      savedRef.current = true;
+      const topNames = top3.map((t) => types.find((x) => x.letter === t.letter)?.name).filter(Boolean);
+      saveGameResultAction("kompas", {
+        title: "Kompas Jurusan",
+        headline: hollandCode,
+        value: topNames.join(" · "),
+        emoji: "🧭",
+      }, { holland_code: hollandCode, totals, top3 });
+    }
+  }, [done, hollandCode, top3, types, totals]);
 
-    const top3 = ranked.slice(0, 3);
-    const hollandCode = top3.map((t) => t.letter).join("");
-
+  if (done) {
     // Match majors by overlap with top 3
     const topLetters = new Set(top3.map((t) => t.letter));
     const scoredMajors = majors
@@ -129,7 +143,7 @@ export function KompasPlayer({ questions, types, majors }: { questions: CompassQ
         )}
 
         <p className="text-center text-xs text-ink/40">Bukan keputusan final — pake ini sebagai starting point eksplorasi, bukan kunci mati.</p>
-        <button onClick={() => { setIdx(0); setAnswers([]); }} className="rounded-full bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white self-center">
+        <button onClick={() => { setIdx(0); setAnswers([]); savedRef.current = false; }} className="rounded-full bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white self-center">
           Coba lagi
         </button>
       </div>

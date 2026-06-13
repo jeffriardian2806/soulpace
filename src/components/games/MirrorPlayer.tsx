@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { saveGameResultAction } from "@/app/main/saveResult";
 
 export type MirrorProfile = { slug: string; name: string; emoji: string; description: string; insight: string };
 export type MirrorOption = { text: string; profile_slug: string };
@@ -8,18 +9,36 @@ export type MirrorScenario = { id: string; category: string; situation: string; 
 export function MirrorPlayer({ scenarios, profiles }: { scenarios: MirrorScenario[]; profiles: MirrorProfile[] }) {
   const [idx, setIdx] = useState(0);
   const [picks, setPicks] = useState<string[]>([]);
+  const savedRef = useRef(false);
+
   if (scenarios.length === 0 || profiles.length === 0) return <p className="text-sm text-ink/50">Konten belum tersedia. Hubungi admin.</p>;
 
   const done = idx >= scenarios.length;
 
+  // Tally untuk save (juga dipake di JSX done state)
+  let profile: MirrorProfile | null = null;
   if (done) {
-    // Tally
     const counts: Record<string, number> = {};
     picks.forEach((p) => { counts[p] = (counts[p] ?? 0) + 1; });
     let topSlug = picks[0]; let topCount = 0;
     Object.entries(counts).forEach(([k, v]) => { if (v > topCount) { topSlug = k; topCount = v; } });
-    const profile = profiles.find((p) => p.slug === topSlug) ?? profiles[0];
+    profile = profiles.find((p) => p.slug === topSlug) ?? profiles[0];
+  }
 
+  useEffect(() => {
+    if (done && profile && !savedRef.current) {
+      savedRef.current = true;
+      saveGameResultAction("mirror", {
+        title: "Pikiran Mirror",
+        headline: profile.name,
+        value: profile.description,
+        emoji: profile.emoji,
+      }, { profile_slug: profile.slug, picks });
+    }
+  }, [done, profile, picks]);
+
+  if (done) {
+    if (!profile) return null;
     return (
       <div className="flex flex-col items-center gap-4 py-6">
         <div className="rounded-3xl bg-gradient-to-br from-sky-400 to-purple-500 p-8 text-center text-white shadow-2xl">
@@ -33,7 +52,7 @@ export function MirrorPlayer({ scenarios, profiles }: { scenarios: MirrorScenari
           <p className="mt-1 text-sm leading-relaxed text-ink/75">{profile.insight}</p>
         </div>
         <p className="text-xs text-ink/45">Bukan diagnosis. Cuma cermin pelan-pelan dari respons kamu hari ini.</p>
-        <button onClick={() => { setIdx(0); setPicks([]); }} className="rounded-full bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white">Coba lagi</button>
+        <button onClick={() => { setIdx(0); setPicks([]); savedRef.current = false; }} className="rounded-full bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white">Coba lagi</button>
       </div>
     );
   }

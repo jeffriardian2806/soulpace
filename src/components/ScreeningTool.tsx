@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SCREENING_DISCLAIMER } from "@/config/screening";
 import type { ScreeningInstrument } from "@/config/screening";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
+import { saveGameResultAction } from "@/app/main/saveResult";
 
 type Answers = Record<string, (number | null)[]>;
 
@@ -62,23 +63,42 @@ export function ScreeningTool({
     );
   }
 
+  // Hoist hasil supaya bisa di-save lewat useEffect tanpa duplikasi logic
+  const results = submitted
+    ? instruments.map((inst) => {
+        const vals = answers[inst.id].map((v) => v ?? 0);
+        const optVals = inst.options.map((o) => o.value);
+        const minVal = Math.min(...optVals);
+        const maxVal = Math.max(...optVals);
+        const score = vals.reduce(
+          (sum, v, idx) => sum + (inst.items[idx]?.reverse ? maxVal + minVal - v : v),
+          0
+        );
+        const band = inst.bands.find((b) => score >= b.min && score <= b.max);
+        const max = inst.items.length * maxVal;
+        const crisis =
+          inst.crisisItemIndex !== undefined && vals[inst.crisisItemIndex] > 0;
+        return { inst, score, max, band, crisis };
+      })
+    : [];
+
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (submitted && !savedRef.current && results.length > 0) {
+      savedRef.current = true;
+      results.forEach((r) => {
+        saveGameResultAction(`screening_${r.inst.id}`, {
+          title: r.inst.name,
+          headline: r.band?.label ?? "-",
+          value: `Skor ${r.score}/${r.max}`,
+          secondary: r.inst.subtitle,
+          emoji: "📋",
+        }, { score: r.score, max: r.max, band_label: r.band?.label, band_advice: r.band?.advice });
+      });
+    }
+  }, [submitted, results]);
+
   if (submitted) {
-    const results = instruments.map((inst) => {
-      const vals = answers[inst.id].map((v) => v ?? 0);
-      // reverse scoring: kalau item.reverse=true, invert pakai (maxVal + minVal - v)
-      const optVals = inst.options.map((o) => o.value);
-      const minVal = Math.min(...optVals);
-      const maxVal = Math.max(...optVals);
-      const score = vals.reduce(
-        (sum, v, idx) => sum + (inst.items[idx]?.reverse ? maxVal + minVal - v : v),
-        0
-      );
-      const band = inst.bands.find((b) => score >= b.min && score <= b.max);
-      const max = inst.items.length * maxVal;
-      const crisis =
-        inst.crisisItemIndex !== undefined && vals[inst.crisisItemIndex] > 0;
-      return { inst, score, max, band, crisis };
-    });
     const anyCrisis = results.some((r) => r.crisis);
 
     return (

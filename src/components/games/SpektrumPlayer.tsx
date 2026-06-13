@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { saveGameResultAction } from "@/app/main/saveResult";
 
 export type SpektrumOption = { text: string; intro_weight: number; extro_weight: number };
 export type SpektrumQuestion = { id: string; category_id: string; text: string; options: SpektrumOption[] };
@@ -8,13 +9,14 @@ export type SpektrumCategory = { id: string; slug: string; name: string; emoji: 
 export function SpektrumPlayer({ categories, questions }: { categories: SpektrumCategory[]; questions: SpektrumQuestion[] }) {
   const [idx, setIdx] = useState(0);
   const [picks, setPicks] = useState<SpektrumOption[]>([]);
-  const [showCategory, setShowCategory] = useState(true); // intro screen per kategori
+  const [showCategory, setShowCategory] = useState(true);
+  const savedRef = useRef(false);
 
   if (categories.length === 0 || questions.length === 0) {
     return <p className="text-sm text-ink/50">Konten belum tersedia.</p>;
   }
 
-  // Group questions by category, in order categories
+  // Group questions by category
   const byCategory = categories.map((c) => ({ category: c, questions: questions.filter((q) => q.category_id === c.id) }));
   const flatOrder: { q: SpektrumQuestion; category: SpektrumCategory; isFirstInCategory: boolean }[] = [];
   byCategory.forEach(({ category, questions: qs }) => {
@@ -23,10 +25,10 @@ export function SpektrumPlayer({ categories, questions }: { categories: Spektrum
 
   const done = idx >= flatOrder.length;
 
+  // Tally hasil (dipake buat save + render)
+  let totalIntro = 0, totalExtro = 0;
+  const byCat: Record<string, { intro: number; extro: number }> = {};
   if (done) {
-    // Tally
-    let totalIntro = 0, totalExtro = 0;
-    const byCat: Record<string, { intro: number; extro: number }> = {};
     flatOrder.forEach((item, i) => {
       const p = picks[i];
       if (!p) return;
@@ -37,13 +39,28 @@ export function SpektrumPlayer({ categories, questions }: { categories: Spektrum
       byCat[k].intro += p.intro_weight;
       byCat[k].extro += p.extro_weight;
     });
-    const sum = totalIntro + totalExtro;
-    const introPct = sum > 0 ? (totalIntro / sum) * 100 : 50;
-    const extroPct = sum > 0 ? (totalExtro / sum) * 100 : 50;
-    const dominant = introPct >= extroPct ? "introvert" : "extrovert";
-    const gap = Math.abs(introPct - extroPct);
-    const ambivert = gap < 15;
+  }
+  const sum = totalIntro + totalExtro;
+  const introPct = sum > 0 ? (totalIntro / sum) * 100 : 50;
+  const extroPct = sum > 0 ? (totalExtro / sum) * 100 : 50;
+  const dominant = introPct >= extroPct ? "introvert" : "extrovert";
+  const gap = Math.abs(introPct - extroPct);
+  const ambivert = gap < 15;
+  const headline = ambivert ? "Ambivert" : dominant === "introvert" ? "Lebih Introvert" : "Lebih Extrovert";
 
+  useEffect(() => {
+    if (done && !savedRef.current) {
+      savedRef.current = true;
+      saveGameResultAction("spektrum", {
+        title: "Spektrum Sosial",
+        headline,
+        value: `${introPct.toFixed(2)}% intro / ${extroPct.toFixed(2)}% extro`,
+        emoji: "🌗",
+      }, { intro: introPct, extro: extroPct, by_category: byCat });
+    }
+  }, [done, headline, introPct, extroPct, byCat]);
+
+  if (done) {
     const insight = ambivert
       ? "Lo termasuk ambivert — punya sisi introvert & extrovert yang seimbang. Bisa adaptasi ke situasi sosial dan ruang sendiri sama-sama nyaman."
       : dominant === "introvert"
@@ -54,7 +71,7 @@ export function SpektrumPlayer({ categories, questions }: { categories: Spektrum
       <div className="flex flex-col gap-4 py-4">
         <div className="rounded-3xl bg-gradient-to-br from-sky-400 via-purple-400 to-rose-400 p-6 text-center text-white shadow-2xl">
           <p className="text-xs uppercase tracking-wide text-white/70">Spektrum kamu</p>
-          <p className="mt-2 text-2xl font-bold">{ambivert ? "Ambivert" : dominant === "introvert" ? "Lebih Introvert" : "Lebih Extrovert"}</p>
+          <p className="mt-2 text-2xl font-bold">{headline}</p>
           <div className="mt-4 flex items-center gap-2 text-sm">
             <span>🌙 {introPct.toFixed(2)}%</span>
             <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-white/20">
@@ -91,7 +108,7 @@ export function SpektrumPlayer({ categories, questions }: { categories: Spektrum
         </div>
 
         <p className="text-center text-xs text-ink/40">Bukan diagnosis — ini cuma kecenderungan dari respons lo hari ini.</p>
-        <button onClick={() => { setIdx(0); setPicks([]); setShowCategory(true); }} className="rounded-full bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white self-center">
+        <button onClick={() => { setIdx(0); setPicks([]); setShowCategory(true); savedRef.current = false; }} className="rounded-full bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white self-center">
           Coba lagi
         </button>
       </div>
