@@ -6,6 +6,18 @@ import { SCREENING_DISCLAIMER } from "@/config/screening";
 import type { ScreeningInstrument } from "@/config/screening";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { saveGameResultAction } from "@/app/main/saveResult";
+import { getSupportMessageAction } from "@/app/main/supportAction";
+import { SupportMessageCard } from "@/components/SupportMessageCard";
+
+// Mapping band label → severity slug (heuristic — Rey bisa adjust per instrumen)
+function bandSeverity(label: string | undefined): "minimal" | "mild" | "moderate" | "severe" {
+  if (!label) return "minimal";
+  const l = label.toLowerCase();
+  if (l.includes("berat") || l.includes("severe") || l.includes("parah")) return "severe";
+  if (l.includes("sedang") || l.includes("moderate")) return "moderate";
+  if (l.includes("ringan") || l.includes("mild")) return "mild";
+  return "minimal";
+}
 
 type Answers = Record<string, (number | null)[]>;
 
@@ -83,18 +95,38 @@ export function ScreeningTool({
     : [];
 
   const savedRef = useRef(false);
+  const [supportMessage, setSupportMessage] = useState<string | null>(null);
+
   useEffect(() => {
     if (submitted && !savedRef.current && results.length > 0) {
       savedRef.current = true;
+      // Save semua hasil + tag severity & crisis
       results.forEach((r) => {
+        const severity = bandSeverity(r.band?.label);
         saveGameResultAction(`screening_${r.inst.id}`, {
           title: r.inst.name,
           headline: r.band?.label ?? "-",
           value: `Skor ${r.score}/${r.max}`,
           secondary: r.inst.subtitle,
           emoji: "📋",
-        }, { score: r.score, max: r.max, band_label: r.band?.label, band_advice: r.band?.advice });
+        }, {
+          score: r.score,
+          max: r.max,
+          band_label: r.band?.label,
+          band_advice: r.band?.advice,
+          crisis: r.crisis,
+          severity,
+        });
       });
+
+      // Trigger support message: prioritas crisis > severe
+      const hasCrisis = results.some((r) => r.crisis);
+      const hasSevere = results.some((r) => bandSeverity(r.band?.label) === "severe");
+      if (hasCrisis) {
+        getSupportMessageAction("crisis_screening").then(setSupportMessage);
+      } else if (hasSevere) {
+        getSupportMessageAction("severe_screening").then(setSupportMessage);
+      }
     }
   }, [submitted, results]);
 
@@ -122,6 +154,8 @@ export function ScreeningTool({
             </p>
           </div>
         )}
+
+        {supportMessage && <SupportMessageCard message={supportMessage} />}
 
         {results.map((r) => (
           <div key={r.inst.id} className="glass rounded-2xl p-4">

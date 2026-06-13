@@ -4,6 +4,8 @@ import { getNotificationsService } from "@/modules/notifications";
 import { FeedShell } from "@/components/FeedShell";
 import { GuestPrompt } from "@/components/GuestPrompt";
 import { getDailyQuote } from "@/lib/dailyQuote";
+import { resolveSupportMessage } from "@/lib/support/resolveMessage";
+import { FeedSupportBanner } from "@/components/FeedSupportBanner";
 
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString("id-ID", {
@@ -99,9 +101,41 @@ export default async function FeedPage({
 
   const quote = await getDailyQuote();
 
+  // Support banner: kalau user pernah trigger crisis/severe screening dalam 24 jam terakhir
+  let supportMessage: string | null = null;
+  let supportTriggeredAt: string | null = null;
+  if (user) {
+    const cutoff = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+    const { data: recentTrigger } = await supabase
+      .from("user_game_results")
+      .select("created_at, detail")
+      .eq("user_id", user.id)
+      .like("game_key", "screening_%")
+      .gte("created_at", cutoff)
+      .order("created_at", { ascending: false })
+      .limit(5);
+    type TriggerRow = { created_at: string; detail: { crisis?: boolean; severity?: string } | null };
+    const rows = (recentTrigger ?? []) as TriggerRow[];
+    const crisisRow = rows.find((r) => r.detail?.crisis === true);
+    const severeRow = rows.find((r) => r.detail?.severity === "severe");
+    const trigger = crisisRow ?? severeRow;
+    if (trigger) {
+      supportTriggeredAt = trigger.created_at;
+      supportMessage = await resolveSupportMessage(
+        crisisRow ? "crisis_screening" : "severe_screening",
+        user.id
+      );
+    }
+  }
+
   const isGuest = !user;
   return (
     <>
+      {supportMessage && supportTriggeredAt && (
+        <div className="mx-auto max-w-2xl px-5 pt-4">
+          <FeedSupportBanner message={supportMessage} triggeredAt={supportTriggeredAt} />
+        </div>
+      )}
       <FeedShell
       isLoggedIn={!!user}
       currentUserId={user?.id ?? null}

@@ -818,3 +818,69 @@ function CMRow({ item, isNew }: { item: CM; isNew?: boolean }) {
     </div>
   );
 }
+
+// ==================== Support Messages editor ====================
+import { saveSupportMessageAction, deleteSupportMessageAction } from "@/app/admin/games/actions";
+
+type SupMsg = {
+  id: string;
+  slug: string;
+  trigger_type: "crisis_screening" | "severe_screening" | "low_mood_streak";
+  required_data: string[];
+  template: string;
+  weight: number;
+  sort_order: number;
+  is_active: boolean;
+};
+
+export function SupportMessageEditor({ items }: { items: SupMsg[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">💙 Pesan Otomatis (Support)</h2>
+      <p className="mb-3 text-xs text-ink/55">
+        Pesan otomatis untuk user di kondisi crisis/severe. Bisa pake slot variable: <code className="bg-ink/5 px-1 rounded text-[10px]">{"{handle}"}</code> <code className="bg-ink/5 px-1 rounded text-[10px]">{"{mirror_archetype}"}</code> <code className="bg-ink/5 px-1 rounded text-[10px]">{"{kompas_top_name}"}</code> <code className="bg-ink/5 px-1 rounded text-[10px]">{"{kompas_code}"}</code> <code className="bg-ink/5 px-1 rounded text-[10px]">{"{spektrum_label}"}</code>.
+        Required Data harus diisi sesuai variable yang dipake (mis. kalo template pake {"{mirror_archetype}"}, required_data harus include &quot;mirror&quot;).
+      </p>
+      <ul className="mb-3 flex flex-col gap-3">{items.map((it) => <li key={it.id}><SupMsgRow item={it} /></li>)}</ul>
+      <SupMsgRow item={{ id: "", slug: "", trigger_type: "crisis_screening", required_data: [], template: "", weight: 1, sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+
+function SupMsgRow({ item, isNew }: { item: SupMsg; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  const DATA_KEYS = ["mirror", "kompas", "spektrum"];
+  function toggleData(k: string) {
+    setV({ ...v, required_data: v.required_data.includes(k) ? v.required_data.filter((x) => x !== k) : [...v.required_data, k] });
+  }
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-sky-100 bg-white/60 p-3">
+      <div className="flex flex-wrap gap-1.5">
+        <input value={v.slug} onChange={(e) => setV({ ...v, slug: e.target.value })} placeholder="slug (unik)" className="w-40 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <select value={v.trigger_type} onChange={(e) => setV({ ...v, trigger_type: e.target.value as SupMsg["trigger_type"] })} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs">
+          <option value="crisis_screening">🆘 crisis_screening</option>
+          <option value="severe_screening">⚠️ severe_screening</option>
+          <option value="low_mood_streak">📉 low_mood_streak</option>
+        </select>
+      </div>
+      <textarea value={v.template} onChange={(e) => setV({ ...v, template: e.target.value })} placeholder="Template pesan (boleh pake {handle}, {mirror_archetype}, {kompas_top_name}, {kompas_code}, {spektrum_label})" rows={4} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs leading-relaxed" />
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs text-ink/55">Required data:</span>
+        {DATA_KEYS.map((k) => (
+          <button key={k} type="button" onClick={() => toggleData(k)} className={`rounded px-2 py-1 text-xs font-medium ${v.required_data.includes(k) ? "bg-sky-500 text-white" : "bg-white text-ink/55 ring-1 ring-sky-100"}`}>
+            {k}
+          </button>
+        ))}
+        <span className="text-[10px] text-ink/40">(kosongin = fallback no-data)</span>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <label className="flex items-center gap-1 text-xs text-ink/70">Weight <input type="number" min={1} value={v.weight} onChange={(e) => setV({ ...v, weight: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" /></label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await saveSupportMessageAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteSupportMessageAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}

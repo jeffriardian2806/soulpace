@@ -563,3 +563,44 @@ export async function deleteCompassMajorAction(id: string) {
   revalidatePath("/admin/games"); revalidatePath("/main/kompas");
   return { error: null };
 }
+
+// ==================== Support Messages (auto-reply ke user crisis/severe) ====================
+
+type SupportMessagePayload = {
+  id?: string;
+  slug: string;
+  trigger_type: "crisis_screening" | "severe_screening" | "low_mood_streak";
+  required_data: string[];
+  template: string;
+  weight: number;
+  sort_order: number;
+  is_active: boolean;
+};
+
+export async function saveSupportMessageAction(p: SupportMessagePayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.slug.trim() || !p.template.trim()) return { error: "Slug & template wajib." };
+  if (!["crisis_screening","severe_screening","low_mood_streak"].includes(p.trigger_type)) return { error: "trigger_type tidak valid." };
+  const row = {
+    slug: p.slug.trim(),
+    trigger_type: p.trigger_type,
+    required_data: p.required_data,
+    template: p.template.trim(),
+    weight: p.weight,
+    sort_order: p.sort_order,
+    is_active: p.is_active,
+    updated_at: new Date().toISOString(),
+  };
+  const q = p.id ? supabase.from("support_messages").update(row).eq("id", p.id) : supabase.from("support_messages").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/feed"); revalidatePath("/skrining");
+  return { error: null };
+}
+
+export async function deleteSupportMessageAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("support_messages").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/feed"); revalidatePath("/skrining");
+  return { error: null };
+}
