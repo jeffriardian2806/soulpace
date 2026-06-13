@@ -3,9 +3,19 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "Main & Kenali Diri — Soulpace" };
 
-const EXTRA = [
-  { href: "/main/empati", emoji: "💙", title: "Pilih Respons Terbaik", desc: "Latihan jadi pendengar yang menenangkan." },
+// Permainan interaktif — visual & tactile, taruh di atas biar narik mata user
+const INTERACTIVE = [
+  { href: "/main/napas", emoji: "🫧", title: "Tarik Napas", desc: "Latihan napas 4-7-8. Ikutin lingkaran biar tenang." },
+  { href: "/main/lepas", emoji: "💨", title: "Lepasin Pikiran", desc: "Tulis, tap balon, pecahin. Lepasin pelan-pelan." },
+  { href: "/main/warna", emoji: "🎨", title: "Warna Hari Ini", desc: "Pilih warna yang match vibe kamu. Tanpa kata." },
+  { href: "/main/tantang", emoji: "🌀", title: "Tantang Pikiran", desc: "Latihan CBT singkat: pisahkan distorsi dari pikiran sehat." },
+  { href: "/main/grounding", emoji: "🧭", title: "Grounding 5-4-3-2-1", desc: "Cemas? Balik ke sekarang lewat indra." },
+];
+
+// Reflektif — text-based, butuh mikir & baca. Taruh setelah interaktif.
+const REFLECTIVE = [
   { href: "/main/pilihan", emoji: "🌙", title: "Ini atau Itu", desc: "Check-in cepat: kamu lagi butuh apa malam ini." },
+  { href: "/main/empati", emoji: "💙", title: "Pilih Respons Terbaik", desc: "Latihan jadi pendengar yang menenangkan." },
   { href: "/main/quest", emoji: "🗺️", title: "7 Hari Kenal Diri", desc: "Program refleksi pendek, tanpa hukuman." },
   { href: "/main/poll", emoji: "📊", title: "Polling Hari Ini", desc: "Suara anonim — biar tahu kamu nggak sendiri." },
   { href: "/main/ruang", emoji: "🪟", title: "Ruang Hari Ini", desc: "Satu kalimat bareng-bareng." },
@@ -56,22 +66,40 @@ export default async function MainPage() {
         </section>
       )}
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {(quizzes ?? []).map((q: { slug: string; title: string; emoji: string; intro: string }) => (
-          <Link key={q.slug} href={`/main/${q.slug}`} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
-            <p className="text-2xl">{q.emoji}</p>
-            <p className="mt-1 text-sm font-bold text-ink">{q.title}</p>
-            <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{q.intro}</p>
-          </Link>
-        ))}
-        {EXTRA.map((e) => (
-          <Link key={e.href} href={e.href} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
-            <p className="text-2xl">{e.emoji}</p>
-            <p className="mt-1 text-sm font-bold text-ink">{e.title}</p>
-            <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{e.desc}</p>
-          </Link>
-        ))}
-      </div>
+      <section>
+        <p className="mb-2 text-sm font-bold text-ink">✨ Permainan Interaktif</p>
+        <p className="mb-3 text-xs text-ink/55">Tactile & visual — cocok pas otak udah cape.</p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {INTERACTIVE.map((e) => (
+            <Link key={e.href} href={e.href} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
+              <p className="text-2xl">{e.emoji}</p>
+              <p className="mt-1 text-sm font-bold text-ink">{e.title}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{e.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <p className="mb-2 text-sm font-bold text-ink">📝 Kuis & Refleksi</p>
+        <p className="mb-3 text-xs text-ink/55">Eksplorasi diri lewat pertanyaan singkat.</p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {(quizzes ?? []).map((q: { slug: string; title: string; emoji: string; intro: string }) => (
+            <Link key={q.slug} href={`/main/${q.slug}`} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
+              <p className="text-2xl">{q.emoji}</p>
+              <p className="mt-1 text-sm font-bold text-ink">{q.title}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{q.intro}</p>
+            </Link>
+          ))}
+          {REFLECTIVE.map((e) => (
+            <Link key={e.href} href={e.href} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
+              <p className="text-2xl">{e.emoji}</p>
+              <p className="mt-1 text-sm font-bold text-ink">{e.title}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{e.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }

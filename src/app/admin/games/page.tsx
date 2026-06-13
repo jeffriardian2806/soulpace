@@ -6,7 +6,7 @@ import type { Quiz } from "@/core/quizzes";
 import type { EmpathyScenario } from "@/core/empathyScenarios";
 import { QuizEditor } from "@/components/admin/QuizEditor";
 import { ScenarioEditor } from "@/components/admin/ScenarioEditor";
-import { TotEditor, DcEditor, QuestPromptsEditor, VibeEditor } from "@/components/admin/MiscEditors";
+import { TotEditor, DcEditor, QuestPromptsEditor, VibeEditor, BreathingEditor, MoodColorEditor, GroundingEditor, CbtScenarioEditor } from "@/components/admin/MiscEditors";
 
 export const metadata = { title: "Admin · Game & Kuis — Soulpace" };
 
@@ -26,11 +26,15 @@ export default async function AdminGamesPage() {
     .from("empathy_scenarios")
     .select("id, topic, situation, options, is_active")
     .order("sort_order", { ascending: true });
-  const [{ data: totRows }, { data: dcRows }, { data: qpRows }, { data: vpRows }] = await Promise.all([
+  const [{ data: totRows }, { data: dcRows }, { data: qpRows }, { data: vpRows }, { data: brRows }, { data: mcRows }, { data: grRows }, { data: cbtRows }] = await Promise.all([
     supabase.from("this_or_that").select("id, prompt_a, prompt_b").order("sort_order"),
     supabase.from("daily_challenges").select("id, body").order("sort_order"),
     supabase.from("quest_prompts").select("day, prompt").order("day"),
     supabase.from("vibe_presets").select("id, emoji, label, href").order("sort_order"),
+    supabase.from("breathing_protocols").select("id, slug, label, in_seconds, hold_seconds, out_seconds, sort_order, is_active").order("sort_order"),
+    supabase.from("mood_colors").select("id, hex, label, note, sort_order, is_active").order("sort_order"),
+    supabase.from("grounding_steps").select("id, count, sense, instr, emoji, sort_order, is_active").order("sort_order"),
+    supabase.from("cbt_scenarios").select("id, context, thoughts, sort_order, is_active").order("sort_order"),
   ]);
 
   const quizzes = (quizRows ?? []).map((q) => ({
@@ -62,6 +66,10 @@ export default async function AdminGamesPage() {
       <DcEditor items={(dcRows ?? []) as { id: string; body: string }[]} />
       <QuestPromptsEditor items={(qpRows ?? []) as { day: number; prompt: string }[]} />
       <VibeEditor items={(vpRows ?? []) as { id: string; emoji: string; label: string; href: string }[]} />
+      <BreathingEditor items={(brRows ?? []) as { id: string; slug: string; label: string; in_seconds: number; hold_seconds: number; out_seconds: number; sort_order: number; is_active: boolean }[]} />
+      <MoodColorEditor items={(mcRows ?? []) as { id: string; hex: string; label: string; note: string; sort_order: number; is_active: boolean }[]} />
+      <GroundingEditor items={(grRows ?? []) as { id: string; count: number; sense: string; instr: string; emoji: string; sort_order: number; is_active: boolean }[]} />
+      <CbtScenarioEditor items={(cbtRows ?? []) as { id: string; context: string; thoughts: { text: string; correct: "distorsi" | "netral" | "sehat"; insight: string; distortion_type?: string | null }[]; sort_order: number; is_active: boolean }[]} />
     </main>
   );
 }
