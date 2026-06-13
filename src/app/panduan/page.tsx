@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 
+export const revalidate = 86400;
+
 export const metadata = {
   title: "Panduan & FAQ — Soulpace",
   description: "Pertanyaan umum seputar Soulpace: anonimitas, cara curhat, cerita, peluk, dan fitur lainnya.",

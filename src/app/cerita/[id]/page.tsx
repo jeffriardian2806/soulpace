@@ -7,6 +7,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { StoryPeluk } from "@/components/StoryPeluk";
 import { StoryReactions } from "@/components/StoryReactions";
+import { CommentForm } from "@/components/CommentForm";
 import { GuestPrompt } from "@/components/GuestPrompt";
 import { ShareButton } from "@/components/ShareButton";
 import { commentStoryAction, deleteStoryAction } from "@/app/cerita/actions";
@@ -207,7 +208,7 @@ export default async function CeritaDetailPage({
                 <span>{fmt(e.created_at)}</span>
                 <span className="inline-flex items-center gap-1">
                   <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-                  {e.views}
+                  {e.views} dibaca
                 </span>
               </p>
             </Link>
@@ -221,20 +222,7 @@ export default async function CeritaDetailPage({
       <section className="space-y-3">
         <h2 className="text-sm font-bold text-ink">Komentar ({comments.length})</h2>
         {user ? (
-          <form action={commentStoryAction} className="flex flex-col gap-2">
-            <input type="hidden" name="story_id" value={story.id} />
-            <textarea
-              name="body"
-              required
-              rows={2}
-              maxLength={2000}
-              placeholder="Tulis komentar yang suportif..."
-              className="rounded-xl border border-ink/10 bg-white/60 p-2.5 text-sm text-ink outline-none focus:border-sky-300"
-            />
-            <button className="self-start rounded-xl bg-sky-500 px-4 py-1.5 text-sm font-medium text-white">
-              Kirim
-            </button>
-          </form>
+          <CommentForm storyId={story.id} action={commentStoryAction} />
         ) : (
           <p className="text-sm text-ink/50">
             <Link href="/login" className="text-sky-600 underline">Masuk</Link> untuk ikut komentar.

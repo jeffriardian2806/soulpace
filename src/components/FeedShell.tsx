@@ -363,7 +363,7 @@ export function FeedShell({
                 <div className="mt-1 flex flex-wrap justify-between gap-x-3 gap-y-0.5 text-xs text-ink/45">
                   <span>oleh {s.handle}</span>
                   <span>{s.date}</span>
-                  <span className="inline-flex items-center gap-1"><span aria-hidden="true">📖</span> {s.episodes}</span>
+                  <span className="inline-flex items-center gap-1"><span aria-hidden="true">📖</span> {s.episodes} episode</span>
                 </div>
                 {s.contentWarning && (
                   <p className="mt-1.5 text-[11px] font-medium text-amber-700">
@@ -379,13 +379,13 @@ export function FeedShell({
                 <div className="mt-1.5 flex flex-wrap justify-between gap-x-3 gap-y-0.5 text-xs text-ink/45">
                   <span className="inline-flex items-center gap-1">
                     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-                    {s.views}
+                    {s.views} dibaca
                   </span>
                   <span className="inline-flex items-center gap-1">
                     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5" fill="currentColor"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>
-                    {s.peluk}
+                    {s.peluk} peluk
                   </span>
-                  <span className="inline-flex items-center gap-1"><span aria-hidden="true">💬</span> {s.comments}</span>
+                  <span className="inline-flex items-center gap-1"><span aria-hidden="true">💬</span> {s.comments} komentar</span>
                 </div>
               </Link>
             ))}

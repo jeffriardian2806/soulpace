@@ -3,7 +3,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 
 const BASE = "https://soulpace.vercel.app";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // URL dasar selalu ada, apa pun yang terjadi dengan DB.
