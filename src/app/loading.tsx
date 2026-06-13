@@ -1,4 +1,15 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 export default function Loading() {
+  const [showText, setShowText] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowText(true), 800);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
       <div className="h-7 w-32 animate-pulse rounded-lg bg-sky-100/70" />
@@ -17,6 +28,14 @@ export default function Loading() {
           </div>
         ))}
       </div>
+      <p
+        className={`mt-2 text-center text-xs text-ink/40 transition-opacity duration-300 ${
+          showText ? "opacity-100" : "opacity-0"
+        }`}
+        aria-live="polite"
+      >
+        Sebentar ya...
+      </p>
     </main>
   );
 }
