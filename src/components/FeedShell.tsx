@@ -303,6 +303,7 @@ export function FeedShell({
         <div className="flex gap-1 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             { href: "/main", icon: "✨", label: "Main" },
+            { href: "/skrining", icon: "📋", label: "Skrining" },
             { href: "/cerita", icon: "📖", label: "Cerita" },
             { href: "/mood", icon: "🙂", label: "Mood" },
             { href: "/syukur", icon: "🙏", label: "Syukur" },
@@ -310,7 +311,6 @@ export function FeedShell({
             { href: "/jurnal", icon: "📓", label: "Jurnal" },
             { href: "/surat", icon: "✉️", label: "Surat" },
             { href: "/edukasi", icon: "💡", label: "Tips" },
-            { href: "/skrining", icon: "📋", label: "Skrining" },
           ].map((t) => (
             <Link
               key={t.href}

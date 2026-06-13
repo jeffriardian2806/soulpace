@@ -288,3 +288,40 @@ function CbtScenarioRow({ item, isNew }: { item: { id: string; context: string; 
     </div>
   );
 }
+
+// ==================== Daily Messages ("Pesan Hari Ini") ====================
+import { saveDailyMessageAction, deleteDailyMessageAction } from "@/app/admin/games/actions";
+
+export function DailyMessageEditor({ items }: { items: { id: string; body: string; sort_order: number; is_active: boolean }[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">💌 Pesan Hari Ini</h2>
+      <p className="mb-3 text-xs text-ink/55">Pesan singkat yang muncul di banner atas feed. Rotasi otomatis per hari (deterministik).</p>
+      <ul className="mb-3 flex flex-col gap-2">
+        {items.map((it) => <li key={it.id}><DailyMessageRow item={it} /></li>)}
+      </ul>
+      <DailyMessageRow item={{ id: "", body: "", sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+
+function DailyMessageRow({ item, isNew }: { item: { id: string; body: string; sort_order: number; is_active: boolean }; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-wrap items-start gap-2 rounded-xl border border-sky-100 bg-white/60 p-2">
+      <textarea value={v.body} onChange={(e) => setV({ ...v, body: e.target.value })} placeholder="Pesan singkat (mis. 'Pelan-pelan nggak apa-apa.')" rows={2} className="min-w-[240px] flex-1 rounded-lg border border-sky-100 bg-white/80 px-2 py-1.5 text-xs" />
+      <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-16 rounded-lg border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <label className="flex items-center gap-1 pt-1.5 text-xs text-ink/70">
+        <input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />
+        Aktif
+      </label>
+      <button onClick={() => start(async () => { const r = await saveDailyMessageAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...v, body: "" }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">
+        {pending ? "..." : isNew ? "+ Tambah" : "Simpan"}
+      </button>
+      {!isNew && (
+        <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteDailyMessageAction(item.id); })} className="text-xs text-rose-500">Hapus</button>
+      )}
+    </div>
+  );
+}

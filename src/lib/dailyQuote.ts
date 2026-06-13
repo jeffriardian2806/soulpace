@@ -1,15 +1,20 @@
-const QUOTES = [
-  "Di depan badai akan segera berlalu. Kamu lebih kuat dari yang kamu kira.",
-  "Kamu nggak sendirian. Hari ini, cukup bertahan saja sudah cukup.",
-  "Setiap hari yang kamu lewati adalah bukti kekuatanmu.",
-  "Boleh capek, boleh nangis. Tapi jangan menyerah.",
-  "Hidupmu berharga, bahkan di hari yang paling berat.",
-  "Pelan-pelan nggak apa-apa. Yang penting kamu nggak berhenti.",
-  "Badai paling besar pun pada akhirnya reda.",
-];
+import { createClient } from "@/lib/supabase/server";
 
-// Deterministik per hari: quote sama sepanjang hari, ganti tiap hari.
-export function getDailyQuote(): string {
+const FALLBACK = "Pelan-pelan nggak apa-apa. Yang penting kamu nggak berhenti.";
+
+/**
+ * Deterministik per hari: quote sama sepanjang hari, ganti tiap hari.
+ * Ambil dari tabel daily_messages (is_active=true). Fallback static kalo DB kosong.
+ */
+export async function getDailyQuote(): Promise<string> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("daily_messages")
+    .select("body")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+  const rows = (data ?? []) as { body: string }[];
+  if (rows.length === 0) return FALLBACK;
   const day = Math.floor(Date.now() / 86400000);
-  return QUOTES[day % QUOTES.length];
+  return rows[day % rows.length].body;
 }

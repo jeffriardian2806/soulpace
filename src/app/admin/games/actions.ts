@@ -293,3 +293,24 @@ export async function deleteCbtScenarioAction(id: string): Promise<{ error: stri
   revalidatePath("/admin/games"); revalidatePath("/main/tantang");
   return { error: null };
 }
+
+type DailyMessagePayload = { id?: string; body: string; sort_order: number; is_active: boolean };
+export async function saveDailyMessageAction(p: DailyMessagePayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.body.trim()) return { error: "Pesan wajib." };
+  const row = { body: p.body.trim(), sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id
+    ? supabase.from("daily_messages").update(row).eq("id", p.id)
+    : supabase.from("daily_messages").insert(row);
+  const { error } = await q;
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/feed");
+  return { error: null };
+}
+export async function deleteDailyMessageAction(id: string): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("daily_messages").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/feed");
+  return { error: null };
+}

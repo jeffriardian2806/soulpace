@@ -97,7 +97,7 @@ export default async function FeedPage({
   if (byLatest[0]) picks.push({ label: "Cerita terbaru", story: byLatest[0] });
   const stories = picks.map((p) => ({ label: p.label, ...p.story }));
 
-  const quote = getDailyQuote();
+  const quote = await getDailyQuote();
 
   const isGuest = !user;
   return (
