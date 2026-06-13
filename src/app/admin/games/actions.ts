@@ -472,3 +472,94 @@ export async function deleteMonsterAction(id: string) {
   revalidatePath("/admin/games"); revalidatePath("/main/monster");
   return { error: null };
 }
+
+// ==================== Spektrum Sosial (introvert/extrovert) ====================
+
+type PersonalityCategoryPayload = { id?: string; slug: string; name: string; emoji: string; description: string; sort_order: number; is_active: boolean };
+export async function savePersonalityCategoryAction(p: PersonalityCategoryPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.slug.trim() || !p.name.trim()) return { error: "Slug & nama wajib." };
+  const row = { slug: p.slug.trim(), name: p.name.trim(), emoji: p.emoji, description: p.description, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("personality_categories").update(row).eq("id", p.id) : supabase.from("personality_categories").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/spektrum");
+  return { error: null };
+}
+export async function deletePersonalityCategoryAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("personality_categories").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/spektrum");
+  return { error: null };
+}
+
+type PersonalityQuestionPayload = { id?: string; category_id: string; text: string; options: { text: string; intro_weight: number; extro_weight: number }[]; sort_order: number; is_active: boolean };
+export async function savePersonalityQuestionAction(p: PersonalityQuestionPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.text.trim() || !p.category_id) return { error: "Pertanyaan & kategori wajib." };
+  if (p.options.length < 2) return { error: "Minimal 2 opsi." };
+  const row = { category_id: p.category_id, text: p.text.trim(), options: p.options, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("personality_questions").update(row).eq("id", p.id) : supabase.from("personality_questions").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/spektrum");
+  return { error: null };
+}
+export async function deletePersonalityQuestionAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("personality_questions").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/spektrum");
+  return { error: null };
+}
+
+// ==================== Kompas Jurusan (RIASEC) ====================
+
+type CompassTypePayload = { letter: "R"|"I"|"A"|"S"|"E"|"C"; name: string; tagline: string; description: string; traits: string; sort_order: number; is_active: boolean };
+export async function saveCompassTypeAction(p: CompassTypePayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.name.trim()) return { error: "Nama tipe wajib." };
+  const row = { letter: p.letter, name: p.name.trim(), tagline: p.tagline, description: p.description, traits: p.traits, sort_order: p.sort_order, is_active: p.is_active };
+  // upsert by letter (PK)
+  const { error } = await supabase.from("compass_types").upsert(row);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/kompas");
+  return { error: null };
+}
+
+type CompassQuestionPayload = { id?: string; text: string; letter: string; sort_order: number; is_active: boolean };
+export async function saveCompassQuestionAction(p: CompassQuestionPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.text.trim()) return { error: "Pertanyaan wajib." };
+  if (!["R","I","A","S","E","C"].includes(p.letter)) return { error: "Letter harus salah satu dari R/I/A/S/E/C." };
+  const row = { text: p.text.trim(), letter: p.letter, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("compass_questions").update(row).eq("id", p.id) : supabase.from("compass_questions").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/kompas");
+  return { error: null };
+}
+export async function deleteCompassQuestionAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("compass_questions").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/kompas");
+  return { error: null };
+}
+
+type CompassMajorPayload = { id?: string; name: string; description: string; primary_letters: string[]; careers: string[]; sort_order: number; is_active: boolean };
+export async function saveCompassMajorAction(p: CompassMajorPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.name.trim()) return { error: "Nama jurusan wajib." };
+  if (p.primary_letters.length === 0) return { error: "Pilih minimal 1 letter RIASEC." };
+  const row = { name: p.name.trim(), description: p.description, primary_letters: p.primary_letters, careers: p.careers, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("compass_majors").update(row).eq("id", p.id) : supabase.from("compass_majors").insert(row);
+  const { error } = await q; if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/kompas");
+  return { error: null };
+}
+export async function deleteCompassMajorAction(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("compass_majors").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games"); revalidatePath("/main/kompas");
+  return { error: null };
+}

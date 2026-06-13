@@ -74,6 +74,23 @@ export default async function MainPage() {
       )}
 
       <section>
+        <p className="mb-2 text-sm font-bold text-ink">🎓 Tes Kepribadian & Karir</p>
+        <p className="mb-3 text-xs text-ink/55">Interaktif, ada ilmu psikologinya — bukan game kosong.</p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Link href="/main/spektrum" className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
+            <p className="text-2xl">🌗</p>
+            <p className="mt-1 text-sm font-bold text-ink">Spektrum Sosial</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-ink/55">24 pertanyaan dari 6 kategori. Dapet % introvert vs extrovert + breakdown per kategori.</p>
+          </Link>
+          <Link href="/main/kompas" className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
+            <p className="text-2xl">🧭</p>
+            <p className="mt-1 text-sm font-bold text-ink">Kompas Jurusan</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-ink/55">Buat anak SMA bingung mau kuliah jurusan apa. Holland Code + rekomendasi jurusan + contoh karir.</p>
+          </Link>
+        </div>
+      </section>
+
+      <section>
         <p className="mb-2 text-sm font-bold text-ink">✨ Permainan Interaktif</p>
         <p className="mb-3 text-xs text-ink/55">Tactile & visual — cocok pas otak udah cape.</p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

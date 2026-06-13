@@ -6,7 +6,7 @@ import type { Quiz } from "@/core/quizzes";
 import type { EmpathyScenario } from "@/core/empathyScenarios";
 import { QuizEditor } from "@/components/admin/QuizEditor";
 import { ScenarioEditor } from "@/components/admin/ScenarioEditor";
-import { TotEditor, DcEditor, QuestPromptsEditor, VibeEditor, BreathingEditor, MoodColorEditor, GroundingEditor, CbtScenarioEditor, DailyMessageEditor, MirrorProfileEditor, MirrorScenarioEditor, DetectiveEditor, VoiceEditor, BatteryEditor, EmotionEditor, TarotEditor, MonsterEditor } from "@/components/admin/MiscEditors";
+import { TotEditor, DcEditor, QuestPromptsEditor, VibeEditor, BreathingEditor, MoodColorEditor, GroundingEditor, CbtScenarioEditor, DailyMessageEditor, MirrorProfileEditor, MirrorScenarioEditor, DetectiveEditor, VoiceEditor, BatteryEditor, EmotionEditor, TarotEditor, MonsterEditor, PersonalityCategoryEditor, PersonalityQuestionEditor, CompassTypeEditor, CompassQuestionEditor, CompassMajorEditor } from "@/components/admin/MiscEditors";
 
 export const metadata = { title: "Admin · Game & Kuis — Soulpace" };
 
@@ -26,7 +26,7 @@ export default async function AdminGamesPage() {
     .from("empathy_scenarios")
     .select("id, topic, situation, options, is_active")
     .order("sort_order", { ascending: true });
-  const [{ data: totRows }, { data: dcRows }, { data: qpRows }, { data: vpRows }, { data: brRows }, { data: mcRows }, { data: grRows }, { data: cbtRows }, { data: dmRows }, { data: mpRows }, { data: msRows }, { data: dcCaseRows }, { data: vsRows }, { data: baRows }, { data: ecRows }, { data: tcRows }, { data: monsRows }] = await Promise.all([
+  const [{ data: totRows }, { data: dcRows }, { data: qpRows }, { data: vpRows }, { data: brRows }, { data: mcRows }, { data: grRows }, { data: cbtRows }, { data: dmRows }, { data: mpRows }, { data: msRows }, { data: dcCaseRows }, { data: vsRows }, { data: baRows }, { data: ecRows }, { data: tcRows }, { data: monsRows }, { data: pcRows }, { data: pqRows }, { data: ctRows }, { data: cqRows }, { data: cmRows }] = await Promise.all([
     supabase.from("this_or_that").select("id, prompt_a, prompt_b").order("sort_order"),
     supabase.from("daily_challenges").select("id, body").order("sort_order"),
     supabase.from("quest_prompts").select("day, prompt").order("day"),
@@ -44,6 +44,11 @@ export default async function AdminGamesPage() {
     supabase.from("emotion_cards").select("id, content, correct, options, sort_order, is_active").order("sort_order"),
     supabase.from("tarot_cards").select("id, name, emoji, meaning_situation, meaning_feeling, meaning_action, sort_order, is_active").order("sort_order"),
     supabase.from("monster_situations").select("id, situation, responses, sort_order, is_active").order("sort_order"),
+    supabase.from("personality_categories").select("id, slug, name, emoji, description, sort_order, is_active").order("sort_order"),
+    supabase.from("personality_questions").select("id, category_id, text, options, sort_order, is_active").order("sort_order"),
+    supabase.from("compass_types").select("letter, name, tagline, description, traits, sort_order, is_active").order("sort_order"),
+    supabase.from("compass_questions").select("id, text, letter, sort_order, is_active").order("sort_order"),
+    supabase.from("compass_majors").select("id, name, description, primary_letters, careers, sort_order, is_active").order("sort_order"),
   ]);
 
   const quizzes = (quizRows ?? []).map((q) => ({
@@ -79,6 +84,11 @@ export default async function AdminGamesPage() {
       <MoodColorEditor items={(mcRows ?? []) as { id: string; hex: string; label: string; note: string; sort_order: number; is_active: boolean }[]} />
       <GroundingEditor items={(grRows ?? []) as { id: string; count: number; sense: string; instr: string; emoji: string; sort_order: number; is_active: boolean }[]} />
       <DailyMessageEditor items={(dmRows ?? []) as { id: string; body: string; sort_order: number; is_active: boolean }[]} />
+      <PersonalityCategoryEditor items={(pcRows ?? []) as { id: string; slug: string; name: string; emoji: string; description: string; sort_order: number; is_active: boolean }[]} />
+      <PersonalityQuestionEditor items={(pqRows ?? []) as { id: string; category_id: string; text: string; options: { text: string; intro_weight: number; extro_weight: number }[]; sort_order: number; is_active: boolean }[]} categories={(pcRows ?? []).map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }))} />
+      <CompassTypeEditor items={(ctRows ?? []) as { letter: string; name: string; tagline: string; description: string; traits: string; sort_order: number; is_active: boolean }[]} />
+      <CompassQuestionEditor items={(cqRows ?? []) as { id: string; text: string; letter: string; sort_order: number; is_active: boolean }[]} />
+      <CompassMajorEditor items={(cmRows ?? []) as { id: string; name: string; description: string; primary_letters: string[]; careers: string[]; sort_order: number; is_active: boolean }[]} />
       <MirrorProfileEditor items={(mpRows ?? []) as { id: string; slug: string; name: string; emoji: string; description: string; insight: string; sort_order: number; is_active: boolean }[]} />
       <MirrorScenarioEditor items={(msRows ?? []) as { id: string; category: string; situation: string; options: { text: string; profile_slug: string }[]; sort_order: number; is_active: boolean }[]} profiles={(mpRows ?? []).map((p: { slug: string; name: string }) => ({ slug: p.slug, name: p.name }))} />
       <DetectiveEditor items={(dcCaseRows ?? []) as { id: string; content: string; correct: string; options: { slug: string; label: string; explanation: string }[]; sort_order: number; is_active: boolean }[]} />

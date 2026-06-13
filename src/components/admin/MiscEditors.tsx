@@ -627,3 +627,194 @@ function MonsterRow({ item, isNew }: { item: Monster; isNew?: boolean }) {
     </div>
   );
 }
+
+// ==================== Spektrum Sosial editors ====================
+import {
+  savePersonalityCategoryAction, deletePersonalityCategoryAction,
+  savePersonalityQuestionAction, deletePersonalityQuestionAction,
+  saveCompassTypeAction,
+  saveCompassQuestionAction, deleteCompassQuestionAction,
+  saveCompassMajorAction, deleteCompassMajorAction,
+} from "@/app/admin/games/actions";
+
+type PCat = { id: string; slug: string; name: string; emoji: string; description: string; sort_order: number; is_active: boolean };
+export function PersonalityCategoryEditor({ items }: { items: PCat[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🌗 Spektrum Sosial — Kategori</h2>
+      <p className="mb-3 text-xs text-ink/55">6 kategori dimensi extraversion (Big Five). Tambahin kalau mau gali lebih dalam.</p>
+      <ul className="mb-3 flex flex-col gap-2">{items.map((it) => <li key={it.id}><PCatRow item={it} /></li>)}</ul>
+      <PCatRow item={{ id: "", slug: "", name: "", emoji: "✨", description: "", sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+function PCatRow({ item, isNew }: { item: PCat; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-col gap-1.5 rounded-xl border border-sky-100 bg-white/60 p-2">
+      <div className="flex flex-wrap gap-1.5">
+        <input value={v.emoji} onChange={(e) => setV({ ...v, emoji: e.target.value })} className="w-12 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-center text-base" />
+        <input value={v.slug} onChange={(e) => setV({ ...v, slug: e.target.value })} placeholder="slug" className="w-24 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+        <input value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} placeholder="Nama kategori" className="flex-1 min-w-[120px] rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      </div>
+      <textarea value={v.description} onChange={(e) => setV({ ...v, description: e.target.value })} placeholder="Deskripsi singkat kategori" rows={2} className="rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await savePersonalityCategoryAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus kategori? (Semua pertanyaan di kategori ini ikut terhapus)")) await deletePersonalityCategoryAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}
+
+type POpt = { text: string; intro_weight: number; extro_weight: number };
+type PQ = { id: string; category_id: string; text: string; options: POpt[]; sort_order: number; is_active: boolean };
+export function PersonalityQuestionEditor({ items, categories }: { items: PQ[]; categories: { id: string; name: string }[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🌗 Spektrum Sosial — Pertanyaan</h2>
+      <p className="mb-3 text-xs text-ink/55">Per pertanyaan: 4 opsi dengan bobot intro/extro masing-masing (mis. opsi paling introvert = 2/0).</p>
+      <ul className="mb-3 flex flex-col gap-3">{items.map((it) => <li key={it.id}><PQRow item={it} categories={categories} /></li>)}</ul>
+      <PQRow item={{ id: "", category_id: categories[0]?.id ?? "", text: "", options: [{ text: "", intro_weight: 2, extro_weight: 0 }, { text: "", intro_weight: 1, extro_weight: 0 }, { text: "", intro_weight: 0, extro_weight: 1 }, { text: "", intro_weight: 0, extro_weight: 2 }], sort_order: items.length + 1, is_active: true }} categories={categories} isNew />
+    </section>
+  );
+}
+function PQRow({ item, categories, isNew }: { item: PQ; categories: { id: string; name: string }[]; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  function updOpt(i: number, patch: Partial<POpt>) { setV({ ...v, options: v.options.map((x, j) => j === i ? { ...x, ...patch } : x) }); }
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-sky-100 bg-white/60 p-3">
+      <div className="flex flex-wrap gap-2">
+        <select value={v.category_id} onChange={(e) => setV({ ...v, category_id: e.target.value })} className="w-40 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs">
+          {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+        <textarea value={v.text} onChange={(e) => setV({ ...v, text: e.target.value })} placeholder="Pertanyaan" rows={2} className="flex-1 min-w-[220px] rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      </div>
+      <div className="flex flex-col gap-1.5 pl-2">
+        {v.options.map((o, i) => (
+          <div key={i} className="flex flex-wrap items-center gap-1.5 rounded-lg bg-sky-50/50 p-1.5">
+            <span className="text-xs text-ink/40">{i + 1}.</span>
+            <input value={o.text} onChange={(e) => updOpt(i, { text: e.target.value })} placeholder="Teks opsi" className="flex-1 min-w-[160px] rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+            <label className="flex items-center gap-1 text-[10px] text-ink/55"><span>🌙</span><input type="number" min={0} max={3} value={o.intro_weight} onChange={(e) => updOpt(i, { intro_weight: +e.target.value })} className="w-12 rounded border border-sky-100 bg-white/80 px-1 py-0.5 text-xs" /></label>
+            <label className="flex items-center gap-1 text-[10px] text-ink/55"><span>🌞</span><input type="number" min={0} max={3} value={o.extro_weight} onChange={(e) => updOpt(i, { extro_weight: +e.target.value })} className="w-12 rounded border border-sky-100 bg-white/80 px-1 py-0.5 text-xs" /></label>
+            <button onClick={() => setV({ ...v, options: v.options.filter((_, j) => j !== i) })} className="text-xs text-rose-500">✕</button>
+          </div>
+        ))}
+        <button onClick={() => setV({ ...v, options: [...v.options, { text: "", intro_weight: 0, extro_weight: 0 }] })} type="button" className="self-start text-xs text-sky-600">+ Tambah opsi</button>
+      </div>
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await savePersonalityQuestionAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deletePersonalityQuestionAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}
+
+// ==================== Kompas Jurusan editors ====================
+
+type CType = { letter: string; name: string; tagline: string; description: string; traits: string; sort_order: number; is_active: boolean };
+export function CompassTypeEditor({ items }: { items: CType[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🧭 Kompas Jurusan — Tipe RIASEC</h2>
+      <p className="mb-3 text-xs text-ink/55">6 tipe (R/I/A/S/E/C). Edit deskripsi yang muncul di hasil quiz.</p>
+      <ul className="flex flex-col gap-2">{items.map((it) => <li key={it.letter}><CTypeRow item={it} /></li>)}</ul>
+    </section>
+  );
+}
+function CTypeRow({ item }: { item: CType }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-col gap-1.5 rounded-xl border border-sky-100 bg-white/60 p-2">
+      <div className="flex flex-wrap gap-1.5">
+        <span className="rounded-lg bg-sky-500 px-3 py-1 text-sm font-bold text-white">{v.letter}</span>
+        <input value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} placeholder="Nama" className="w-32 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+        <input value={v.tagline} onChange={(e) => setV({ ...v, tagline: e.target.value })} placeholder="Tagline" className="flex-1 min-w-[140px] rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      </div>
+      <textarea value={v.description} onChange={(e) => setV({ ...v, description: e.target.value })} placeholder="Deskripsi tipe" rows={2} className="rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      <input value={v.traits} onChange={(e) => setV({ ...v, traits: e.target.value })} placeholder="Traits (pisah · )" className="rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await saveCompassTypeAction({ ...v, letter: v.letter as "R"|"I"|"A"|"S"|"E"|"C" }); if (r.error) alert(r.error); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : "Simpan"}</button>
+      </div>
+    </div>
+  );
+}
+
+type CQ = { id: string; text: string; letter: string; sort_order: number; is_active: boolean };
+export function CompassQuestionEditor({ items }: { items: CQ[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🧭 Kompas Jurusan — Pertanyaan</h2>
+      <p className="mb-3 text-xs text-ink/55">Per pertanyaan dipasang ke 1 letter RIASEC. User jawab Likert 1-5.</p>
+      <ul className="mb-3 flex flex-col gap-2">{items.map((it) => <li key={it.id}><CQRow item={it} /></li>)}</ul>
+      <CQRow item={{ id: "", text: "", letter: "R", sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+function CQRow({ item, isNew }: { item: CQ; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [pending, start] = useTransition();
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 rounded-xl border border-sky-100 bg-white/60 p-2">
+      <select value={v.letter} onChange={(e) => setV({ ...v, letter: e.target.value })} className="rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs font-bold">
+        <option value="R">R</option><option value="I">I</option><option value="A">A</option><option value="S">S</option><option value="E">E</option><option value="C">C</option>
+      </select>
+      <input value={v.text} onChange={(e) => setV({ ...v, text: e.target.value })} placeholder="Pertanyaan" className="flex-1 min-w-[240px] rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded-lg border border-sky-100 bg-white/70 px-2 py-1 text-xs" />
+      <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+      <button onClick={() => start(async () => { const r = await saveCompassQuestionAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) setV({ ...item }); })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah" : "Simpan"}</button>
+      {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteCompassQuestionAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+    </div>
+  );
+}
+
+type CM = { id: string; name: string; description: string; primary_letters: string[]; careers: string[]; sort_order: number; is_active: boolean };
+export function CompassMajorEditor({ items }: { items: CM[] }) {
+  return (
+    <section className="glass rounded-2xl p-4">
+      <h2 className="mb-2 text-base font-bold text-ink">🧭 Kompas Jurusan — Daftar Jurusan</h2>
+      <p className="mb-3 text-xs text-ink/55">Tiap jurusan dipasangin 1-4 letter RIASEC + list karir. Toggle letter dengan klik tombol.</p>
+      <ul className="mb-3 flex flex-col gap-3">{items.map((it) => <li key={it.id}><CMRow item={it} /></li>)}</ul>
+      <CMRow item={{ id: "", name: "", description: "", primary_letters: [], careers: [], sort_order: items.length + 1, is_active: true }} isNew />
+    </section>
+  );
+}
+function CMRow({ item, isNew }: { item: CM; isNew?: boolean }) {
+  const [v, setV] = useState(item);
+  const [careersStr, setCareersStr] = useState(item.careers.join(", "));
+  const [pending, start] = useTransition();
+  const LETTERS = ["R","I","A","S","E","C"];
+  function toggleLetter(l: string) {
+    setV({ ...v, primary_letters: v.primary_letters.includes(l) ? v.primary_letters.filter((x) => x !== l) : [...v.primary_letters, l] });
+  }
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-sky-100 bg-white/60 p-3">
+      <input value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} placeholder="Nama jurusan" className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs font-semibold" />
+      <textarea value={v.description} onChange={(e) => setV({ ...v, description: e.target.value })} placeholder="Deskripsi jurusan singkat" rows={2} className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-xs text-ink/55">Letter RIASEC:</span>
+        {LETTERS.map((l) => (
+          <button key={l} type="button" onClick={() => toggleLetter(l)} className={`rounded px-2 py-1 text-xs font-bold ${v.primary_letters.includes(l) ? "bg-sky-500 text-white" : "bg-white text-ink/55 ring-1 ring-sky-100"}`}>
+            {l}
+          </button>
+        ))}
+        <span className="text-[10px] text-ink/40">(urutan = prioritas, klik buat toggle)</span>
+      </div>
+      <input value={careersStr} onChange={(e) => { setCareersStr(e.target.value); setV({ ...v, careers: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) }); }} placeholder="Karir (pisah koma, mis. Dokter, Peneliti, Konsultan)" className="rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-1 text-xs text-ink/70"><input type="checkbox" checked={v.is_active} onChange={(e) => setV({ ...v, is_active: e.target.checked })} />Aktif</label>
+        <input type="number" value={v.sort_order} onChange={(e) => setV({ ...v, sort_order: +e.target.value })} className="w-14 rounded border border-sky-100 bg-white/80 px-2 py-1 text-xs" />
+        <button onClick={() => start(async () => { const r = await saveCompassMajorAction({ ...v, id: isNew ? undefined : v.id }); if (r.error) alert(r.error); else if (isNew) { setV({ ...item }); setCareersStr(""); } })} disabled={pending} className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50">{pending ? "..." : isNew ? "+ Tambah jurusan" : "Simpan"}</button>
+        {!isNew && <button onClick={() => start(async () => { if (confirm("Hapus?")) await deleteCompassMajorAction(item.id); })} className="text-xs text-rose-500">Hapus</button>}
+      </div>
+    </div>
+  );
+}
