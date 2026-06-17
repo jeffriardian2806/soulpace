@@ -100,6 +100,18 @@ export default async function ProfilePage() {
         </div>
       </Link>
 
+      {/* === Entry point: Pusat Bantuan === */}
+      <Link href="/resource" className="rounded-2xl bg-gradient-to-br from-rose-50 to-orange-50 p-4 ring-1 ring-rose-100 transition-colors hover:bg-rose-100/50">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🌐</span>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-ink">Pusat Bantuan</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-ink/55">Crisis line, psikolog, & artikel edukasi terpercaya</p>
+          </div>
+          <span className="text-xs text-sky-600">→</span>
+        </div>
+      </Link>
+
       {/* === Tes & Pengenalan Diri === */}
       <section className="glass rounded-2xl p-4">
         <div className="flex items-baseline justify-between">

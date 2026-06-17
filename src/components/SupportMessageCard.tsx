@@ -8,9 +8,14 @@ export function SupportMessageCard({ message, dismissible = false, onDismiss }: 
         <div className="flex-1 min-w-0">
           <p className="text-xs uppercase tracking-wide text-sky-700 font-semibold">Pesan dari Soulpace</p>
           <p className="mt-1 text-sm leading-relaxed text-ink/85">{message}</p>
-          <Link href="/skrining" className="mt-2 inline-block text-xs font-medium text-sky-600 hover:underline">
-            Lihat skrining lagi
-          </Link>
+          <div className="mt-2 flex flex-wrap gap-3">
+            <Link href="/skrining" className="text-xs font-medium text-sky-600 hover:underline">
+              Lihat skrining lagi
+            </Link>
+            <Link href="/resource" className="text-xs font-medium text-rose-600 hover:underline">
+              🌐 Pusat Bantuan
+            </Link>
+          </div>
         </div>
         {dismissible && onDismiss && (
           <button onClick={onDismiss} aria-label="Tutup" className="text-ink/30 hover:text-ink/60 text-lg leading-none">✕</button>
