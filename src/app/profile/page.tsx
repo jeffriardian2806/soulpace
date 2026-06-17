@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPostsService } from "@/modules/posts";
 import { getProfilesService } from "@/modules/profiles";
 import { PostCard } from "@/components/PostCard";
+import { PremiumStatusCard } from "@/components/PremiumStatusCard";
 
 type GameSummary = { title: string; headline: string; value?: string; secondary?: string; emoji?: string };
 type GameResultRow = { game_key: string; summary: GameSummary; created_at: string };
@@ -88,6 +89,8 @@ export default async function ProfilePage() {
           baca lagi, dan lihat sudah sejauh apa kamu bertahan.
         </p>
       </div>
+
+      <PremiumStatusCard />
 
       {/* === Tes & Pengenalan Diri === */}
       <section className="glass rounded-2xl p-4">
