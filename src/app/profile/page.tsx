@@ -88,6 +88,18 @@ export default async function ProfilePage() {
 
       <PremiumStatusCard />
 
+      {/* === Entry point: Riwayat 30 Hari === */}
+      <Link href="/riwayat" className="rounded-2xl bg-gradient-to-br from-emerald-50 to-sky-50 p-4 ring-1 ring-emerald-100 transition-colors hover:bg-emerald-100/50">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">📅</span>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-ink">Riwayat 30 Hari</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-ink/55">Timeline mood, jurnal, syukur, tes, & curhat — semua dalam 1 view</p>
+          </div>
+          <span className="text-xs text-sky-600">→</span>
+        </div>
+      </Link>
+
       {/* === Tes & Pengenalan Diri === */}
       <section className="glass rounded-2xl p-4">
         <div className="flex items-baseline justify-between">
