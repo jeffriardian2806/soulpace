@@ -11,14 +11,10 @@ type GameResultRow = { game_key: string; summary: GameSummary; created_at: strin
 type QuizResultRow = { quiz_key: string; result_key: string; created_at: string };
 
 // game_key → href untuk re-take
-const GAME_HREF: Record<string, string> = {
-  spektrum: "/main/spektrum",
-  kompas: "/main/kompas",
-  mirror: "/main/cermin",
-};
+// Resolusi href dari game_key:
+// - Semua game di-link ke /laporan/{gameKey} (laporan dalam, ada tombol "Ulangi tes" di sana)
 function resolveHref(gameKey: string): string {
-  if (gameKey.startsWith("screening_")) return "/skrining";
-  return GAME_HREF[gameKey] ?? "/main";
+  return `/laporan/${gameKey}`;
 }
 
 export default async function ProfilePage() {
@@ -119,7 +115,7 @@ export default async function ProfilePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <p className="text-xs uppercase tracking-wide text-ink/45">{s.title}</p>
-                      <span className="text-[10px] text-ink/40">Ulang →</span>
+                      <span className="text-[10px] text-ink/40">Lihat laporan →</span>
                     </div>
                     <p className="mt-0.5 text-sm font-bold text-ink">{s.headline}</p>
                     {s.value && <p className="mt-0.5 text-xs leading-relaxed text-ink/60">{s.value}</p>}
@@ -137,7 +133,7 @@ export default async function ProfilePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <p className="text-xs uppercase tracking-wide text-ink/45">{meta?.title ?? q.quiz_key}</p>
-                      <span className="text-[10px] text-ink/40">Ulang →</span>
+                      <span className="text-[10px] text-ink/40">Lihat laporan →</span>
                     </div>
                     <p className="mt-0.5 text-sm font-bold text-ink capitalize">{q.result_key.replace(/_/g, " ")}</p>
                   </div>
