@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Tes & Skrining — Soulpace",
   description:
-    "Tes kepribadian (Spektrum Sosial, Kompas Jurusan) dan skrining klinis (PHQ-9, GAD-7) — semua interaktif, ada ilmu psikologinya.",
+    "Tes kepribadian (Spektrum, Kompas), Mental Health Check-Up (Burnout, Self-Esteem, dll), dan skrining klinis (PHQ-9, GAD-7).",
   robots: { index: true, follow: true },
 };
 
@@ -26,15 +26,19 @@ const PERSONALITY_TESTS = [
   },
 ];
 
+type ScreeningCard = { slug: string; name: string; subtitle: string; category: "clinical" | "mhcu" | "other" };
+
 export default async function SkriningPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("screening_instruments")
-    .select("slug, name, subtitle")
+    .select("slug, name, subtitle, category")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  const clinicalList = (data ?? []) as { slug: string; name: string; subtitle: string }[];
+  const all = (data ?? []) as ScreeningCard[];
+  const mhcuList = all.filter((x) => x.category === "mhcu");
+  const clinicalList = all.filter((x) => x.category === "clinical");
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
@@ -48,7 +52,7 @@ export default async function SkriningPage() {
         Eksplorasi diri lewat tes interaktif + cek gejala dengan instrumen klinis. Semuanya ada ilmu psikologinya, hasilnya cuma buat kamu sendiri.
       </p>
 
-      {/* === Section atas: Tes Kepribadian & Karir (non-clinical) === */}
+      {/* === Section 1: Tes Kepribadian & Karir (non-clinical, gamified) === */}
       <section>
         <h2 className="mb-1 text-base font-bold text-ink">🎓 Tes Kepribadian &amp; Karir</h2>
         <p className="mb-3 text-xs text-ink/55">
@@ -68,7 +72,33 @@ export default async function SkriningPage() {
         </div>
       </section>
 
-      {/* === Section bawah: Skrining Klinis (list card, klik buat mulai) === */}
+      {/* === Section 2: Mental Health Check-Up (preventive, non-clinical) === */}
+      <section className="mt-2">
+        <h2 className="mb-1 text-base font-bold text-ink">🌱 Mental Health Check-Up (MHCU)</h2>
+        <p className="mb-3 text-xs text-ink/55">
+          Cek pelan-pelan area kesejahteraan psikologis kamu. Bukan diagnosis — alat refleksi preventif yang complementary sama skrining klinis di bawah.
+        </p>
+        {mhcuList.length === 0 ? (
+          <p className="rounded-2xl bg-sky-50/50 p-4 text-center text-sm text-ink/60">
+            Belum ada instrumen MHCU aktif.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {mhcuList.map((c) => (
+              <Link key={c.slug} href={`/skrining/${c.slug}`} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
+                <div className="flex items-start justify-between">
+                  <p className="text-2xl">🌱</p>
+                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">MHCU</span>
+                </div>
+                <p className="mt-1 text-sm font-bold text-ink">{c.name}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{c.subtitle}</p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* === Section 3: Skrining Klinis (clinical detection) === */}
       <section className="mt-2">
         <h2 className="mb-1 text-base font-bold text-ink">📋 Skrining Klinis</h2>
         <p className="mb-3 text-xs text-ink/55">
@@ -76,7 +106,7 @@ export default async function SkriningPage() {
         </p>
         {clinicalList.length === 0 ? (
           <p className="rounded-2xl bg-sky-50/50 p-4 text-center text-sm text-ink/60">
-            Belum ada instrumen aktif.
+            Belum ada instrumen klinis aktif.
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
