@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Jurnal Pribadi — Soulpace" };
 
@@ -13,6 +14,9 @@ function fmt(iso: string): string {
 }
 
 export default async function JurnalPage() {
+  const _blocked_ = await checkPremiumAccess("jurnal");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const {
     data: { user },

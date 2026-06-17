@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createGratitudeAction, deleteGratitudeAction } from "@/app/syukur/actions";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Rasa Syukur — Soulpace" };
 
@@ -16,6 +17,9 @@ function fmt(iso: string): string {
 type Row = { id: string; items: string[]; created_at: string };
 
 export default async function SyukurPage() {
+  const _blocked_ = await checkPremiumAccess("syukur");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const {
     data: { user },

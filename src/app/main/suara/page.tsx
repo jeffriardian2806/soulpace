@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SuaraPlayer, type VoiceScenario } from "@/components/games/SuaraPlayer";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Suara Dalam Kepala — Soulpace" };
 
 export default async function SuaraPage() {
+  const _blocked_ = await checkPremiumAccess("suara");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data } = await supabase.from("voice_scenarios").select("id, situation, critic_text, supportive_text, outcome_critic, outcome_supportive").eq("is_active", true).order("sort_order");
   const scenarios = (data ?? []) as VoiceScenario[];

@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { KompasPlayer, type CompassQuestion, type CompassType, type CompassMajor } from "@/components/games/KompasPlayer";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Kompas Jurusan — Soulpace" };
 
 export default async function KompasPage() {
+  const _blocked_ = await checkPremiumAccess("kompas");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const [{ data: qRows }, { data: tRows }, { data: mRows }] = await Promise.all([
     supabase.from("compass_questions").select("id, text, letter").eq("is_active", true).order("sort_order"),

@@ -3,10 +3,14 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MoodTracker } from "@/components/MoodTracker";
 import { MoodInsight } from "@/components/MoodInsight";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Mood Tracker — Soulpace" };
 
 export default async function MoodPage() {
+  const _blocked_ = await checkPremiumAccess("mood");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const {
     data: { user },

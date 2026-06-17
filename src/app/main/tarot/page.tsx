@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { TarotPlayer, type TarotCard } from "@/components/games/TarotPlayer";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Tarot Refleksi — Soulpace" };
 
 export default async function TarotPage() {
+  const _blocked_ = await checkPremiumAccess("tarot");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data } = await supabase.from("tarot_cards").select("id, name, emoji, meaning_situation, meaning_feeling, meaning_action").eq("is_active", true).order("sort_order");
   const cards = (data ?? []) as TarotCard[];

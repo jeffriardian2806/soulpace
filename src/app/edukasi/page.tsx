@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata: Metadata = {
   title: "Edukasi & Tips Kesehatan Mental — Soulpace",
@@ -24,7 +25,10 @@ function Card({
   );
 }
 
-export default function EdukasiPage() {
+export default async function EdukasiPage() {
+  const _blocked_ = await checkPremiumAccess("edukasi");
+  if (_blocked_) return _blocked_;
+
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
       <header className="flex items-center justify-between">

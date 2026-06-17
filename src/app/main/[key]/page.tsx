@@ -3,9 +3,12 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Quiz } from "@/core/quizzes";
 import { QuizRunner } from "@/components/QuizRunner";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export default async function QuizPage({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
+  const _blocked_ = await checkPremiumAccess(key);
+  if (_blocked_) return _blocked_;
   const supabase = await createClient();
   const { data } = await supabase
     .from("quizzes")

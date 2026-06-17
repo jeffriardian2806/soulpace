@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SpektrumPlayer, type SpektrumCategory, type SpektrumQuestion } from "@/components/games/SpektrumPlayer";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Spektrum Sosial — Soulpace" };
 
 export default async function SpektrumPage() {
+  const _blocked_ = await checkPremiumAccess("spektrum");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const [{ data: catRows }, { data: qRows }] = await Promise.all([
     supabase.from("personality_categories").select("id, slug, name, emoji, description").eq("is_active", true).order("sort_order"),

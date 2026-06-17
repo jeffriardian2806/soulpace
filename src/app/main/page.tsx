@@ -1,40 +1,41 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getFeatureFlagMap, PremiumBadgeInline } from "@/components/PremiumGate";
 
 export const metadata = { title: "Main & Kenali Diri — Soulpace" };
 
-// Permainan interaktif — visual & tactile, taruh di atas biar narik mata user
+// Permainan interaktif — slug = key feature_flags
 const INTERACTIVE = [
-  { href: "/main/cermin", emoji: "🪞", title: "Pikiran Mirror", desc: "10 situasi hidup, dapet profil cara kamu menghadapi." },
-  { href: "/main/tarot", emoji: "🎴", title: "Tarot Refleksi", desc: "Tarik 3 kartu: situasi, perasaan, aksi. Cermin diri." },
-  { href: "/main/napas", emoji: "🫧", title: "Tarik Napas", desc: "Latihan napas 4-7-8. Ikutin lingkaran biar tenang." },
-  { href: "/main/baterai", emoji: "🔋", title: "Energi Sosial", desc: "Simulasi 7 hari: jaga balance sosial, energi, produktivitas." },
-  { href: "/main/monster", emoji: "👹", title: "Monster Cemas", desc: "Pilih respons ke pikiran negatif — liat monster mengecil." },
-  { href: "/main/detektif", emoji: "🔍", title: "Detektif Emosi", desc: "Tebak emosi di balik chat. Latihan EQ ringan." },
-  { href: "/main/suara", emoji: "🗣️", title: "Suara Dalam Kepala", desc: "Suara kritis vs supportive. Pilih mana yang didenger." },
-  { href: "/main/emosi", emoji: "🎯", title: "Tebak Emosi", desc: "Rapid-fire: lihat kartu, tebak emosi. Seru & cepet." },
-  { href: "/main/lepas", emoji: "💨", title: "Lepasin Pikiran", desc: "Tulis, tap balon, pecahin. Lepasin pelan-pelan." },
-  { href: "/main/warna", emoji: "🎨", title: "Warna Hari Ini", desc: "Pilih warna yang match vibe kamu. Tanpa kata." },
-  { href: "/main/tantang", emoji: "🌀", title: "Tantang Pikiran", desc: "Latihan CBT: pisahkan distorsi dari pikiran sehat." },
-  { href: "/main/grounding", emoji: "🧭", title: "Grounding 5-4-3-2-1", desc: "Cemas? Balik ke sekarang lewat indra." },
+  { href: "/main/cermin", slug: "mirror", emoji: "🪞", title: "Pikiran Mirror", desc: "10 situasi hidup, dapet profil cara kamu menghadapi." },
+  { href: "/main/tarot", slug: "tarot", emoji: "🎴", title: "Tarot Refleksi", desc: "Tarik 3 kartu: situasi, perasaan, aksi. Cermin diri." },
+  { href: "/main/napas", slug: "napas", emoji: "🫧", title: "Tarik Napas", desc: "Latihan napas 4-7-8. Ikutin lingkaran biar tenang." },
+  { href: "/main/baterai", slug: "baterai", emoji: "🔋", title: "Energi Sosial", desc: "Simulasi 7 hari: jaga balance sosial, energi, produktivitas." },
+  { href: "/main/monster", slug: "monster", emoji: "👹", title: "Monster Cemas", desc: "Pilih respons ke pikiran negatif — liat monster mengecil." },
+  { href: "/main/detektif", slug: "detektif", emoji: "🔍", title: "Detektif Emosi", desc: "Tebak emosi di balik chat. Latihan EQ ringan." },
+  { href: "/main/suara", slug: "suara", emoji: "🗣️", title: "Suara Dalam Kepala", desc: "Suara kritis vs supportive. Pilih mana yang didenger." },
+  { href: "/main/emosi", slug: "emosi", emoji: "🎯", title: "Tebak Emosi", desc: "Rapid-fire: lihat kartu, tebak emosi. Seru & cepet." },
+  { href: "/main/lepas", slug: "lepas", emoji: "💨", title: "Lepasin Pikiran", desc: "Tulis, tap balon, pecahin. Lepasin pelan-pelan." },
+  { href: "/main/warna", slug: "warna", emoji: "🎨", title: "Warna Hari Ini", desc: "Pilih warna yang match vibe kamu. Tanpa kata." },
+  { href: "/main/tantang", slug: "tantang", emoji: "🌀", title: "Tantang Pikiran", desc: "Latihan CBT: pisahkan distorsi dari pikiran sehat." },
+  { href: "/main/grounding", slug: "grounding", emoji: "🧭", title: "Grounding 5-4-3-2-1", desc: "Cemas? Balik ke sekarang lewat indra." },
 ];
 
-// Reflektif — text-based, butuh mikir & baca. Taruh setelah interaktif.
 const REFLECTIVE = [
-  { href: "/main/pilihan", emoji: "🌙", title: "Ini atau Itu", desc: "Check-in cepat: kamu lagi butuh apa malam ini." },
-  { href: "/main/empati", emoji: "💙", title: "Pilih Respons Terbaik", desc: "Latihan jadi pendengar yang menenangkan." },
-  { href: "/main/quest", emoji: "🗺️", title: "7 Hari Kenal Diri", desc: "Program refleksi pendek, tanpa hukuman." },
-  { href: "/main/poll", emoji: "📊", title: "Polling Hari Ini", desc: "Suara anonim — biar tahu kamu nggak sendiri." },
-  { href: "/main/ruang", emoji: "🪟", title: "Ruang Hari Ini", desc: "Satu kalimat bareng-bareng." },
+  { href: "/main/pilihan", slug: "pilihan", emoji: "🌙", title: "Ini atau Itu", desc: "Check-in cepat: kamu lagi butuh apa malam ini." },
+  { href: "/main/empati", slug: "empati", emoji: "💙", title: "Pilih Respons Terbaik", desc: "Latihan jadi pendengar yang menenangkan." },
+  { href: "/main/quest", slug: "quest", emoji: "🗺️", title: "7 Hari Kenal Diri", desc: "Program refleksi pendek, tanpa hukuman." },
+  { href: "/main/poll", slug: "poll", emoji: "📊", title: "Polling Hari Ini", desc: "Suara anonim — biar tahu kamu nggak sendiri." },
+  { href: "/main/ruang", slug: "ruang", emoji: "🪟", title: "Ruang Hari Ini", desc: "Satu kalimat bareng-bareng." },
 ];
 
 export default async function MainPage() {
   const supabase = await createClient();
 
-  const [{ data: quizzes }, { data: challenges }, { data: vibes }] = await Promise.all([
+  const [{ data: quizzes }, { data: challenges }, { data: vibes }, flagMap] = await Promise.all([
     supabase.from("quizzes").select("slug, title, emoji, intro").eq("is_active", true).order("sort_order", { ascending: true }),
     supabase.from("daily_challenges").select("body").eq("is_active", true).order("sort_order", { ascending: true }),
     supabase.from("vibe_presets").select("emoji, label, href").eq("is_active", true).order("sort_order", { ascending: true }),
+    getFeatureFlagMap(),
   ]);
 
   const challengeList = (challenges ?? []).map((r: { body: string }) => r.body);
@@ -79,7 +80,10 @@ export default async function MainPage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {INTERACTIVE.map((e) => (
             <Link key={e.href} href={e.href} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
-              <p className="text-2xl">{e.emoji}</p>
+              <div className="flex items-start justify-between">
+                <p className="text-2xl">{e.emoji}</p>
+                <PremiumBadgeInline flagMap={flagMap} slug={e.slug} />
+              </div>
               <p className="mt-1 text-sm font-bold text-ink">{e.title}</p>
               <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{e.desc}</p>
             </Link>
@@ -93,14 +97,20 @@ export default async function MainPage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {(quizzes ?? []).map((q: { slug: string; title: string; emoji: string; intro: string }) => (
             <Link key={q.slug} href={`/main/${q.slug}`} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
-              <p className="text-2xl">{q.emoji}</p>
+              <div className="flex items-start justify-between">
+                <p className="text-2xl">{q.emoji}</p>
+                <PremiumBadgeInline flagMap={flagMap} slug={q.slug} />
+              </div>
               <p className="mt-1 text-sm font-bold text-ink">{q.title}</p>
               <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{q.intro}</p>
             </Link>
           ))}
           {REFLECTIVE.map((e) => (
             <Link key={e.href} href={e.href} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
-              <p className="text-2xl">{e.emoji}</p>
+              <div className="flex items-start justify-between">
+                <p className="text-2xl">{e.emoji}</p>
+                <PremiumBadgeInline flagMap={flagMap} slug={e.slug} />
+              </div>
               <p className="mt-1 text-sm font-bold text-ink">{e.title}</p>
               <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{e.desc}</p>
             </Link>

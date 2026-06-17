@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ScreeningTool } from "@/components/ScreeningTool";
 import type { ScreeningInstrument } from "@/config/screening";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 type DbItem = { position: number; text: string; reverse: boolean };
 type DbOption = { label: string; value: number; sort_order: number };
@@ -58,6 +59,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function SkriningInstrumentPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const _blocked_ = await checkPremiumAccess(`screening_${slug}`);
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data } = await supabase
     .from("screening_instruments")

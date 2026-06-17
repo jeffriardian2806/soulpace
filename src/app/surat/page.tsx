@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createLetterAction } from "@/app/surat/actions";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Surat untuk Diri di Masa Depan — Soulpace" };
 
@@ -14,6 +15,9 @@ function fmt(iso: string): string {
 }
 
 export default async function SuratPage() {
+  const _blocked_ = await checkPremiumAccess("surat");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const {
     data: { user },

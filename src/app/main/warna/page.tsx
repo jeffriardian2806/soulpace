@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { WarnaPlayer, type MoodColor } from "@/components/games/WarnaPlayer";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Warna Hari Ini — Soulpace" };
 
 export default async function WarnaPage() {
+  const _blocked_ = await checkPremiumAccess("warna");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data } = await supabase
     .from("mood_colors")

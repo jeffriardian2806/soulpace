@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { RoomForm } from "@/components/RoomForm";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Ruang Hari Ini — Soulpace" };
 
@@ -14,6 +15,9 @@ function timeAgo(iso: string): string {
 }
 
 export default async function RuangPage() {
+  const _blocked_ = await checkPremiumAccess("ruang");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data: room } = await supabase
     .from("rooms")

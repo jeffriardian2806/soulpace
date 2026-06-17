@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata: Metadata = {
   title: "Cerita — Soulpace",
@@ -25,6 +26,9 @@ export default async function CeritaPage({
 }: {
   searchParams: Promise<{ sort?: string }>;
 }) {
+  const _blocked_ = await checkPremiumAccess("cerita");
+  if (_blocked_) return _blocked_;
+
   const sp = await searchParams;
   const sort = sp.sort === 'oldest' || sp.sort === 'popular' ? sp.sort : 'latest';
   const supabase = await createClient();

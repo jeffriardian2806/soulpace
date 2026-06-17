@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { TantangPlayer, type CbtScenario } from "@/components/games/TantangPlayer";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Tantang Pikiran — Soulpace" };
 
 export default async function TantangPage() {
+  const _blocked_ = await checkPremiumAccess("tantang");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data } = await supabase
     .from("cbt_scenarios")

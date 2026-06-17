@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { EmosiPlayer, type EmotionCard } from "@/components/games/EmosiPlayer";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Tebak Emosi — Soulpace" };
 
 export default async function EmosiPage() {
+  const _blocked_ = await checkPremiumAccess("emosi");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data } = await supabase.from("emotion_cards").select("id, content, correct, options").eq("is_active", true).order("sort_order");
   const cards = (data ?? []) as EmotionCard[];

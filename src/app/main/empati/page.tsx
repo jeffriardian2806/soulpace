@@ -2,10 +2,14 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { EmpathyScenario } from "@/core/empathyScenarios";
 import { EmpathyGame } from "@/components/EmpathyGame";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Pilih Respons Terbaik — Soulpace" };
 
 export default async function EmpatiPage() {
+  const _blocked_ = await checkPremiumAccess("empati");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data } = await supabase
     .from("empathy_scenarios")

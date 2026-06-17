@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { GroundingPlayer, type GroundingStep } from "@/components/games/GroundingPlayer";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Grounding 5-4-3-2-1 — Soulpace" };
 
 export default async function GroundingPage() {
+  const _blocked_ = await checkPremiumAccess("grounding");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data } = await supabase
     .from("grounding_steps")

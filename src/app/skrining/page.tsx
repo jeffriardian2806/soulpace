@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { getFeatureFlagMap, PremiumBadgeInline } from "@/components/PremiumGate";
 
 export const metadata: Metadata = {
   title: "Tes & Skrining — Soulpace",
@@ -30,6 +31,7 @@ type ScreeningCard = { slug: string; name: string; subtitle: string; category: "
 
 export default async function SkriningPage() {
   const supabase = await createClient();
+  const flagMap = await getFeatureFlagMap();
   const { data } = await supabase
     .from("screening_instruments")
     .select("slug, name, subtitle, category")
@@ -63,7 +65,10 @@ export default async function SkriningPage() {
             <Link key={t.href} href={t.href} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
               <div className="flex items-start justify-between">
                 <p className="text-2xl">{t.emoji}</p>
-                <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold text-sky-700">{t.badge}</span>
+                <div className="flex items-center gap-1">
+                  <PremiumBadgeInline flagMap={flagMap} slug={t.href.replace("/main/", "")} />
+                  <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold text-sky-700">{t.badge}</span>
+                </div>
               </div>
               <p className="mt-1 text-sm font-bold text-ink">{t.title}</p>
               <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{t.desc}</p>
@@ -88,7 +93,10 @@ export default async function SkriningPage() {
               <Link key={c.slug} href={`/skrining/${c.slug}`} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
                 <div className="flex items-start justify-between">
                   <p className="text-2xl">🌱</p>
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">MHCU</span>
+                  <div className="flex items-center gap-1">
+                    <PremiumBadgeInline flagMap={flagMap} slug={`screening_${c.slug}`} />
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">MHCU</span>
+                  </div>
                 </div>
                 <p className="mt-1 text-sm font-bold text-ink">{c.name}</p>
                 <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{c.subtitle}</p>
@@ -114,7 +122,10 @@ export default async function SkriningPage() {
               <Link key={c.slug} href={`/skrining/${c.slug}`} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
                 <div className="flex items-start justify-between">
                   <p className="text-2xl">📋</p>
-                  <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold text-sky-700">Klinis</span>
+                  <div className="flex items-center gap-1">
+                    <PremiumBadgeInline flagMap={flagMap} slug={`screening_${c.slug}`} />
+                    <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold text-sky-700">Klinis</span>
+                  </div>
                 </div>
                 <p className="mt-1 text-sm font-bold text-ink">{c.name}</p>
                 <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{c.subtitle}</p>

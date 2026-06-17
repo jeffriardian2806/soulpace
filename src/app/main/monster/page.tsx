@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { MonsterPlayer, type MonsterSituation } from "@/components/games/MonsterPlayer";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Monster Cemas — Soulpace" };
 
 export default async function MonsterPage() {
+  const _blocked_ = await checkPremiumAccess("monster");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data } = await supabase.from("monster_situations").select("id, situation, responses").eq("is_active", true).order("sort_order");
   const situations = (data ?? []) as MonsterSituation[];

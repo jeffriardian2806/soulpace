@@ -2,10 +2,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { QuestSeven } from "@/components/QuestSeven";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "7 Hari Kenal Diri — Soulpace" };
 
 export default async function QuestPage() {
+  const _blocked_ = await checkPremiumAccess("quest");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");

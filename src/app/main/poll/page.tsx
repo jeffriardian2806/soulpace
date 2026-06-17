@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PollWidget } from "@/components/PollWidget";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Polling Hari Ini — Soulpace" };
 
 export default async function PollPage() {
+  const _blocked_ = await checkPremiumAccess("poll");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data: poll } = await supabase
     .from("polls")

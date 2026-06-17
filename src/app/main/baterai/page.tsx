@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { BateraiPlayer, type BatteryAction } from "@/components/games/BateraiPlayer";
+import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = { title: "Energi Sosial — Soulpace" };
 
 export default async function BateraiPage() {
+  const _blocked_ = await checkPremiumAccess("baterai");
+  if (_blocked_) return _blocked_;
+
   const supabase = await createClient();
   const { data } = await supabase.from("battery_actions").select("id, emoji, label, description, social_delta, energy_delta, productivity_delta").eq("is_active", true).order("sort_order");
   const actions = (data ?? []) as BatteryAction[];
