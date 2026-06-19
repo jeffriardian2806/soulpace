@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 import { VisualPairChoicePlayer } from "@/components/visual/VisualPairChoicePlayer";
@@ -18,14 +17,35 @@ export default async function PilihVibePage() {
   if (_blocked_) return _blocked_;
 
   const supabase = await createClient();
-  const [{ data: itemsRow }, { data: profilesRow }] = await Promise.all([
+  const [{ data: itemsRow, error: itemsErr }, { data: profilesRow, error: profilesErr }] = await Promise.all([
     supabase.from("visual_pair_choice_items").select("slug, prompt, option_a, option_b, sort_order").eq("is_active", true).order("sort_order"),
     supabase.from("visual_vibe_profiles").select("slug, name, emoji, description, dominant_traits").eq("is_active", true).order("sort_order"),
   ]);
 
   const items = ((itemsRow ?? []) as Item[]);
   const profiles = ((profilesRow ?? []) as Profile[]);
-  if (items.length === 0) redirect("/main");
+  const err = itemsErr ?? profilesErr;
+
+  if (err || items.length === 0) {
+    return (
+      <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-4 px-5 py-6">
+        <header className="flex items-center gap-3">
+          <Link href="/main" className="text-sm text-ink/50">← Main</Link>
+          <h1 className="text-lg font-bold text-ink">🎨 Pilih Vibe</h1>
+        </header>
+        <div className="rounded-2xl bg-amber-50 p-6 ring-1 ring-amber-200">
+          <p className="text-3xl">🔧</p>
+          <p className="mt-2 text-base font-bold text-ink">Fitur belum siap</p>
+          <p className="mt-1 text-sm leading-relaxed text-ink/70">
+            Konten visual belum ada di database. Admin perlu run migration <code className="rounded bg-ink/5 px-1 py-0.5 text-xs">0035_soulpace_visual_reflection.sql</code> dulu.
+          </p>
+          {err && (
+            <p className="mt-2 text-[10px] text-rose-600 italic">Error: {err.message}</p>
+          )}
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-4 px-5 py-6">
