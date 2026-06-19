@@ -24,12 +24,12 @@ export default async function LaporanMhcuPage() {
   // Fetch list MHCU instruments
   const { data: instruments } = await supabase
     .from("screening_instruments")
-    .select("slug, name, subtitle, sort_order")
+    .select("slug, name, subtitle, sort_order, screening_bands(min_score, max_score, label)")
     .eq("category", "mhcu")
     .eq("is_active", true)
     .order("sort_order");
 
-  const mhcuList = (instruments ?? []) as { slug: string; name: string; subtitle: string; sort_order: number }[];
+  const mhcuList = (instruments ?? []) as { slug: string; name: string; subtitle: string; sort_order: number; screening_bands: { min_score: number; max_score: number; label: string }[] }[];
 
   // Fetch latest hasil per MHCU instrument dalam 30 hari
   const cutoff = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
@@ -61,10 +61,12 @@ export default async function LaporanMhcuPage() {
     severity?: string;
     band_label?: string;
     created_at?: string;
+    bands: { min_score: number; max_score: number; label: string }[];
   };
   const dimensions: DimensionResult[] = mhcuList.map((m) => {
     const r = latestByKey.get(`screening_${m.slug}`);
-    if (!r) return { slug: m.slug, name: m.name, completed: false };
+    const bands = (m.screening_bands ?? []).slice().sort((a, b) => a.min_score - b.min_score);
+    if (!r) return { slug: m.slug, name: m.name, completed: false, bands };
     return {
       slug: m.slug,
       name: m.name,
@@ -75,6 +77,7 @@ export default async function LaporanMhcuPage() {
       severity: r.detail?.severity,
       band_label: r.detail?.band_label,
       created_at: r.created_at,
+      bands,
     };
   });
 
