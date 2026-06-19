@@ -242,10 +242,6 @@ export function TrailGame() {
                 <stop offset="0%" stopColor="#0ea5e9" />
                 <stop offset="100%" stopColor="#a855f7" />
               </linearGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-              </filter>
             </defs>
 
             {/* Trail lines */}
@@ -264,31 +260,24 @@ export function TrailGame() {
             {/* Dots */}
             {dots.map((d) => {
               const isTapped = tappedIds.includes(d.id);
-              const isNext = d.id === tappedIds.length;
               const isError = errorFlashId === d.id;
-              const fillColor = isError ? "#f43f5e" : isTapped ? "#10b981" : isNext ? "#fff" : "#fff";
-              const strokeColor = isError ? "#9f1239" : isTapped ? "#047857" : isNext ? "#0ea5e9" : "#cbd5e1";
-              const strokeWidth = isNext ? 3 : 2;
+              const fillColor = isError ? "#f43f5e" : isTapped ? "#10b981" : "#fff";
+              const strokeColor = isError ? "#9f1239" : isTapped ? "#047857" : "#cbd5e1";
+              const strokeWidth = 2;
               const textColor = isError ? "#fff" : isTapped ? "#fff" : "#0f172a";
               const isLetter = d.type === "letter";
               return (
                 <g
                   key={d.id}
                   onClick={() => handleTap(d.id)}
-                  className={`cursor-pointer ${isError ? "animate-pulse" : isNext ? "" : ""}`}
+                  className={`cursor-pointer ${isError ? "animate-pulse" : ""}`}
                   style={{ touchAction: "manipulation" }}
                 >
                   {/* Invisible larger hit area */}
                   <circle cx={d.x} cy={d.y} r={26} fill="transparent" />
-                  {/* Glow for next target */}
-                  {isNext && !isTapped && (
-                    <circle cx={d.x} cy={d.y} r={22} fill="#0ea5e9" opacity={0.2} className="animate-ping" />
-                  )}
                   <circle
                     cx={d.x} cy={d.y} r={isLetter ? 18 : 20}
                     fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}
-                    filter={isNext ? "url(#glow)" : undefined}
-                    className={isNext ? "transition-all" : ""}
                   />
                   <text
                     x={d.x} y={d.y}

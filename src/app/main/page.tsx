@@ -19,6 +19,8 @@ const INTERACTIVE = [
   { href: "/main/tantang", slug: "tantang", emoji: "🌀", title: "Tantang Pikiran", desc: "Latihan CBT: pisahkan distorsi dari pikiran sehat." },
   { href: "/main/grounding", slug: "grounding", emoji: "🧭", title: "Grounding 5-4-3-2-1", desc: "Cemas? Balik ke sekarang lewat indra." },
   { href: "/main/trail", slug: "trail", emoji: "🛤️", title: "Trail Making Test", desc: "Game penalaran: connect dots berurutan. Ngukur cognitive flexibility." },
+  { href: "/main/mata-pertama", slug: "mata-pertama", emoji: "👁️", title: "Mata Pertama", desc: "Refleksi visual: apa yang lo lihat pertama → vibe insight playful." },
+  { href: "/main/pilih-vibe", slug: "pilih-vibe", emoji: "🎨", title: "Pilih Vibe", desc: "Forced choice grafis: pilih A atau B → vibe profile hari ini." },
 ];
 
 const REFLECTIVE = [
