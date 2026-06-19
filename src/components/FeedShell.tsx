@@ -306,8 +306,8 @@ export function FeedShell({
             { href: "/skrining", icon: "📋", label: "Skrining" },
             { href: "/refleksi", icon: "✍️", label: "Refleksi" },
             { href: "/mood", icon: "🙂", label: "Mood" },
-            { href: "/syukur", icon: "🙏", label: "Syukur" },
-            { href: "/hening", icon: "🌙", label: "Hening" },
+            { href: "/syukur", icon: "🙏", label: "Afirmasi" },
+            // { href: "/hening", icon: "🌙", label: "Hening" }, // hidden — belum digunakan
           ].map((t) => (
             <Link
               key={t.href}
