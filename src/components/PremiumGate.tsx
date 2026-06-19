@@ -80,12 +80,12 @@ function PremiumBlocked({ slug, name, tokenCost, balance, reason }: { slug: stri
 /**
  * Server fetch — bikin Map slug→flag biar hub pages (/main, /skrining) bisa pre-fetch & render badge tanpa N+1 query.
  */
-export async function getFeatureFlagMap(): Promise<Map<string, { is_premium: boolean; token_cost: number }>> {
+export async function getFeatureFlagMap(): Promise<Map<string, { is_premium: boolean; token_cost: number; timer_seconds: number | null }>> {
   const supabase = await createClient();
-  const { data } = await supabase.from("feature_flags").select("slug, is_premium, token_cost").eq("is_active", true);
-  const map = new Map<string, { is_premium: boolean; token_cost: number }>();
-  ((data ?? []) as { slug: string; is_premium: boolean; token_cost: number }[]).forEach((f) => {
-    map.set(f.slug, { is_premium: f.is_premium, token_cost: f.token_cost });
+  const { data } = await supabase.from("feature_flags").select("slug, is_premium, token_cost, timer_seconds").eq("is_active", true);
+  const map = new Map<string, { is_premium: boolean; token_cost: number; timer_seconds: number | null }>();
+  ((data ?? []) as { slug: string; is_premium: boolean; token_cost: number; timer_seconds: number | null }[]).forEach((f) => {
+    map.set(f.slug, { is_premium: f.is_premium, token_cost: f.token_cost, timer_seconds: f.timer_seconds });
   });
   return map;
 }
@@ -93,7 +93,7 @@ export async function getFeatureFlagMap(): Promise<Map<string, { is_premium: boo
 /**
  * Inline badge — renderkan kalau slug ditandai premium di flagMap.
  */
-export function PremiumBadgeInline({ flagMap, slug }: { flagMap: Map<string, { is_premium: boolean; token_cost: number }>; slug: string }) {
+export function PremiumBadgeInline({ flagMap, slug }: { flagMap: Map<string, { is_premium: boolean; token_cost: number; timer_seconds: number | null }>; slug: string }) {
   const flag = flagMap.get(slug);
   if (!flag?.is_premium) return null;
   return (

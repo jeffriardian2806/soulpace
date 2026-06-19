@@ -14,7 +14,7 @@ export default async function AdminMonetizationPage() {
   if (!profile || (profile.role !== "moderator" && profile.role !== "admin")) redirect("/feed");
 
   const [{ data: flagRows }, { data: voucherRows }] = await Promise.all([
-    supabase.from("feature_flags").select("slug, name, description, is_premium, token_cost, sort_order, is_active").order("sort_order"),
+    supabase.from("feature_flags").select("slug, name, description, is_premium, token_cost, timer_seconds, sort_order, is_active").order("sort_order"),
     supabase.from("vouchers").select("id, code, notes, token_amount, days_amount, max_redeem, redeem_count, expires_at, is_active, created_at").order("created_at", { ascending: false }),
   ]);
 
@@ -33,7 +33,7 @@ export default async function AdminMonetizationPage() {
         Atur fitur mana yang premium (default semua FREE), berapa token cost-nya, dan terbitkan voucher buat user. Toggle bisa diubah kapan saja secara dinamis.
       </p>
 
-      <FeatureFlagsTable items={(flagRows ?? []) as { slug: string; name: string; description: string | null; is_premium: boolean; token_cost: number; sort_order: number; is_active: boolean }[]} />
+      <FeatureFlagsTable items={(flagRows ?? []) as { slug: string; name: string; description: string | null; is_premium: boolean; token_cost: number; timer_seconds: number | null; sort_order: number; is_active: boolean }[]} />
       <VouchersPanel items={(voucherRows ?? []) as { id: string; code: string; notes: string | null; token_amount: number; days_amount: number; max_redeem: number; redeem_count: number; expires_at: string | null; is_active: boolean; created_at: string }[]} />
     </main>
   );

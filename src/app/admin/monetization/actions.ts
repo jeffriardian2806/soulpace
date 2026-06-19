@@ -12,18 +12,18 @@ async function requireAdmin() {
   return { supabase, userId: user.id };
 }
 
-export async function toggleFeaturePremiumAction(slug: string, isPremium: boolean, tokenCost: number): Promise<{ error: string | null }> {
+export async function toggleFeaturePremiumAction(slug: string, isPremium: boolean, tokenCost: number, timerSeconds: number | null): Promise<{ error: string | null }> {
   const { supabase } = await requireAdmin();
   const { error } = await supabase
     .from("feature_flags")
-    .update({ is_premium: isPremium, token_cost: tokenCost, updated_at: new Date().toISOString() })
+    .update({ is_premium: isPremium, token_cost: tokenCost, timer_seconds: timerSeconds, updated_at: new Date().toISOString() })
     .eq("slug", slug);
   if (error) return { error: error.message };
   revalidatePath("/admin/monetization");
   return { error: null };
 }
 
-export async function upsertFeatureFlagAction(p: { slug: string; name: string; description?: string; is_premium: boolean; token_cost: number; sort_order: number; is_active: boolean }): Promise<{ error: string | null }> {
+export async function upsertFeatureFlagAction(p: { slug: string; name: string; description?: string; is_premium: boolean; token_cost: number; timer_seconds?: number | null; sort_order: number; is_active: boolean }): Promise<{ error: string | null }> {
   const { supabase } = await requireAdmin();
   if (!p.slug.trim() || !p.name.trim()) return { error: "Slug & nama wajib." };
   const row = {
@@ -32,6 +32,7 @@ export async function upsertFeatureFlagAction(p: { slug: string; name: string; d
     description: p.description ?? null,
     is_premium: p.is_premium,
     token_cost: p.token_cost,
+    timer_seconds: p.timer_seconds ?? null,
     sort_order: p.sort_order,
     is_active: p.is_active,
     updated_at: new Date().toISOString(),

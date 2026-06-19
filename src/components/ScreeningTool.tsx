@@ -33,6 +33,7 @@ export function ScreeningTool({
   flowMode = false,
   nextHref,
   flowStepLabel,
+  timerSeconds,
 }: {
   instruments: ScreeningInstrument[];
   /**
@@ -43,6 +44,11 @@ export function ScreeningTool({
   flowMode?: boolean;
   nextHref?: string;
   flowStepLabel?: string;
+  /**
+   * Countdown timer dalam detik. null/undefined/0 = no timer.
+   * Saat expired, kasih soft prompt (TIDAK auto-submit — biar data ga skewed).
+   */
+  timerSeconds?: number | null;
 }) {
   const router = useRouter();
   const [answers, setAnswers] = useState<Answers>(() =>
@@ -50,6 +56,9 @@ export function ScreeningTool({
   );
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number | null>(timerSeconds && timerSeconds > 0 ? timerSeconds : null);
+  const [timerExpired, setTimerExpired] = useState(false);
+  const [timerDisabled, setTimerDisabled] = useState(false);
 
   const allAnswered = instruments.every((inst) =>
     answers[inst.id].every((a) => a !== null)
@@ -109,6 +118,17 @@ export function ScreeningTool({
 
   const savedRef = useRef(false);
   const [supportMessage, setSupportMessage] = useState<string | null>(null);
+
+  // Timer countdown
+  useEffect(() => {
+    if (timeLeft === null || submitted || timerExpired || timerDisabled) return;
+    if (timeLeft <= 0) {
+      setTimerExpired(true);
+      return;
+    }
+    const t = setTimeout(() => setTimeLeft((v) => (v === null ? null : v - 1)), 1000);
+    return () => clearTimeout(t);
+  }, [timeLeft, submitted, timerExpired, timerDisabled]);
 
   useEffect(() => {
     if (submitted && !savedRef.current && results.length > 0) {

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ScreeningTool } from "@/components/ScreeningTool";
 import type { ScreeningInstrument } from "@/config/screening";
-import { checkPremiumAccess } from "@/components/PremiumGate";
+import { checkPremiumAccess, getFeatureFlagMap } from "@/components/PremiumGate";
 
 type DbItem = { position: number; text: string; reverse: boolean };
 type DbOption = { label: string; value: number; sort_order: number };
@@ -82,6 +82,8 @@ export default async function SkriningInstrumentPage({
   if (!data) notFound();
 
   const instrument = mapInstrument(data as DbInstrument);
+  const flagMap = await getFeatureFlagMap();
+  const timerSeconds = flagMap.get(`screening_${slug}`)?.timer_seconds ?? null;
 
   // === MHCU guided flow ===
   // Kalau `?flow=mhcu`, hitung next step (instrumen MHCU berikutnya yang user belum complete dalam 30 hari)
@@ -169,6 +171,7 @@ export default async function SkriningInstrumentPage({
         flowMode={flowMode}
         nextHref={nextHref}
         flowStepLabel={flowStepLabel}
+        timerSeconds={timerSeconds}
       />
     </main>
   );
