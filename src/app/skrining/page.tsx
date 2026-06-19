@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getFeatureFlagMap, PremiumBadgeInline } from "@/components/PremiumGate";
+import { MhcuActionList } from "@/components/MhcuActionList";
 
 export const metadata: Metadata = {
   title: "Tes & Skrining — Soulpace",
@@ -42,6 +43,38 @@ export default async function SkriningPage() {
   const mhcuList = all.filter((x) => x.category === "mhcu");
   const clinicalList = all.filter((x) => x.category === "clinical");
 
+  // Cek hasil user MHCU dalam 30 hari (buat sequential lock state)
+  const { data: { user } } = await supabase.auth.getUser();
+  const cutoff = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+  let mhcuCompletedSet = new Set<string>();
+  let mhcuLatestResults: Record<string, { headline: string; value?: string; band_label?: string; severity?: string }> = {};
+  if (user) {
+    const mhcuSlugs = mhcuList.map((m) => `screening_${m.slug}`);
+    if (mhcuSlugs.length > 0) {
+      const { data: rows } = await supabase
+        .from("user_game_results")
+        .select("game_key, summary, detail, created_at")
+        .eq("user_id", user.id)
+        .in("game_key", mhcuSlugs)
+        .gte("created_at", cutoff)
+        .order("created_at", { ascending: false });
+      const seenBySlug = new Set<string>();
+      ((rows ?? []) as { game_key: string; summary: { headline: string; value?: string }; detail: { band_label?: string; severity?: string } | null; created_at: string }[]).forEach((r) => {
+        const baseSlug = r.game_key.replace("screening_", "");
+        if (!seenBySlug.has(baseSlug)) {
+          seenBySlug.add(baseSlug);
+          mhcuCompletedSet.add(baseSlug);
+          mhcuLatestResults[baseSlug] = {
+            headline: r.summary.headline,
+            value: r.summary.value,
+            band_label: r.detail?.band_label,
+            severity: r.detail?.severity,
+          };
+        }
+      });
+    }
+  }
+
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
       <header className="flex items-center justify-between">
@@ -77,32 +110,18 @@ export default async function SkriningPage() {
         </div>
       </section>
 
-      {/* === Section 2: Mental Health Check-Up (preventive, non-clinical) === */}
+      {/* === Section 2: MHCU (sequential action steps) === */}
       <section className="mt-2">
         <h2 className="mb-1 text-base font-bold text-ink">🌱 Mental Health Check-Up (MHCU)</h2>
         <p className="mb-3 text-xs text-ink/55">
-          Cek pelan-pelan area kesejahteraan psikologis kamu. Bukan diagnosis — alat refleksi preventif yang complementary sama skrining klinis di bawah.
+          Cek kesehatan mental komprehensif — 6 tahap berurutan. Selesain semuanya biar dapet laporan lengkap (kayak hasil MCU di RS).
         </p>
         {mhcuList.length === 0 ? (
           <p className="rounded-2xl bg-sky-50/50 p-4 text-center text-sm text-ink/60">
             Belum ada instrumen MHCU aktif.
           </p>
         ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {mhcuList.map((c) => (
-              <Link key={c.slug} href={`/skrining/${c.slug}`} className="glass rounded-2xl p-4 transition-colors hover:bg-sky-50">
-                <div className="flex items-start justify-between">
-                  <p className="text-2xl">🌱</p>
-                  <div className="flex items-center gap-1">
-                    <PremiumBadgeInline flagMap={flagMap} slug={`screening_${c.slug}`} />
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">MHCU</span>
-                  </div>
-                </div>
-                <p className="mt-1 text-sm font-bold text-ink">{c.name}</p>
-                <p className="mt-0.5 text-xs leading-relaxed text-ink/55">{c.subtitle}</p>
-              </Link>
-            ))}
-          </div>
+          <MhcuActionList items={mhcuList} flagMap={flagMap} completedSet={mhcuCompletedSet} latestResults={mhcuLatestResults} />
         )}
       </section>
 
