@@ -300,7 +300,7 @@ export function FeedShell({
         </header>
 
         {/* Tools wellness: gaya shortcut (ikon + label) biar beda jelas dari filter */}
-        <div className="flex gap-1 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex justify-between gap-1 pb-1">
           {[
             { href: "/main", icon: "✨", label: "Main" },
             { href: "/skrining", icon: "📋", label: "Skrining" },
@@ -312,7 +312,7 @@ export function FeedShell({
             <Link
               key={t.href}
               href={t.href}
-              className="flex w-[60px] shrink-0 flex-col items-center gap-1 rounded-xl py-1.5 text-ink/70 transition-colors hover:bg-sky-50"
+              className="flex flex-1 flex-col items-center gap-1 rounded-xl py-1.5 text-ink/70 transition-colors hover:bg-sky-50"
             >
               <span className="text-lg leading-none">{t.icon}</span>
               <span className="text-[10px] font-medium">{t.label}</span>
