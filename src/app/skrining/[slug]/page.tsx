@@ -144,9 +144,9 @@ export default async function SkriningInstrumentPage({
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
       <header className="flex items-center gap-3">
-        <Link href={flowMode ? "/skrining" : "/skrining"} className="text-sm text-ink/50">
-          {flowMode ? "× Keluar flow" : "← Kembali"}
-        </Link>
+        {!flowMode && (
+          <Link href="/skrining" className="text-sm text-ink/50">← Kembali</Link>
+        )}
         <h1 className="text-xl font-bold text-ink">
           {flowMode ? "🌱" : "📋"} {instrument.name}
         </h1>
@@ -157,7 +157,7 @@ export default async function SkriningInstrumentPage({
             MHCU · Tahap {flowProgressInfo.current} dari {flowProgressInfo.total}
           </p>
           <p className="mt-0.5 text-[10px] text-ink/55">
-            Hasil komprehensif akan muncul setelah semua tahap selesai. Jawab dulu, lanjut step berikutnya otomatis.
+            Progress auto-saved. Hasil cuma muncul setelah 6/6 tahap selesai — kalau pause, tinggal balik lagi nanti dari tahap yang belum kelar.
           </p>
         </div>
       )}

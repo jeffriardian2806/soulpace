@@ -58,21 +58,18 @@ export function MhcuActionList({
           const done = completedSet.has(item.slug);
           const isNext = idx === nextIdx;
           const isLocked = !done && !isNext;
-          const result = latestResults[item.slug];
 
-          // Done state: green check + skor + link laporan
+          // Done state: green check + status (NO clickable link, NO band/skor — hasil per-step ga boleh dilihat sebelum 6/6 selesai)
           if (done) {
             return (
               <li key={item.slug}>
-                <Link href={`/laporan/screening_${item.slug}`} className="flex items-center gap-3 rounded-xl bg-emerald-50 p-3 ring-1 ring-emerald-200 transition-colors hover:bg-emerald-100">
+                <div className="flex items-center gap-3 rounded-xl bg-emerald-50 p-3 ring-1 ring-emerald-200">
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white">✓</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs uppercase tracking-wide text-emerald-700/70">Tahap {idx + 1} · Selesai</p>
                     <p className="text-sm font-bold text-ink">{item.name}</p>
-                    {result?.band_label && <p className="text-xs italic text-ink/65">Hasil: {result.band_label}</p>}
                   </div>
-                  <span className="text-xs text-emerald-600">Lihat laporan →</span>
-                </Link>
+                </div>
               </li>
             );
           }

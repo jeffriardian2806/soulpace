@@ -42,7 +42,31 @@ export default async function ProfilePage() {
   ((gameResultRows ?? []) as GameResultRow[]).forEach((r) => {
     if (!latestByGame.has(r.game_key)) latestByGame.set(r.game_key, r);
   });
-  const latestGameResults = Array.from(latestByGame.values());
+
+  // === MHCU aggregation: group screening_<mhcu_slug> jadi 1 card aggregate ===
+  // Fetch list MHCU instruments biar tau total + status komplet
+  const { data: mhcuInstrumentList } = await supabase
+    .from("screening_instruments")
+    .select("slug")
+    .eq("category", "mhcu")
+    .eq("is_active", true);
+  const mhcuSlugs = new Set(((mhcuInstrumentList ?? []) as { slug: string }[]).map((m) => `screening_${m.slug}`));
+  const mhcuTotal = mhcuSlugs.size;
+
+  // Cek MHCU completed dalam 30 hari (untuk konsistensi sama flow gate)
+  const cutoffMhcu = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+  const mhcuDoneInWindow = new Set<string>();
+  ((gameResultRows ?? []) as GameResultRow[]).forEach((r) => {
+    if (mhcuSlugs.has(r.game_key) && r.created_at >= cutoffMhcu) {
+      mhcuDoneInWindow.add(r.game_key);
+    }
+  });
+  const mhcuDoneCount = mhcuDoneInWindow.size;
+  const mhcuComplete = mhcuTotal > 0 && mhcuDoneCount === mhcuTotal;
+  const mhcuStarted = mhcuDoneCount > 0;
+
+  // Hilangkan MHCU entries dari latestGameResults — diganti aggregate card
+  const latestGameResults = Array.from(latestByGame.values()).filter((r) => !mhcuSlugs.has(r.game_key));
 
   // Ambil hasil quiz lama (pattern existing quiz_results)
   const { data: quizRows } = await supabase
@@ -67,7 +91,7 @@ export default async function ProfilePage() {
     quizMetaMap.set(q.slug, { title: q.title, emoji: q.emoji });
   });
 
-  const hasAnyResult = latestGameResults.length > 0 || latestQuizResults.length > 0;
+  const hasAnyResult = latestGameResults.length > 0 || latestQuizResults.length > 0 || mhcuStarted;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
@@ -131,6 +155,30 @@ export default async function ProfilePage() {
           </div>
         ) : (
           <div className="mt-3 flex flex-col gap-2">
+            {/* === MHCU aggregate card (kalau ada activity MHCU) === */}
+            {mhcuStarted && (
+              <Link
+                href={mhcuComplete ? "/laporan/mhcu" : "/skrining"}
+                className="flex items-start gap-3 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 p-3 ring-1 ring-emerald-200 transition-colors hover:from-emerald-100 hover:to-teal-100"
+              >
+                <span className="text-2xl">🌱</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="text-xs uppercase tracking-wide text-emerald-700/70">Mental Health Check-Up</p>
+                    <span className="text-[10px] text-emerald-600">{mhcuComplete ? "Lihat laporan komprehensif →" : "Lanjut MHCU →"}</span>
+                  </div>
+                  <p className="mt-0.5 text-sm font-bold text-ink">
+                    {mhcuComplete ? "MHCU komplet" : `MHCU sedang berjalan (${mhcuDoneCount}/${mhcuTotal})`}
+                  </p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-ink/60">
+                    {mhcuComplete
+                      ? "Hasil agregat lintas 6 dimensi siap dilihat."
+                      : `Tinggal ${mhcuTotal - mhcuDoneCount} tahap lagi. Hasil cuma muncul setelah semua selesai.`}
+                  </p>
+                </div>
+              </Link>
+            )}
+
             {latestGameResults.map((r) => {
               const s = r.summary;
               return (

@@ -53,23 +53,34 @@ export default async function RiwayatPage() {
   const cutoff = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
 
   // Fetch parallel — 30 hari terakhir
-  const [mood, grat, journal, letter, post, game] = await Promise.all([
+  const [mood, grat, journal, letter, post, game, mhcuInst] = await Promise.all([
     supabase.from("mood_entries").select("id, mood, note, entry_date, created_at").eq("user_id", user.id).gte("created_at", cutoff).order("created_at", { ascending: false }),
     supabase.from("gratitude_entries").select("id, items, created_at").eq("user_id", user.id).gte("created_at", cutoff).order("created_at", { ascending: false }),
     supabase.from("journal_entries").select("id, title, body, created_at").eq("user_id", user.id).gte("created_at", cutoff).order("created_at", { ascending: false }),
     supabase.from("future_letters").select("id, body, deliver_at, created_at").eq("user_id", user.id).gte("created_at", cutoff).order("created_at", { ascending: false }),
     supabase.from("posts").select("id, body, category_id, crisis_flag, created_at").eq("author_id", user.id).eq("status", "active").gte("created_at", cutoff).order("created_at", { ascending: false }),
     supabase.from("user_game_results").select("id, game_key, summary, created_at").eq("user_id", user.id).gte("created_at", cutoff).order("created_at", { ascending: false }),
+    supabase.from("screening_instruments").select("slug").eq("category", "mhcu").eq("is_active", true),
   ]);
 
-  // Merge all into single timeline
+  // === MHCU filter: jangan tampilin entri MHCU individual di timeline ===
+  // (sesuai prinsip: hasil per-step ga boleh dilihat sebelum 6/6 selesai)
+  const mhcuKeys = new Set(((mhcuInst.data ?? []) as { slug: string }[]).map((m) => `screening_${m.slug}`));
+  const filteredGameRows = ((game.data ?? []) as GameRow[]).filter((r) => !mhcuKeys.has(r.game_key));
+  const mhcuRows = ((game.data ?? []) as GameRow[]).filter((r) => mhcuKeys.has(r.game_key));
+  const mhcuTotal = mhcuKeys.size;
+  const mhcuDoneInWindow = new Set(mhcuRows.map((r) => r.game_key));
+  const mhcuDoneCount = mhcuDoneInWindow.size;
+  const mhcuComplete = mhcuTotal > 0 && mhcuDoneCount === mhcuTotal;
+
+  // Merge all into single timeline (MHCU individual entries EXCLUDED)
   const items: Item[] = [
     ...((mood.data ?? []) as MoodRow[]).map((d) => ({ kind: "mood" as const, id: d.id, created_at: d.created_at, data: d })),
     ...((grat.data ?? []) as GratRow[]).map((d) => ({ kind: "gratitude" as const, id: d.id, created_at: d.created_at, data: d })),
     ...((journal.data ?? []) as JournalRow[]).map((d) => ({ kind: "journal" as const, id: d.id, created_at: d.created_at, data: d })),
     ...((letter.data ?? []) as LetterRow[]).map((d) => ({ kind: "letter" as const, id: d.id, created_at: d.created_at, data: d })),
     ...((post.data ?? []) as PostRow[]).map((d) => ({ kind: "post" as const, id: d.id, created_at: d.created_at, data: d })),
-    ...((game.data ?? []) as GameRow[]).map((d) => ({ kind: "game" as const, id: d.id, created_at: d.created_at, data: d })),
+    ...filteredGameRows.map((d) => ({ kind: "game" as const, id: d.id, created_at: d.created_at, data: d })),
   ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   // Group by date (yyyy-mm-dd)
@@ -119,6 +130,30 @@ export default async function RiwayatPage() {
           {counts.game > 0 && <span className="rounded-full bg-white/20 px-2 py-0.5">🎯 {counts.game} tes</span>}
         </div>
       </section>
+
+      {/* === MHCU status (kalau user lagi/udah jalanin MHCU dalam 30 hari) === */}
+      {mhcuDoneCount > 0 && (
+        <Link
+          href={mhcuComplete ? "/laporan/mhcu" : "/skrining"}
+          className="flex items-start gap-3 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 p-4 ring-1 ring-emerald-200 transition-colors hover:from-emerald-100 hover:to-teal-100"
+        >
+          <span className="text-3xl">🌱</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="text-xs uppercase tracking-wide text-emerald-700/70">MHCU dalam 30 hari ini</p>
+              <span className="text-[10px] text-emerald-600">{mhcuComplete ? "Lihat laporan →" : "Lanjut →"}</span>
+            </div>
+            <p className="mt-0.5 text-sm font-bold text-ink">
+              {mhcuComplete ? "Komplet semua tahap" : `Sedang berjalan (${mhcuDoneCount}/${mhcuTotal})`}
+            </p>
+            <p className="mt-0.5 text-xs leading-relaxed text-ink/60">
+              {mhcuComplete
+                ? "Hasil komprehensif siap dilihat. Detail per-dimensi bisa di-drill dari sana."
+                : `Hasil cuma muncul setelah ${mhcuTotal} tahap selesai. Tinggal ${mhcuTotal - mhcuDoneCount} lagi.`}
+            </p>
+          </div>
+        </Link>
+      )}
 
       {/* === Mood trend sparkline (kalau ada minimum 3 entries) === */}
       {moodEntries.length >= 3 && (

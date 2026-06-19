@@ -101,6 +101,49 @@ export default async function LaporanPage({ params }: { params: Promise<{ gameKe
       .eq("is_active", true)
       .maybeSingle();
     if (!instrument) notFound();
+
+    // === MHCU guard: per-test laporan cuma boleh diakses kalau 6/6 MHCU komplet dalam 30 hari ===
+    if (instrument.category === "mhcu") {
+      const { data: mhcuList } = await supabase
+        .from("screening_instruments")
+        .select("slug")
+        .eq("category", "mhcu")
+        .eq("is_active", true);
+      const mhcuSlugs = (mhcuList ?? []).map((m: { slug: string }) => `screening_${m.slug}`);
+      const cutoff = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+      const { data: doneRows } = await supabase
+        .from("user_game_results")
+        .select("game_key")
+        .eq("user_id", user.id)
+        .in("game_key", mhcuSlugs)
+        .gte("created_at", cutoff);
+      const completedSet = new Set((doneRows ?? []).map((r: { game_key: string }) => r.game_key));
+      const allComplete = mhcuSlugs.every((s) => completedSet.has(s));
+
+      if (!allComplete) {
+        // Block individual access — kasih notice di redirect ke /skrining
+        return (
+          <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
+            <header className="flex items-center gap-3">
+              <Link href="/skrining" className="text-sm text-ink/50">← Skrining</Link>
+              <h1 className="text-base font-bold text-ink">🔒 Laporan terkunci</h1>
+            </header>
+            <div className="rounded-2xl bg-amber-50 p-6 ring-1 ring-amber-200">
+              <p className="text-3xl">🌱</p>
+              <p className="mt-2 text-base font-bold text-ink">Laporan MHCU per-tahap belum bisa dilihat</p>
+              <p className="mt-1 text-sm leading-relaxed text-ink/70">
+                MHCU itu paket komprehensif — kayak MCU di rumah sakit, hasil tiap tahap saling berhubungan. Laporan per-tahap cuma kebuka setelah <strong>{mhcuSlugs.length} tahap selesai semua</strong>. Progress sekarang: <strong>{completedSet.size} / {mhcuSlugs.length}</strong>.
+              </p>
+              <Link href="/skrining" className="mt-3 inline-block rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white">
+                Lanjut tahap berikutnya →
+              </Link>
+            </div>
+          </main>
+        );
+      }
+      // 6/6 komplet → lanjut render normal (drill-down dari /laporan/mhcu OK)
+    }
+
     // Sort bands by min_score
     const bands = [...(instrument.screening_bands ?? [])].sort((a, b) => a.min_score - b.min_score);
     return <ScreeningLaporan
