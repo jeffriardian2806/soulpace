@@ -57,8 +57,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function SkriningInstrumentPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function SkriningInstrumentPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ flow?: string }>;
+}) {
   const { slug } = await params;
+  const { flow } = await searchParams;
   const _blocked_ = await checkPremiumAccess(`screening_${slug}`);
   if (_blocked_) return _blocked_;
 
@@ -66,7 +73,7 @@ export default async function SkriningInstrumentPage({ params }: { params: Promi
   const { data } = await supabase
     .from("screening_instruments")
     .select(
-      "slug, name, subtitle, prompt, crisis_item_position, screening_items(position, text, reverse), screening_options(label, value, sort_order), screening_bands(min_score, max_score, label, advice)"
+      "slug, name, subtitle, prompt, crisis_item_position, category, screening_items(position, text, reverse), screening_options(label, value, sort_order), screening_bands(min_score, max_score, label, advice)"
     )
     .eq("slug", slug)
     .eq("is_active", true)
@@ -76,16 +83,93 @@ export default async function SkriningInstrumentPage({ params }: { params: Promi
 
   const instrument = mapInstrument(data as DbInstrument);
 
+  // === MHCU guided flow ===
+  // Kalau `?flow=mhcu`, hitung next step (instrumen MHCU berikutnya yang user belum complete dalam 30 hari)
+  // setelah submit, ScreeningTool akan auto-redirect ke next step (atau ke /laporan/mhcu kalau ini terakhir)
+  let flowMode = false;
+  let nextHref: string | undefined;
+  let flowStepLabel: string | undefined;
+  let flowProgressInfo: { current: number; total: number } | null = null;
+
+  if (flow === "mhcu" && (data as { category?: string }).category === "mhcu") {
+    flowMode = true;
+
+    // Fetch list MHCU instruments urutan
+    const { data: mhcuRows } = await supabase
+      .from("screening_instruments")
+      .select("slug, name, sort_order")
+      .eq("category", "mhcu")
+      .eq("is_active", true)
+      .order("sort_order");
+    const mhcuList = (mhcuRows ?? []) as { slug: string; name: string; sort_order: number }[];
+
+    // Fetch user's completed MHCU dalam 30 hari
+    const { data: { user } } = await supabase.auth.getUser();
+    const completed = new Set<string>();
+    if (user) {
+      const cutoff = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+      const slugs = mhcuList.map((m) => `screening_${m.slug}`);
+      if (slugs.length > 0) {
+        const { data: doneRows } = await supabase
+          .from("user_game_results")
+          .select("game_key")
+          .eq("user_id", user.id)
+          .in("game_key", slugs)
+          .gte("created_at", cutoff);
+        ((doneRows ?? []) as { game_key: string }[]).forEach((r) => {
+          completed.add(r.game_key.replace("screening_", ""));
+        });
+      }
+    }
+
+    // Cari index step saat ini
+    const currentIdx = mhcuList.findIndex((m) => m.slug === slug);
+    flowProgressInfo = { current: currentIdx + 1, total: mhcuList.length };
+    flowStepLabel = `Tahap ${currentIdx + 1} selesai`;
+
+    // Cari next step: yang belum complete (excluding current — anggap current akan complete setelah submit)
+    const futureCompleted = new Set(completed);
+    futureCompleted.add(slug);
+    const nextStep = mhcuList.find((m, i) => i > currentIdx && !futureCompleted.has(m.slug))
+                  ?? mhcuList.find((m) => !futureCompleted.has(m.slug));
+
+    if (nextStep) {
+      nextHref = `/skrining/${nextStep.slug}?flow=mhcu`;
+    } else {
+      // Semua tahap selesai → ke laporan komprehensif
+      nextHref = "/laporan/mhcu";
+    }
+  }
+
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
       <header className="flex items-center gap-3">
-        <Link href="/skrining" className="text-sm text-ink/50">← Kembali</Link>
-        <h1 className="text-xl font-bold text-ink">📋 {instrument.name}</h1>
+        <Link href={flowMode ? "/skrining" : "/skrining"} className="text-sm text-ink/50">
+          {flowMode ? "× Keluar flow" : "← Kembali"}
+        </Link>
+        <h1 className="text-xl font-bold text-ink">
+          {flowMode ? "🌱" : "📋"} {instrument.name}
+        </h1>
       </header>
+      {flowMode && flowProgressInfo && (
+        <div className="rounded-2xl bg-emerald-50 px-4 py-2 ring-1 ring-emerald-200">
+          <p className="text-xs font-semibold text-emerald-700">
+            MHCU · Tahap {flowProgressInfo.current} dari {flowProgressInfo.total}
+          </p>
+          <p className="mt-0.5 text-[10px] text-ink/55">
+            Hasil komprehensif akan muncul setelah semua tahap selesai. Jawab dulu, lanjut step berikutnya otomatis.
+          </p>
+        </div>
+      )}
       <p className="text-sm leading-relaxed text-ink/60">
-        {instrument.subtitle}. Kuesioner singkat buat mengenali gejala. Jawab apa adanya. Hasilnya cuma buat kamu sendiri.
+        {instrument.subtitle}. Jawab apa adanya. Hasilnya cuma buat kamu sendiri.
       </p>
-      <ScreeningTool instruments={[instrument]} />
+      <ScreeningTool
+        instruments={[instrument]}
+        flowMode={flowMode}
+        nextHref={nextHref}
+        flowStepLabel={flowStepLabel}
+      />
     </main>
   );
 }

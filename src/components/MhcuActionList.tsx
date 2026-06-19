@@ -81,7 +81,7 @@ export function MhcuActionList({
           if (isNext) {
             return (
               <li key={item.slug}>
-                <Link href={`/skrining/${item.slug}`} className="flex items-center gap-3 rounded-xl bg-gradient-to-br from-sky-500 to-purple-600 p-4 text-white shadow-lg transition-transform hover:scale-[1.02]">
+                <Link href={`/skrining/${item.slug}?flow=mhcu`} className="flex items-center gap-3 rounded-xl bg-gradient-to-br from-sky-500 to-purple-600 p-4 text-white shadow-lg transition-transform hover:scale-[1.02]">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-base font-bold text-sky-600">{idx + 1}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs uppercase tracking-wide text-white/80">Tahap {idx + 1} · Berikutnya</p>

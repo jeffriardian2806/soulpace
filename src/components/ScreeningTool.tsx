@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { SCREENING_DISCLAIMER } from "@/config/screening";
 import type { ScreeningInstrument } from "@/config/screening";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
@@ -29,9 +30,21 @@ function emptyAnswers(instruments: ScreeningInstrument[]): Answers {
 
 export function ScreeningTool({
   instruments,
+  flowMode = false,
+  nextHref,
+  flowStepLabel,
 }: {
   instruments: ScreeningInstrument[];
+  /**
+   * Flow mode (mis. MHCU guided sequential):
+   * - Tidak render hasil per-instrument setelah submit
+   * - Auto-redirect ke `nextHref` setelah save selesai
+   */
+  flowMode?: boolean;
+  nextHref?: string;
+  flowStepLabel?: string;
 }) {
+  const router = useRouter();
   const [answers, setAnswers] = useState<Answers>(() =>
     emptyAnswers(instruments)
   );
@@ -100,10 +113,11 @@ export function ScreeningTool({
   useEffect(() => {
     if (submitted && !savedRef.current && results.length > 0) {
       savedRef.current = true;
+
       // Save semua hasil + tag severity & crisis
-      results.forEach((r) => {
+      const savePromises = results.map((r) => {
         const severity = bandSeverity(r.band?.label);
-        saveGameResultAction(`screening_${r.inst.id}`, {
+        return saveGameResultAction(`screening_${r.inst.id}`, {
           title: r.inst.name,
           headline: r.band?.label ?? "-",
           value: `Skor ${r.score}/${r.max}`,
@@ -119,7 +133,15 @@ export function ScreeningTool({
         });
       });
 
-      // Trigger support message: prioritas crisis > severe
+      // Flow mode (mis. MHCU): tunggu save settle, langsung redirect — skip support card & result render
+      if (flowMode && nextHref) {
+        Promise.allSettled(savePromises).then(() => {
+          router.push(nextHref);
+        });
+        return;
+      }
+
+      // Mode normal: trigger support message (prioritas crisis > severe)
       const hasCrisis = results.some((r) => r.crisis);
       const hasSevere = results.some((r) => bandSeverity(r.band?.label) === "severe");
       if (hasCrisis) {
@@ -128,7 +150,20 @@ export function ScreeningTool({
         getSupportMessageAction("severe_screening").then(setSupportMessage);
       }
     }
-  }, [submitted, results]);
+  }, [submitted, results, flowMode, nextHref, router]);
+
+  // === Flow mode: skip render hasil, kasih loading screen sambil redirect ===
+  if (submitted && flowMode) {
+    return (
+      <div className="rounded-3xl bg-gradient-to-br from-emerald-400 to-teal-500 p-8 text-center text-white shadow-lg">
+        <p className="text-4xl">✓</p>
+        <p className="mt-3 text-base font-bold">{flowStepLabel ?? "Tahap selesai!"}</p>
+        <p className="mt-1 text-xs text-white/85">
+          Lanjut ke tahap berikutnya...
+        </p>
+      </div>
+    );
+  }
 
   if (submitted) {
     const anyCrisis = results.some((r) => r.crisis);
