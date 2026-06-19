@@ -134,6 +134,24 @@ export default async function SkriningPage() {
           </div>
         )}
       </section>
+
+      {/* === Section 4: Tips & Edukasi (link ke page edukasi) === */}
+      <section className="mt-2">
+        <h2 className="mb-1 text-base font-bold text-ink">📚 Tips & Edukasi</h2>
+        <p className="mb-3 text-xs text-ink/55">
+          Latihan singkat & tips praktis buat menjaga kesehatan mental harian.
+        </p>
+        <Link href="/edukasi" className="glass block rounded-2xl p-4 transition-colors hover:bg-amber-50">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">💡</span>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-ink">Lihat semua tips & latihan</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-ink/55">Teknik napas, grounding, relaksasi otot, meditasi, kebiasaan harian — semua dalam satu page.</p>
+            </div>
+            <span className="text-xs text-sky-600">→</span>
+          </div>
+        </Link>
+      </section>
     </main>
   );
 }
