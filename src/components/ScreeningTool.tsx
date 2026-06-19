@@ -288,7 +288,9 @@ export function ScreeningTool({
         onClick={onSubmit}
         className="w-full rounded-xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white"
       >
-        Lihat hasil
+        {flowMode
+          ? (nextHref === "/laporan/mhcu" ? "Selesain MHCU & lihat hasil →" : "Lanjut tahap berikutnya →")
+          : "Lihat hasil"}
       </button>
     </div>
   );
