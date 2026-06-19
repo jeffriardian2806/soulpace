@@ -16,12 +16,15 @@ export function AdminPageShell({
 }) {
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-4 px-5 py-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-ink">{title}</h1>
-        <Link href={parentHref} className="text-xs font-medium text-sky-600 underline">
+      <header className="flex flex-wrap items-center justify-between gap-2">
+        <Link href={parentHref} className="text-sm font-medium text-sky-600 hover:underline">
           {parentLabel}
         </Link>
+        <Link href="/settings" className="text-xs text-ink/55 hover:text-ink/80">
+          ⚙️ Pengaturan
+        </Link>
       </header>
+      <h1 className="text-xl font-bold text-ink">{title}</h1>
       {subtitle && <p className="text-sm leading-relaxed text-ink/60">{subtitle}</p>}
       {children}
     </main>

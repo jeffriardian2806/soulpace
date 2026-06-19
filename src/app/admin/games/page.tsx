@@ -62,10 +62,15 @@ export default async function AdminGamesLanding() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-4 px-5 py-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-ink">🎮 Admin Games</h1>
-        <Link href="/admin/monetization" className="text-xs font-medium text-sky-600 underline">💎 Monetisasi</Link>
+      <header className="flex flex-wrap items-center justify-between gap-2">
+        <Link href="/settings" className="text-sm font-medium text-sky-600 hover:underline">
+          ← Pengaturan
+        </Link>
+        <Link href="/admin/monetization" className="text-xs font-medium text-purple-600 hover:underline">
+          💎 Monetisasi
+        </Link>
       </header>
+      <h1 className="text-xl font-bold text-ink">🎮 Admin Games</h1>
       <p className="text-sm leading-relaxed text-ink/60">
         Kelola konten setiap fitur. Klik kategori buat masuk editor masing-masing.
       </p>

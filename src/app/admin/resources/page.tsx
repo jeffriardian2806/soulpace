@@ -20,10 +20,15 @@ export default async function AdminResourcesPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-4 px-5 py-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-ink">🌐 Resources</h1>
-        <Link href="/admin/games" className="text-xs font-medium text-sky-600 underline">← Admin Games</Link>
+      <header className="flex flex-wrap items-center justify-between gap-2">
+        <Link href="/settings" className="text-sm font-medium text-sky-600 hover:underline">
+          ← Pengaturan
+        </Link>
+        <Link href="/admin/games" className="text-xs font-medium text-sky-600 hover:underline">
+          🎮 Admin Games
+        </Link>
       </header>
+      <h1 className="text-xl font-bold text-ink">🌐 Resources</h1>
       <p className="text-sm leading-relaxed text-ink/60">
         Kelola Pusat Bantuan: daftar crisis lines, psikolog, artikel edukasi, komunitas, & worksheet. Toggle is_active buat publish/unpublish.
       </p>
