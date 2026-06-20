@@ -461,7 +461,7 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos, messages }: Props) {
           style={{ animation: "breathe 10s ease-in-out infinite" }}
         />
 
-        <div className="relative z-10 flex flex-col items-center justify-center flex-1 gap-6 max-w-md w-full mx-auto">
+        <div className="relative z-10 flex flex-col items-center justify-center flex-1 gap-3 max-w-md w-full mx-auto">
           {/* Anchor photo (if any) — adapts to image native aspect ratio, max-h capped */}
           {photo?.signed_url ? (
             <div className="relative flex flex-col items-center">
@@ -469,7 +469,7 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos, messages }: Props) {
               <img
                 src={photo.signed_url}
                 alt=""
-                className="block rounded-3xl shadow-2xl ring-4 ring-white/80 max-w-[95vw] max-h-[70vh] w-auto h-auto"
+                className="block rounded-3xl shadow-2xl ring-4 ring-white/80 max-w-[100vw] max-h-[78vh] w-auto h-auto"
               />
               {photo.caption && (
                 <p className="mt-3 rounded-full bg-white/95 px-4 py-1.5 text-sm font-medium text-ink/80 shadow-lg max-w-[80vw] truncate">
