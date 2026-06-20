@@ -469,7 +469,7 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos, messages }: Props) {
               <img
                 src={photo.signed_url}
                 alt=""
-                className="block rounded-3xl shadow-2xl ring-4 ring-white/80 max-w-[85vw] max-h-[55vh] w-auto h-auto"
+                className="block rounded-3xl shadow-2xl ring-4 ring-white/80 max-w-[95vw] max-h-[70vh] w-auto h-auto"
               />
               {photo.caption && (
                 <p className="mt-3 rounded-full bg-white/95 px-4 py-1.5 text-sm font-medium text-ink/80 shadow-lg max-w-[80vw] truncate">
