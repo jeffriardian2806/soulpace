@@ -27,6 +27,9 @@ export async function saveTopicAction(p: {
   if (authErr || !supabase) return { error: authErr ?? "Auth failed" };
 
   if (!p.slug.trim() || !p.title.trim()) return { error: "Slug & title wajib." };
+  if (!p.categoryIds || p.categoryIds.length === 0) {
+    return { error: "Wajib pilih minimal 1 kategori — biar muncul di Konsultasi flow." };
+  }
 
   const row = {
     slug: p.slug.trim(),

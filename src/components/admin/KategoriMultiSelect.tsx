@@ -6,7 +6,7 @@ export function KategoriMultiSelect({
   categories,
   selectedIds,
   onChange,
-  label = "Kategori (untuk Konsultasi flow)",
+  label = "Kategori (WAJIB pilih min 1 untuk Konsultasi flow)",
   hint = "Centang kategori yang relevan. Bisa lebih dari 1. Tampil di /konsultasi/sesi-baru/[kategori] sesuai centangan.",
 }: {
   categories: Category[];
@@ -47,8 +47,8 @@ export function KategoriMultiSelect({
         })}
       </div>
       {selectedIds.length === 0 && (
-        <p className="mt-2 text-[10px] italic text-amber-700">
-          ⚠️ Belum ada kategori dipilih — data ini gak akan muncul di Konsultasi flow.
+        <p className="mt-2 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-semibold text-rose-800 ring-1 ring-rose-200">
+          🔴 Wajib pilih min 1 kategori. Save akan gagal kalau kosong.
         </p>
       )}
     </div>

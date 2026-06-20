@@ -34,6 +34,9 @@ export async function saveInstrumentAction(
   if (items.length === 0 || options.length === 0 || bands.length === 0) {
     return { ok: false, error: "Minimal 1 pertanyaan, 1 opsi, dan 1 band." };
   }
+  if (!p.categoryIds || p.categoryIds.length === 0) {
+    return { ok: false, error: "Wajib pilih minimal 1 kategori — biar muncul di Konsultasi flow." };
+  }
 
   let crisisPos = p.crisisItemPosition;
   if (crisisPos != null && (crisisPos < 1 || crisisPos > items.length)) {
