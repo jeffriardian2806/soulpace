@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Contact, ProfessionalContact } from "@/app/safety-plan/actions";
 import { TTSButton } from "@/components/voice/TTSButton";
+import { spellPhoneForTTS } from "@/lib/voiceUtils";
 
 type SafetyPlanData = {
   warning_signs: string[];
@@ -35,13 +36,16 @@ export function SafetyPlanView({ data, crisisMode = false }: { data: SafetyPlanD
   // Build TTS texts (natural spoken version)
   const profTTS = () => {
     if (data.professional_contacts.length === 0) return "";
-    const items = data.professional_contacts.map(c => `${c.name} di ${c.phone}`).join(", ");
-    return `Telepon profesional atau crisis line: ${items}.`;
+    const items = data.professional_contacts.map(c => `${c.name}, nomor ${spellPhoneForTTS(c.phone)}`).join(". ");
+    return `Telepon profesional atau crisis line. ${items}.`;
   };
   const helpTTS = () => {
     if (data.help_contacts.length === 0) return "";
-    const items = data.help_contacts.map(c => c.note ? `${c.name}, ${c.note}` : c.name).join(", ");
-    return `Orang yang bisa lo minta tolong: ${items}.`;
+    const items = data.help_contacts.map(c => {
+      const noteText = c.note ? `, ${c.note}` : "";
+      return `${c.name}${noteText}, nomor ${spellPhoneForTTS(c.phone)}`;
+    }).join(". ");
+    return `Orang yang bisa lo minta tolong. ${items}.`;
   };
   const meansTTS = () => {
     if (data.means_restriction.length === 0) return "";
@@ -53,8 +57,8 @@ export function SafetyPlanView({ data, crisisMode = false }: { data: SafetyPlanD
   };
   const distractTTS = () => {
     if (data.distraction_contacts.length === 0) return "";
-    const items = data.distraction_contacts.map(c => c.name).join(", ");
-    return `Orang yang bisa distract lo: ${items}.`;
+    const items = data.distraction_contacts.map(c => `${c.name}, nomor ${spellPhoneForTTS(c.phone)}`).join(". ");
+    return `Orang yang bisa distract lo. ${items}.`;
   };
 
   return (

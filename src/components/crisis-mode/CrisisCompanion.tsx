@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
-import { TTSButton } from "@/components/voice/TTSButton";
+import { useCrisisAudio } from "./CrisisAudio";
+import { spellPhoneForTTS } from "@/lib/voiceUtils";
 
 type Contact = { name: string; phone: string; note?: string };
 type ProfessionalContact = { name: string; phone: string; type: string };
@@ -38,13 +39,58 @@ const GENTLE_MESSAGES = [
 
 const telHref = (phone: string) => `tel:${phone.replace(/\s|-|ext\.?/gi, "")}`;
 
+/**
+ * Speak text via SpeechSynthesis with ducking event dispatched.
+ * Returns cancel function.
+ */
+function speakAuto(text: string): () => void {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return () => {};
+
+  window.speechSynthesis.cancel();
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "id-ID";
+  utter.rate = 0.9;
+  utter.pitch = 1;
+
+  const voices = window.speechSynthesis.getVoices();
+  const idVoice = voices.find((v) => v.lang.startsWith("id"));
+  if (idVoice) utter.voice = idVoice;
+
+  const dispatchTTS = (playing: boolean) => {
+    window.dispatchEvent(new CustomEvent("soulpace:tts", { detail: { playing } }));
+  };
+
+  utter.onend = () => dispatchTTS(false);
+  utter.onerror = () => dispatchTTS(false);
+
+  dispatchTTS(true);
+  window.speechSynthesis.speak(utter);
+
+  return () => {
+    window.speechSynthesis.cancel();
+    dispatchTTS(false);
+  };
+}
+
 export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
   const [phase, setPhase] = useState<Phase>("opening");
   const [phase1Remaining, setPhase1Remaining] = useState(PHASE_1_DURATION);
   const [phase4Remaining, setPhase4Remaining] = useState(PHASE_4_DURATION);
   const [photoIdx, setPhotoIdx] = useState(0);
   const [messageIdx, setMessageIdx] = useState(0);
+  // Audio state: TTS auto-speak + background drone. Default ON.
+  const [audioEnabled, setAudioEnabled] = useState(true);
   const haptRef = useRef<number | null>(null);
+
+  // Background ambient drone — hook handles lifecycle
+  useCrisisAudio(audioEnabled);
+
+  // === AUTO-TTS speak helper, respects audioEnabled ===
+  const autoSpeak = useCallback((text: string) => {
+    if (!audioEnabled) return () => {};
+    return speakAuto(text);
+  }, [audioEnabled]);
 
   // === Phase 1: 30-sec somatic anchor with haptic ===
   useEffect(() => {
@@ -76,6 +122,67 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
       clearInterval(hapticInterval);
     };
   }, [phase]);
+  // === AUTO-TTS per phase change ===
+  useEffect(() => {
+    let cancelFn: (() => void) | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    // Small delay biar visual + TTS sync
+    timeoutId = setTimeout(() => {
+      let text = "";
+
+      switch (phase) {
+        case "opening":
+          text = "Gw di sini sama lo. Tarik napas pelan. Lo aman.";
+          break;
+        case "means_check":
+          text = "Sebelum lanjut. Ada benda yang bisa nyakitin lo deket sekarang?";
+          break;
+        case "means_restrict":
+          text = "Coba pindahin dulu. Pindahin ke ruangan lain, atau kasih ke orang. Gw nunggu.";
+          break;
+        case "connection": {
+          const profContacts = safetyPlan?.professional_contacts ?? [];
+          const profDefault: ProfessionalContact[] = profContacts.length === 0 ? [
+            { name: "SEJIWA", phone: "119 ext 8", type: "crisis_line" },
+            { name: "Halo Kemenkes", phone: "1500-567", type: "crisis_line" },
+          ] : [];
+          const allProf = [...profContacts, ...profDefault];
+          const helpContacts = safetyPlan?.help_contacts ?? [];
+
+          const profList = allProf.map(c => `${c.name}, nomor ${spellPhoneForTTS(c.phone)}`).join(". ");
+          const helpList = helpContacts.map(c => `${c.name}, nomor ${spellPhoneForTTS(c.phone)}`).join(". ");
+
+          text = "Konek ke manusia dulu. Suara orang lebih kuat dari teks.";
+          if (profList) text += ` Telepon profesional atau crisis line. ${profList}.`;
+          if (helpList) text += ` Atau orang yang bisa lo minta tolong. ${helpList}.`;
+          break;
+        }
+        case "done":
+          text = "Lo udah lewatin moment ini. Yang berat tadi udah lewat. Lo masih ada. Itu pekerjaan paling penting hari ini.";
+          break;
+        case "companion":
+        default:
+          text = ""; // Companion mode pakai rotation effect (separate useEffect)
+      }
+
+      if (text) cancelFn = autoSpeak(text);
+    }, 400);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (cancelFn) cancelFn();
+    };
+  }, [phase, autoSpeak, safetyPlan]);
+
+  // === AUTO-TTS for companion message rotation ===
+  useEffect(() => {
+    if (phase !== "companion") return;
+    const text = GENTLE_MESSAGES[messageIdx];
+    const cancel = autoSpeak(text);
+    return () => cancel();
+  }, [phase, messageIdx, autoSpeak]);
+
 
   // === Phase 4: 10-min companion timer + photo/message rotation ===
   useEffect(() => {
@@ -127,6 +234,14 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
   if (phase === "opening") {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 via-rose-50 to-purple-50 px-6 py-8 overflow-hidden">
+        <button
+          onClick={() => setAudioEnabled(prev => !prev)}
+          className="absolute top-4 right-4 z-50 rounded-full bg-white/85 backdrop-blur px-3 py-1.5 text-xs font-medium text-ink/70 ring-1 ring-ink/15 shadow"
+          aria-label={audioEnabled ? "Matikan suara" : "Nyalakan suara"}
+        >
+          {audioEnabled ? "🔊 Suara ON" : "🔇 Suara OFF"}
+        </button>
+
         {/* Pulsing background gradient */}
         <div
           className="absolute inset-0 bg-gradient-to-br from-rose-200/40 via-amber-200/40 to-purple-200/40"
@@ -170,6 +285,14 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
   if (phase === "means_check") {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 via-rose-50 to-purple-50 px-6">
+        <button
+          onClick={() => setAudioEnabled(prev => !prev)}
+          className="absolute top-4 right-4 z-50 rounded-full bg-white/85 backdrop-blur px-3 py-1.5 text-xs font-medium text-ink/70 ring-1 ring-ink/15 shadow"
+          aria-label={audioEnabled ? "Matikan suara" : "Nyalakan suara"}
+        >
+          {audioEnabled ? "🔊 Suara ON" : "🔇 Suara OFF"}
+        </button>
+
         <div className="max-w-md w-full flex flex-col gap-6 text-center">
           <p className="text-3xl">🌿</p>
           <p className="text-lg font-bold text-ink">Sebelum lanjut.</p>
@@ -199,6 +322,14 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
     const userMeans = safetyPlan?.means_restriction ?? [];
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 via-rose-50 to-purple-50 px-6 overflow-y-auto py-8">
+        <button
+          onClick={() => setAudioEnabled(prev => !prev)}
+          className="absolute top-4 right-4 z-50 rounded-full bg-white/85 backdrop-blur px-3 py-1.5 text-xs font-medium text-ink/70 ring-1 ring-ink/15 shadow"
+          aria-label={audioEnabled ? "Matikan suara" : "Nyalakan suara"}
+        >
+          {audioEnabled ? "🔊 Suara ON" : "🔇 Suara OFF"}
+        </button>
+
         <div className="max-w-md w-full flex flex-col gap-5">
           <p className="text-center text-3xl">🔒</p>
           <p className="text-center text-lg font-bold text-ink">Coba pindahin dulu.</p>
@@ -240,6 +371,14 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
 
     return (
       <div className="fixed inset-0 flex flex-col bg-gradient-to-br from-rose-50 via-amber-50 to-purple-50 px-6 py-6 overflow-y-auto">
+        <button
+          onClick={() => setAudioEnabled(prev => !prev)}
+          className="absolute top-4 right-4 z-50 rounded-full bg-white/85 backdrop-blur px-3 py-1.5 text-xs font-medium text-ink/70 ring-1 ring-ink/15 shadow"
+          aria-label={audioEnabled ? "Matikan suara" : "Nyalakan suara"}
+        >
+          {audioEnabled ? "🔊 Suara ON" : "🔇 Suara OFF"}
+        </button>
+
         <div className="max-w-md w-full mx-auto flex flex-col gap-4">
           <div className="text-center">
             <p className="text-3xl">📞</p>
@@ -311,6 +450,14 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
 
     return (
       <div className="fixed inset-0 flex flex-col bg-gradient-to-br from-amber-50 via-rose-50 to-purple-50 px-6 py-6 overflow-hidden">
+        <button
+          onClick={() => setAudioEnabled(prev => !prev)}
+          className="absolute top-4 right-4 z-50 rounded-full bg-white/85 backdrop-blur px-3 py-1.5 text-xs font-medium text-ink/70 ring-1 ring-ink/15 shadow"
+          aria-label={audioEnabled ? "Matikan suara" : "Nyalakan suara"}
+        >
+          {audioEnabled ? "🔊 Suara ON" : "🔇 Suara OFF"}
+        </button>
+
         {/* Pulsing background */}
         <div
           className="absolute inset-0 bg-gradient-to-br from-amber-100/40 via-rose-100/50 to-purple-100/40"
@@ -369,19 +516,20 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
   // done
   const internalStrategies = safetyPlan?.internal_strategies ?? [];
   return (
-    <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-4 px-5 py-8">
+    <main className="relative mx-auto flex min-h-screen max-w-xl flex-col gap-4 px-5 py-8">
+      <button
+        onClick={() => setAudioEnabled(prev => !prev)}
+        className="absolute top-4 right-4 z-50 rounded-full bg-white/85 backdrop-blur px-3 py-1.5 text-xs font-medium text-ink/70 ring-1 ring-ink/15 shadow"
+        aria-label={audioEnabled ? "Matikan suara" : "Nyalakan suara"}
+      >
+        {audioEnabled ? "🔊 Suara ON" : "🔇 Suara OFF"}
+      </button>
       <div className="rounded-3xl bg-gradient-to-br from-emerald-400 via-sky-400 to-purple-400 p-6 text-white shadow-lg">
         <p className="text-5xl">🌅</p>
         <p className="mt-3 text-xl font-bold">Lo udah lewatin moment ini.</p>
         <p className="mt-2 text-sm leading-relaxed text-white/90">
           Yang berat tadi udah lewat. Lo masih ada. Itu pekerjaan paling penting hari ini.
         </p>
-        <div className="mt-3">
-          <TTSButton
-            text="Lo udah lewatin moment ini. Yang berat tadi udah lewat. Lo masih ada. Itu pekerjaan paling penting hari ini."
-            label="Dengerin pesan ini"
-          />
-        </div>
       </div>
 
       {internalStrategies.length > 0 && (
