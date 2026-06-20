@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createJournalAction } from "@/app/jurnal/actions";
+import { VoiceTextarea } from "@/components/voice/VoiceTextarea";
 
 export const metadata = { title: "Tulis Jurnal — Soulpace" };
 
@@ -19,12 +20,12 @@ export default function JurnalBaruPage() {
           maxLength={200}
           className="rounded-xl border border-ink/10 bg-white/60 p-3 text-sm text-ink outline-none focus:border-sky-300"
         />
-        <textarea
+        <VoiceTextarea
           name="body"
           required
           rows={14}
-          placeholder="Tulis sepanjang yang kamu mau. Ceritakan apa pun..."
-          className="rounded-xl border border-ink/10 bg-white/60 p-3 text-sm leading-relaxed text-ink outline-none focus:border-sky-300"
+          placeholder="Tulis sepanjang yang kamu mau. Ceritakan apa pun... atau tap 🎤 buat input pakai suara."
+          className="w-full rounded-xl border border-ink/10 bg-white/60 p-3 pr-20 text-sm leading-relaxed text-ink outline-none focus:border-sky-300"
         />
         <button className="rounded-xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white">
           Simpan jurnal

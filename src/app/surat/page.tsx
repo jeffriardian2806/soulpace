@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createLetterAction } from "@/app/surat/actions";
 import { checkPremiumAccess } from "@/components/PremiumGate";
+import { VoiceTextarea } from "@/components/voice/VoiceTextarea";
 
 export const metadata = { title: "Surat untuk Diri di Masa Depan — Soulpace" };
 
@@ -68,12 +69,12 @@ export default async function SuratPage() {
       <section className="glass rounded-2xl p-4">
         <h2 className="text-sm font-bold text-ink">Tulis surat baru</h2>
         <form action={createLetterAction} className="mt-3 flex flex-col gap-3">
-          <textarea
+          <VoiceTextarea
             name="body"
             required
             rows={8}
-            placeholder="Untuk diriku nanti..."
-            className="rounded-xl border border-ink/10 bg-white/60 p-3 text-sm leading-relaxed text-ink outline-none focus:border-sky-300"
+            placeholder="Untuk diriku nanti... atau tap 🎤 buat input pakai suara."
+            className="w-full rounded-xl border border-ink/10 bg-white/60 p-3 pr-20 text-sm leading-relaxed text-ink outline-none focus:border-sky-300"
           />
           <label className="text-xs text-ink/60">
             Kirim ke diriku dalam:
