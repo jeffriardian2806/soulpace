@@ -462,15 +462,17 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos, messages }: Props) {
         />
 
         <div className="relative z-10 flex flex-col items-center justify-center flex-1 gap-6 max-w-md w-full mx-auto">
-          {/* Anchor photo (if any) */}
+          {/* Anchor photo (if any) — adapts to image native aspect ratio, max-h capped */}
           {photo?.signed_url ? (
-            <div className="relative w-full max-w-sm">
-              <div className="aspect-square w-full rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/80 bg-white/30">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photo.signed_url} alt="" className="w-full h-full object-cover" />
-              </div>
+            <div className="relative flex flex-col items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photo.signed_url}
+                alt=""
+                className="block rounded-3xl shadow-2xl ring-4 ring-white/80 max-w-[85vw] max-h-[55vh] w-auto h-auto"
+              />
               {photo.caption && (
-                <p className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-4 py-1.5 text-sm font-medium text-ink/80 shadow-lg whitespace-nowrap max-w-[90%] truncate">
+                <p className="mt-3 rounded-full bg-white/95 px-4 py-1.5 text-sm font-medium text-ink/80 shadow-lg max-w-[80vw] truncate">
                   {photo.caption}
                 </p>
               )}
