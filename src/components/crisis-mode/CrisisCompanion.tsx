@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import { useCrisisAudio } from "./CrisisAudio";
-import { spellPhoneForTTS } from "@/lib/voiceUtils";
+import { spellPhoneForTTS, humanizeForTTS } from "@/lib/voiceUtils";
 
 type Contact = { name: string; phone: string; note?: string };
 type ProfessionalContact = { name: string; phone: string; type: string };
@@ -17,6 +17,14 @@ type Props = {
     is_complete: boolean;
   } | null;
   anchorPhotos: { signed_url: string | null; caption: string | null }[];
+  messages: {
+    phase_opening: string;
+    phase_means_check: string;
+    phase_means_restrict: string;
+    phase_connection_intro: string;
+    phase_done_encouragement: string;
+    companion_gentle: string[];
+  };
 };
 
 type Phase = "opening" | "means_check" | "means_restrict" | "connection" | "companion" | "done";
@@ -25,17 +33,6 @@ const PHASE_1_DURATION = 30; // detik
 const PHASE_4_DURATION = 600; // 10 menit
 const PHOTO_ROTATE_INTERVAL = 60; // detik
 const MESSAGE_ROTATE_INTERVAL = 40; // detik
-
-const GENTLE_MESSAGES = [
-  "Gw masih di sini sama lo.",
-  "Nafas. Pelan aja.",
-  "Lo bertahan. Itu lebih dari cukup.",
-  "Ga harus ngapa-ngapain. Cukup ada.",
-  "Setiap detik lewat itu kemenangan.",
-  "Lo aman sekarang.",
-  "Mind lo lagi alarm. Tubuh lo aman.",
-  "Yang lo rasain valid. Yang lo butuh valid.",
-];
 
 const telHref = (phone: string) => `tel:${phone.replace(/\s|-|ext\.?/gi, "")}`;
 
@@ -48,7 +45,7 @@ function speakAuto(text: string): () => void {
 
   window.speechSynthesis.cancel();
 
-  const utter = new SpeechSynthesisUtterance(text);
+  const utter = new SpeechSynthesisUtterance(humanizeForTTS(text));
   utter.lang = "id-ID";
   utter.rate = 0.9;
   utter.pitch = 1;
@@ -73,7 +70,7 @@ function speakAuto(text: string): () => void {
   };
 }
 
-export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
+export function CrisisCompanion({ safetyPlan, anchorPhotos, messages }: Props) {
   const [phase, setPhase] = useState<Phase>("opening");
   const [phase1Remaining, setPhase1Remaining] = useState(PHASE_1_DURATION);
   const [phase4Remaining, setPhase4Remaining] = useState(PHASE_4_DURATION);
@@ -133,13 +130,13 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
 
       switch (phase) {
         case "opening":
-          text = "Gw di sini sama lo. Tarik napas pelan. Lo aman.";
+          text = messages.phase_opening;
           break;
         case "means_check":
-          text = "Sebelum lanjut. Ada benda yang bisa nyakitin lo deket sekarang?";
+          text = messages.phase_means_check;
           break;
         case "means_restrict":
-          text = "Coba pindahin dulu. Pindahin ke ruangan lain, atau kasih ke orang. Gw nunggu.";
+          text = messages.phase_means_restrict;
           break;
         case "connection": {
           const profContacts = safetyPlan?.professional_contacts ?? [];
@@ -153,13 +150,13 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
           const profList = allProf.map(c => `${c.name}, nomor ${spellPhoneForTTS(c.phone)}`).join(". ");
           const helpList = helpContacts.map(c => `${c.name}, nomor ${spellPhoneForTTS(c.phone)}`).join(". ");
 
-          text = "Konek ke manusia dulu. Suara orang lebih kuat dari teks.";
+          text = messages.phase_connection_intro;
           if (profList) text += ` Telepon profesional atau crisis line. ${profList}.`;
           if (helpList) text += ` Atau orang yang bisa lo minta tolong. ${helpList}.`;
           break;
         }
         case "done":
-          text = "Lo udah lewatin moment ini. Yang berat tadi udah lewat. Lo masih ada. Itu pekerjaan paling penting hari ini.";
+          text = messages.phase_done_encouragement;
           break;
         case "companion":
         default:
@@ -173,12 +170,12 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
       if (timeoutId) clearTimeout(timeoutId);
       if (cancelFn) cancelFn();
     };
-  }, [phase, autoSpeak, safetyPlan]);
+  }, [phase, autoSpeak, safetyPlan, messages]);
 
   // === AUTO-TTS for companion message rotation ===
   useEffect(() => {
     if (phase !== "companion") return;
-    const text = GENTLE_MESSAGES[messageIdx];
+    const text = messages.companion_gentle[messageIdx];
     const cancel = autoSpeak(text);
     return () => cancel();
   }, [phase, messageIdx, autoSpeak]);
@@ -203,7 +200,7 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
 
     // Rotate gentle messages
     const msgInterval = setInterval(() => {
-      setMessageIdx((i) => (i + 1) % GENTLE_MESSAGES.length);
+      setMessageIdx((i) => (i + 1) % messages.companion_gentle.length);
     }, MESSAGE_ROTATE_INTERVAL * 1000);
 
     // Rotate photos
@@ -467,11 +464,13 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
         <div className="relative z-10 flex flex-col items-center justify-center flex-1 gap-6 max-w-md w-full mx-auto">
           {/* Anchor photo (if any) */}
           {photo?.signed_url ? (
-            <div className="w-48 h-48 rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/80">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photo.signed_url} alt="" className="w-full h-full object-cover" />
+            <div className="relative w-full max-w-sm">
+              <div className="aspect-square w-full rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/80 bg-white/30">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photo.signed_url} alt="" className="w-full h-full object-contain" />
+              </div>
               {photo.caption && (
-                <p className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-ink/70 shadow whitespace-nowrap">
+                <p className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-4 py-1.5 text-sm font-medium text-ink/80 shadow-lg whitespace-nowrap max-w-[90%] truncate">
                   {photo.caption}
                 </p>
               )}
@@ -486,7 +485,7 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
 
           {/* Gentle message */}
           <p className="text-center text-lg font-medium text-ink/85 px-4 leading-relaxed">
-            {GENTLE_MESSAGES[messageIdx]}
+            {messages.companion_gentle[messageIdx]}
           </p>
 
           {/* Timer */}

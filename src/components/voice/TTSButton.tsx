@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { humanizeForTTS } from "@/lib/voiceUtils";
 
 export function TTSButton({
   text,
@@ -31,7 +32,7 @@ export function TTSButton({
 
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(humanizeForTTS(text));
     utterance.lang = lang;
     utterance.rate = 0.95;
     utterance.pitch = 1;

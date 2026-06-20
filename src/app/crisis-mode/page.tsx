@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 import { getSafetyPlanAction } from "@/app/safety-plan/actions";
 import { listAnchorPhotosAction } from "@/app/anchor-album/actions";
+import { getCrisisMessages } from "@/app/crisis-mode/messages";
 import { CrisisCompanion } from "@/components/crisis-mode/CrisisCompanion";
 
 export const metadata = {
@@ -31,9 +32,10 @@ export default async function CrisisModePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login?redirect=/crisis-mode");
 
-  const [planRow, anchorPhotos] = await Promise.all([
+  const [planRow, anchorPhotos, messages] = await Promise.all([
     getSafetyPlanAction(),
     listAnchorPhotosAction(),
+    getCrisisMessages(),
   ]);
 
   const plan = planRow as SafetyPlanRow | null;
@@ -50,6 +52,7 @@ export default async function CrisisModePage() {
     <CrisisCompanion
       safetyPlan={safetyPlan}
       anchorPhotos={anchorPhotos.map(p => ({ signed_url: p.signed_url, caption: p.caption }))}
+      messages={messages}
     />
   );
 }

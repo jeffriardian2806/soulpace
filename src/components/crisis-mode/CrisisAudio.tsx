@@ -1,21 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 /**
- * Background ambient drone untuk Crisis Mode.
- * Generated via Web Audio API — zero external dependency, full control.
- * 3 oscillator (A2 + E3 + A3) low volume, dengan LFO untuk breathing pulse.
- * Auto-duck via "soulpace:tts" CustomEvent.
+ * Background ambient untuk Crisis Mode — brown noise calming, BUKAN sine whine.
+ * 
+ * Sound design:
+ * - Brown noise (low-frequency dominant, kayak distant rain/ocean) jadi primary layer
+ * - Lowpass filter 400Hz buat cut semua high-freq harshness
+ * - Subtle sub-bass sine 55Hz buat body warmth
+ * - Slow LFO modulate lowpass cutoff (300-500Hz, 20s cycle) — gentle wave-like sweep
+ * - Master volume 0.18 (lebih kedengaran but masih background)
+ * - Auto-duck via soulpace:tts → 0.04 saat TTS jalan
  */
 export function useCrisisAudio(enabled: boolean) {
   const ctxRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
-  const oscsRef = useRef<OscillatorNode[]>([]);
-  const lfoRef = useRef<OscillatorNode | null>(null);
-  // Target volume (saat ga ke-duck)
-  const TARGET_VOLUME = 0.04;
-  const DUCKED_VOLUME = 0.005;
+
+  const TARGET_VOLUME = 0.18;
+  const DUCKED_VOLUME = 0.04;
 
   useEffect(() => {
     if (!enabled) return;
@@ -28,45 +31,55 @@ export function useCrisisAudio(enabled: boolean) {
     const ctx = new Ctx();
     ctxRef.current = ctx;
 
-    // Master gain (volume)
+    // === Master gain (volume utama) ===
     const master = ctx.createGain();
     master.gain.value = TARGET_VOLUME;
     master.connect(ctx.destination);
     masterGainRef.current = master;
 
-    // Lowpass filter buat soften
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 800;
-    filter.connect(master);
+    // === Brown noise generator (primary calming layer) ===
+    const bufferSize = ctx.sampleRate * 4; // 4 detik buffer, loops
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let lastOut = 0.0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      data[i] = (lastOut + 0.02 * white) / 1.02;
+      lastOut = data[i];
+      data[i] *= 3.5; // amplify
+    }
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = buffer;
+    noiseSource.loop = true;
 
-    // 3 oscillator forming a quiet chord (A minor-ish, soothing)
-    const freqs = [110, 165, 220]; // A2, E3, A3
-    const oscs = freqs.map((f) => {
-      const osc = ctx.createOscillator();
-      osc.frequency.value = f;
-      osc.type = "sine";
+    // === Lowpass filter — buang high-freq, sisain "rain-like" rumble ===
+    const lowpass = ctx.createBiquadFilter();
+    lowpass.type = "lowpass";
+    lowpass.frequency.value = 400;
+    lowpass.Q.value = 0.7;
 
-      // Individual gain per oscillator (different mix)
-      const oscGain = ctx.createGain();
-      oscGain.gain.value = f === 165 ? 0.4 : 0.5; // mid voice slightly quieter
-
-      osc.connect(oscGain).connect(filter);
-      osc.start();
-      return osc;
-    });
-    oscsRef.current = oscs;
-
-    // LFO untuk slow breathing effect on master volume
+    // === LFO modulate lowpass cutoff (gentle wave sweep 300↔500 Hz, 20s cycle) ===
     const lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.1; // 10 detik cycle
+    lfo.frequency.value = 0.05; // 20 detik cycle
     const lfoGain = ctx.createGain();
-    lfoGain.gain.value = TARGET_VOLUME * 0.3; // modulate 30% of base
-    lfo.connect(lfoGain).connect(master.gain);
+    lfoGain.gain.value = 100; // sweep ±100 Hz around 400Hz center
+    lfo.connect(lfoGain).connect(lowpass.frequency);
     lfo.start();
-    lfoRef.current = lfo;
 
-    // Listen to TTS event untuk ducking
+    // === Sub-bass sine 55Hz buat body warmth (subtle) ===
+    const subBass = ctx.createOscillator();
+    subBass.type = "sine";
+    subBass.frequency.value = 55;
+    const subGain = ctx.createGain();
+    subGain.gain.value = 0.08; // subtle
+    subBass.connect(subGain).connect(master);
+    subBass.start();
+
+    // === Chain: noise → lowpass → master ===
+    noiseSource.connect(lowpass).connect(master);
+    noiseSource.start();
+
+    // === TTS ducking listener ===
     const handler = (e: Event) => {
       const detail = (e as CustomEvent<{ playing: boolean }>).detail;
       if (!masterGainRef.current || !ctxRef.current) return;
@@ -79,7 +92,8 @@ export function useCrisisAudio(enabled: boolean) {
     return () => {
       window.removeEventListener("soulpace:tts", handler as EventListener);
       try {
-        oscs.forEach((osc) => osc.stop());
+        noiseSource.stop();
+        subBass.stop();
         lfo.stop();
         ctx.close();
       } catch {
@@ -87,8 +101,6 @@ export function useCrisisAudio(enabled: boolean) {
       }
       ctxRef.current = null;
       masterGainRef.current = null;
-      oscsRef.current = [];
-      lfoRef.current = null;
     };
   }, [enabled]);
 }

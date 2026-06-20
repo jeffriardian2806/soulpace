@@ -207,9 +207,9 @@ export function AnchorAlbumManager({ initialItems, userId }: { initialItems: Anc
           {initialItems.map((item) => (
             <div key={item.id} className="overflow-hidden rounded-2xl bg-white ring-1 ring-ink/10">
               {item.signed_url ? (
-                <div className="relative aspect-square">
+                <div className="relative aspect-square bg-ink/5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.signed_url} alt={item.caption ?? "Anchor photo"} className="absolute inset-0 h-full w-full object-cover" />
+                  <img src={item.signed_url} alt={item.caption ?? "Anchor photo"} className="absolute inset-0 h-full w-full object-contain" />
                 </div>
               ) : (
                 <div className="aspect-square bg-ink/10 flex items-center justify-center text-ink/30 text-xs">no preview</div>
