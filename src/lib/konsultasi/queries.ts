@@ -149,7 +149,7 @@ export type PemeriksaanResult =
 
 export type SaranTaken =
   | { type: "article"; slug: string }
-  | { type: "rey_consultation" }
+  | { type: "psikolog_consultation" }
   | { type: "safety_plan" };
 
 export async function getUserConsultationSessions(limit = 20): Promise<(ConsultationSession & { category_name: string })[]> {

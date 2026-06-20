@@ -93,7 +93,7 @@ export default async function SesiBaruPage({ params }: Props) {
             ))
           ) : (
             <div className="rounded-xl bg-ink/5 p-3 text-xs text-ink/50">
-              Belum ada skrining khusus kategori ini. Rey lagi prepare.
+              Belum ada skrining khusus kategori ini. Tim psikolog kami lagi prepare.
             </div>
           )}
 

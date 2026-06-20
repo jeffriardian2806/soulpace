@@ -10,7 +10,7 @@ import { saveGameResultAction } from "@/app/main/saveResult";
 import { getSupportMessageAction } from "@/app/main/supportAction";
 import { SupportMessageCard } from "@/components/SupportMessageCard";
 
-// Mapping band label → severity slug (heuristic — Rey bisa adjust per instrumen)
+// Mapping band label → severity slug (heuristic — tim psikolog bisa adjust per instrumen)
 function bandSeverity(label: string | undefined): "minimal" | "mild" | "moderate" | "severe" {
   if (!label) return "minimal";
   const l = label.toLowerCase();
