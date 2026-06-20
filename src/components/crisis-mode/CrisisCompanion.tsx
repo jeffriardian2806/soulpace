@@ -467,7 +467,7 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos, messages }: Props) {
             <div className="relative w-full max-w-sm">
               <div className="aspect-square w-full rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/80 bg-white/30">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photo.signed_url} alt="" className="w-full h-full object-contain" />
+                <img src={photo.signed_url} alt="" className="w-full h-full object-cover" />
               </div>
               {photo.caption && (
                 <p className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-4 py-1.5 text-sm font-medium text-ink/80 shadow-lg whitespace-nowrap max-w-[90%] truncate">

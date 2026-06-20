@@ -21,23 +21,24 @@ async function compressImage(file: File): Promise<Blob> {
     reader.onload = (e) => {
       const img = document.createElement("img");
       img.onload = () => {
+        // === Auto center-crop ke square — biar pas display di card grid + Crisis Mode ===
+        // Ambil sisi pendek sebagai source square, crop center
+        const sourceSize = Math.min(img.width, img.height);
+        const sx = (img.width - sourceSize) / 2;
+        const sy = (img.height - sourceSize) / 2;
+
+        // Target canvas: 1024×1024 (atau lebih kecil kalau source < 1024)
+        const targetSize = Math.min(MAX_DIMENSION, sourceSize);
+
         const canvas = document.createElement("canvas");
-        let width = img.width;
-        let height = img.height;
-        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-          if (width > height) {
-            height = (height * MAX_DIMENSION) / width;
-            width = MAX_DIMENSION;
-          } else {
-            width = (width * MAX_DIMENSION) / height;
-            height = MAX_DIMENSION;
-          }
-        }
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = targetSize;
+        canvas.height = targetSize;
         const ctx = canvas.getContext("2d");
         if (!ctx) return reject(new Error("Canvas context error"));
-        ctx.drawImage(img, 0, 0, width, height);
+
+        // Center-crop + scale ke target
+        ctx.drawImage(img, sx, sy, sourceSize, sourceSize, 0, 0, targetSize, targetSize);
+
         canvas.toBlob(
           (blob) => (blob ? resolve(blob) : reject(new Error("Compression failed"))),
           "image/jpeg",
@@ -186,7 +187,7 @@ export function AnchorAlbumManager({ initialItems, userId }: { initialItems: Anc
               {uploading ? "Mengunggah..." : "+ Pilih foto"}
             </button>
             <p className="mt-2 text-[10px] italic text-ink/40">
-              Max 5 MB. Otomatis di-compress sebelum upload (max 1024px, ~80% quality).
+              Max 5 MB. Otomatis di-crop center jadi square 1024×1024 (~80% quality) biar fit display.
             </p>
           </>
         ) : (
@@ -209,7 +210,7 @@ export function AnchorAlbumManager({ initialItems, userId }: { initialItems: Anc
               {item.signed_url ? (
                 <div className="relative aspect-square bg-ink/5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.signed_url} alt={item.caption ?? "Anchor photo"} className="absolute inset-0 h-full w-full object-contain" />
+                  <img src={item.signed_url} alt={item.caption ?? "Anchor photo"} className="absolute inset-0 h-full w-full object-cover" />
                 </div>
               ) : (
                 <div className="aspect-square bg-ink/10 flex items-center justify-center text-ink/30 text-xs">no preview</div>
