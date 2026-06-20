@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Contact, ProfessionalContact } from "@/app/safety-plan/actions";
+import { TTSButton } from "@/components/voice/TTSButton";
 
 type SafetyPlanData = {
   warning_signs: string[];
@@ -31,6 +32,31 @@ export function SafetyPlanView({ data, crisisMode = false }: { data: SafetyPlanD
   // Format phone for tel: link
   const telHref = (phone: string) => `tel:${phone.replace(/\s|-|ext\.?/gi, "")}`;
 
+  // Build TTS texts (natural spoken version)
+  const profTTS = () => {
+    if (data.professional_contacts.length === 0) return "";
+    const items = data.professional_contacts.map(c => `${c.name} di ${c.phone}`).join(", ");
+    return `Telepon profesional atau crisis line: ${items}.`;
+  };
+  const helpTTS = () => {
+    if (data.help_contacts.length === 0) return "";
+    const items = data.help_contacts.map(c => c.note ? `${c.name}, ${c.note}` : c.name).join(", ");
+    return `Orang yang bisa lo minta tolong: ${items}.`;
+  };
+  const meansTTS = () => {
+    if (data.means_restriction.length === 0) return "";
+    return `Amankan diri dulu. ${data.means_restriction.join(". ")}.`;
+  };
+  const internalTTS = () => {
+    if (data.internal_strategies.length === 0) return "";
+    return `Hal yang lo udah tau bisa bantu. ${data.internal_strategies.join(". ")}.`;
+  };
+  const distractTTS = () => {
+    if (data.distraction_contacts.length === 0) return "";
+    const items = data.distraction_contacts.map(c => c.name).join(", ");
+    return `Orang yang bisa distract lo: ${items}.`;
+  };
+
   return (
     <div className="flex flex-col gap-4">
       {/* Crisis mode header — emphasis on action */}
@@ -41,12 +67,15 @@ export function SafetyPlanView({ data, crisisMode = false }: { data: SafetyPlanD
           <p className="mt-1 text-sm leading-relaxed text-white/90">
             Lo udah siapin daftar ini di moment tenang. Ikutin step di bawah satu per satu. Ga perlu mikir — tinggal tap.
           </p>
+          <p className="mt-2 text-[11px] text-white/75 italic">
+            Mata blur baca? Tap 🔊 di tiap section, akan dibacain.
+          </p>
         </div>
       )}
 
       {/* Section 5 (Professional) — TOP priority di crisis mode */}
       {crisisMode && data.professional_contacts.length > 0 && (
-        <ViewSection emoji="🏥" title="Telepon profesional / crisis line">
+        <ViewSection emoji="🏥" title="Telepon profesional / crisis line" ttsText={profTTS()}>
           <div className="flex flex-col gap-2">
             {data.professional_contacts.map((c, i) => (
               <a key={i} href={telHref(c.phone)} className="flex items-center justify-between rounded-xl bg-rose-50 p-3 ring-1 ring-rose-200 active:bg-rose-100">
@@ -63,7 +92,7 @@ export function SafetyPlanView({ data, crisisMode = false }: { data: SafetyPlanD
 
       {/* Section 4 (Help) — di crisis mode prominent */}
       {crisisMode && data.help_contacts.length > 0 && (
-        <ViewSection emoji="🤝" title="Telepon orang yang bisa lo minta tolong">
+        <ViewSection emoji="🤝" title="Telepon orang yang bisa lo minta tolong" ttsText={helpTTS()}>
           <div className="flex flex-col gap-2">
             {data.help_contacts.map((c, i) => (
               <a key={i} href={telHref(c.phone)} className="flex items-center justify-between rounded-xl bg-emerald-50 p-3 ring-1 ring-emerald-200 active:bg-emerald-100">
@@ -80,7 +109,7 @@ export function SafetyPlanView({ data, crisisMode = false }: { data: SafetyPlanD
 
       {/* Section 6 (Means Restriction) — di crisis mode prominent */}
       {crisisMode && data.means_restriction.length > 0 && (
-        <ViewSection emoji="🔒" title="Amankan diri dulu">
+        <ViewSection emoji="🔒" title="Amankan diri dulu" ttsText={meansTTS()}>
           <ul className="flex flex-col gap-2">
             {data.means_restriction.map((s, i) => (
               <li key={i} className="rounded-xl bg-amber-50 p-3 text-sm text-ink/80 ring-1 ring-amber-200">
@@ -93,7 +122,7 @@ export function SafetyPlanView({ data, crisisMode = false }: { data: SafetyPlanD
 
       {/* Section 2 (Internal Strategies) — di crisis mode */}
       {crisisMode && data.internal_strategies.length > 0 && (
-        <ViewSection emoji="🛡️" title="Hal yang lo udah tau bisa bantu">
+        <ViewSection emoji="🛡️" title="Hal yang lo udah tau bisa bantu" ttsText={internalTTS()}>
           <ul className="flex flex-col gap-2">
             {data.internal_strategies.map((s, i) => (
               <li key={i} className="rounded-xl bg-sky-50 p-3 text-sm text-ink/80 ring-1 ring-sky-200">
@@ -106,7 +135,7 @@ export function SafetyPlanView({ data, crisisMode = false }: { data: SafetyPlanD
 
       {/* Section 3 (Distraction) — di crisis mode */}
       {crisisMode && data.distraction_contacts.length > 0 && (
-        <ViewSection emoji="👥" title="Orang yang bisa distract lo">
+        <ViewSection emoji="👥" title="Orang yang bisa distract lo" ttsText={distractTTS()}>
           <div className="flex flex-col gap-2">
             {data.distraction_contacts.map((c, i) => (
               <a key={i} href={telHref(c.phone)} className="flex items-center justify-between rounded-xl bg-purple-50 p-3 ring-1 ring-purple-200 active:bg-purple-100">
@@ -199,10 +228,13 @@ export function SafetyPlanView({ data, crisisMode = false }: { data: SafetyPlanD
   );
 }
 
-function ViewSection({ emoji, title, children }: { emoji: string; title: string; children: React.ReactNode }) {
+function ViewSection({ emoji, title, children, ttsText }: { emoji: string; title: string; children: React.ReactNode; ttsText?: string }) {
   return (
     <section className="rounded-2xl bg-white p-4 ring-1 ring-ink/8">
-      <p className="text-sm font-semibold text-ink">{emoji} {title}</p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold text-ink">{emoji} {title}</p>
+        {ttsText && <TTSButton text={ttsText} label="Dengerin" />}
+      </div>
       <div className="mt-2">{children}</div>
     </section>
   );

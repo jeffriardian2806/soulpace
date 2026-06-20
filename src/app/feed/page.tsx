@@ -7,6 +7,7 @@ import { getDailyQuote } from "@/lib/dailyQuote";
 import { resolveSupportMessage } from "@/lib/support/resolveMessage";
 import { FeedSupportBanner } from "@/components/FeedSupportBanner";
 import { PatternNudgeBanner } from "@/components/patterns/PatternNudgeBanner";
+import { CrisisModeTopBanner } from "@/components/crisis-mode/CrisisModeTopBanner";
 import { LateNightNudge } from "@/components/patterns/LateNightNudge";
 import { detectPatternNudge } from "@/lib/patterns/detect";
 
@@ -136,6 +137,11 @@ export default async function FeedPage({
   const isGuest = !user;
   return (
     <>
+      {user && (
+        <div className="mx-auto max-w-2xl px-5 pt-4">
+          <CrisisModeTopBanner />
+        </div>
+      )}
       {supportMessage && supportTriggeredAt && (
         <div className="mx-auto max-w-2xl px-5 pt-4">
           <FeedSupportBanner message={supportMessage} triggeredAt={supportTriggeredAt} />

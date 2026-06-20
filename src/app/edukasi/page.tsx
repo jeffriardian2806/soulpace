@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 import { createClient } from "@/lib/supabase/server";
-import { EdukasiClient } from "@/components/edukasi/EdukasiClient";
 
 export const metadata: Metadata = {
   title: "Edukasi & Tips Kesehatan Mental — Soulpace",
@@ -13,27 +12,19 @@ export const metadata: Metadata = {
 };
 
 type Topic = { slug: string; title: string; emoji: string | null; definition: string | null; sort_order: number };
-type Tip = { id: string; topic_slug: string; tip_title: string; tip_content: string; sort_order: number };
 
-export default async function EdukasiPage({ searchParams }: { searchParams: Promise<{ topic?: string }> }) {
+export default async function EdukasiPage() {
   const _blocked_ = await checkPremiumAccess("edukasi");
   if (_blocked_) return _blocked_;
 
-  const sp = await searchParams;
   const supabase = await createClient();
-  const [topicsRes, tipsRes] = await Promise.all([
-    supabase.from("tip_topics").select("slug, title, emoji, definition, sort_order").eq("is_active", true).order("sort_order"),
-    supabase.from("tips").select("id, topic_slug, tip_title, tip_content, sort_order").eq("is_active", true).order("topic_slug").order("sort_order"),
-  ]);
+  const { data } = await supabase
+    .from("tip_topics")
+    .select("slug, title, emoji, definition, sort_order")
+    .eq("is_active", true)
+    .order("sort_order");
 
-  const topics = (topicsRes.data ?? []) as Topic[];
-  const tips = (tipsRes.data ?? []) as Tip[];
-
-  // Group tips per topic
-  const topicsWithTips = topics.map(t => ({
-    ...t,
-    tips: tips.filter(x => x.topic_slug === t.slug),
-  }));
+  const topics = (data ?? []) as Topic[];
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
@@ -48,7 +39,9 @@ export default async function EdukasiPage({ searchParams }: { searchParams: Prom
         <a href={CRISIS_RESOURCE.url} target="_blank" rel="nofollow noopener noreferrer" className="font-medium text-sky-600 underline">healing119.id</a>.
       </div>
 
-      {topicsWithTips.length === 0 ? (
+      <p className="text-sm text-ink/65">Pilih topik buat baca tips lengkap-nya:</p>
+
+      {topics.length === 0 ? (
         <div className="rounded-2xl bg-amber-50 p-6 ring-1 ring-amber-200">
           <p className="text-3xl">🔧</p>
           <p className="mt-2 text-base font-bold text-ink">Konten belum siap</p>
@@ -57,7 +50,26 @@ export default async function EdukasiPage({ searchParams }: { searchParams: Prom
           </p>
         </div>
       ) : (
-        <EdukasiClient topics={topicsWithTips} initialTopic={sp.topic ?? null} />
+        <section className="grid gap-2 sm:grid-cols-2">
+          {topics.map((t) => (
+            <Link
+              key={t.slug}
+              href={`/edukasi/${t.slug}`}
+              className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-ink/8 transition-all hover:ring-sky-300 hover:bg-sky-50 active:scale-[0.99]"
+            >
+              <span className="text-3xl shrink-0">{t.emoji ?? "📌"}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-ink">{t.title}</p>
+                {t.definition && (
+                  <p className="mt-0.5 text-xs leading-relaxed text-ink/60 line-clamp-2">
+                    {t.definition.length > 100 ? t.definition.slice(0, 100) + "..." : t.definition}
+                  </p>
+                )}
+              </div>
+              <span className="text-sky-600 shrink-0">→</span>
+            </Link>
+          ))}
+        </section>
       )}
 
       <Link href="/skrining" className="glass mt-2 flex items-center justify-between rounded-2xl p-4 transition-colors hover:bg-sky-100">

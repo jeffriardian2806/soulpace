@@ -21,6 +21,11 @@ export function TTSButton({
     setIsSupported(typeof window !== "undefined" && "speechSynthesis" in window);
   }, []);
 
+  const dispatchTTS = (playing: boolean) => {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(new CustomEvent("soulpace:tts", { detail: { playing } }));
+  };
+
   const speak = () => {
     if (!isSupported) return;
 
@@ -35,24 +40,37 @@ export function TTSButton({
     const idVoice = voices.find((v) => v.lang.startsWith("id"));
     if (idVoice) utterance.voice = idVoice;
 
-    utterance.onend = () => setIsPlaying(false);
-    utterance.onerror = () => setIsPlaying(false);
+    utterance.onstart = () => dispatchTTS(true);
+    utterance.onend = () => {
+      setIsPlaying(false);
+      dispatchTTS(false);
+    };
+    utterance.onerror = () => {
+      setIsPlaying(false);
+      dispatchTTS(false);
+    };
 
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
     setIsPlaying(true);
+    dispatchTTS(true); // fire immediately, onstart sometimes delayed
   };
 
   const stop = () => {
     window.speechSynthesis.cancel();
     setIsPlaying(false);
+    dispatchTTS(false);
   };
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      window.speechSynthesis?.cancel();
+      if (typeof window !== "undefined") {
+        window.speechSynthesis?.cancel();
+        dispatchTTS(false);
+      }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!isSupported) return null;

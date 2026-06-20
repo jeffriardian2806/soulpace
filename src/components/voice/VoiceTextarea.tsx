@@ -29,7 +29,8 @@ export function VoiceTextarea({
   const [isSupported, setIsSupported] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance>(null);
-  const finalTranscriptRef = useRef<string>(defaultValue);
+  // Base text = teks yang ada SEBELUM session voice ini dimulai
+  const baseTextRef = useRef<string>(defaultValue);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -47,27 +48,35 @@ export function VoiceTextarea({
       return;
     }
 
+    // Snapshot teks current sebagai base — voice append AFTER this
+    baseTextRef.current = value;
+
     const recognition: SpeechRecognitionInstance = new SR();
     recognition.lang = lang;
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    finalTranscriptRef.current = value;
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
-      let interim = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
+      // PROCESS FULL RESULTS ARRAY — Chrome accumulates results, don't rely on resultIndex.
+      // Loop dari 0 sampe akhir, separate final vs interim, REPLACE bukan accumulate.
+      let finalText = "";
+      let interimText = "";
+      for (let i = 0; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          const prefix = finalTranscriptRef.current && !finalTranscriptRef.current.endsWith(" ") ? " " : "";
-          finalTranscriptRef.current += prefix + transcript;
+          finalText += transcript;
         } else {
-          interim += transcript;
+          interimText += transcript;
         }
       }
-      const display = finalTranscriptRef.current + (interim ? (finalTranscriptRef.current && !finalTranscriptRef.current.endsWith(" ") ? " " : "") + interim : "");
-      setValue(display);
+
+      // Combine base + final + interim. Base bisa kosong atau punya text dari sebelumnya.
+      const base = baseTextRef.current;
+      const baseTrimmed = base.replace(/\s+$/, "");
+      const separator = baseTrimmed ? " " : "";
+      const combined = baseTrimmed + separator + finalText + interimText;
+      setValue(combined);
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,7 +91,6 @@ export function VoiceTextarea({
     };
 
     recognition.onend = () => {
-      setValue(finalTranscriptRef.current);
       setIsListening(false);
     };
 
@@ -106,7 +114,10 @@ export function VoiceTextarea({
           value={value}
           onChange={(e) => {
             setValue(e.target.value);
-            finalTranscriptRef.current = e.target.value;
+            // User edit manual → update base biar voice session next nggak overwrite edit lo
+            if (!isListening) {
+              baseTextRef.current = e.target.value;
+            }
           }}
           required={required}
           rows={rows}

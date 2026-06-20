@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { TTSButton } from "@/components/voice/TTSButton";
 
 type Contact = { name: string; phone: string; note?: string };
 type ProfessionalContact = { name: string; phone: string; type: string };
@@ -375,6 +376,12 @@ export function CrisisCompanion({ safetyPlan, anchorPhotos }: Props) {
         <p className="mt-2 text-sm leading-relaxed text-white/90">
           Yang berat tadi udah lewat. Lo masih ada. Itu pekerjaan paling penting hari ini.
         </p>
+        <div className="mt-3">
+          <TTSButton
+            text="Lo udah lewatin moment ini. Yang berat tadi udah lewat. Lo masih ada. Itu pekerjaan paling penting hari ini."
+            label="Dengerin pesan ini"
+          />
+        </div>
       </div>
 
       {internalStrategies.length > 0 && (
