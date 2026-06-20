@@ -142,7 +142,7 @@ export default async function FeedPage({
           <CrisisModeTopBanner />
         </div>
       )}
-      {supportMessage && supportTriggeredAt && (
+{supportMessage && supportTriggeredAt && (
         <div className="mx-auto max-w-2xl px-5 pt-4">
           <FeedSupportBanner message={supportMessage} triggeredAt={supportTriggeredAt} />
         </div>
