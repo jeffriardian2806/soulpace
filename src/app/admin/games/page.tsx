@@ -14,6 +14,7 @@ const GROUPS: { title: string; items: CardItem[] }[] = [
       { href: "/admin/games/daily-challenges", emoji: "🎯", title: "Tantangan Empati",   desc: "Daily challenge yang muncul di /main." },
       { href: "/admin/games/vibe-presets",     emoji: "🎨", title: "Vibe Presets",       desc: "Shortcut emoji-label di hub /main." },
       { href: "/admin/games/edukasi",          emoji: "📚", title: "Tips & Edukasi",    desc: "Topic per kondisi (overthinking, cemas, dll) + tips actionable." },
+      { href: "/admin/games/ambient-media",    emoji: "🎵", title: "Ambient Media",     desc: "Audio/video calming via external link (Pixabay/YouTube/Vimeo)." },
     ],
   },
   {

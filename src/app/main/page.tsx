@@ -21,6 +21,8 @@ const INTERACTIVE = [
   { href: "/main/trail", slug: "trail", emoji: "🛤️", title: "Trail Making Test", desc: "Game penalaran: connect dots berurutan. Ngukur cognitive flexibility." },
   { href: "/main/mata-pertama", slug: "mata-pertama", emoji: "👁️", title: "Mata Pertama", desc: "Refleksi visual: apa yang lo lihat pertama → vibe insight playful." },
   { href: "/main/pilih-vibe", slug: "pilih-vibe", emoji: "🎨", title: "Pilih Vibe", desc: "Forced choice grafis: pilih A atau B → vibe profile hari ini." },
+  { href: "/scream", slug: "scream", emoji: "📢", title: "Lampias Suara", desc: "Teriak, hum, helaan napas keras. Real-time, zero recording. Lampiasin biar plong." },
+  { href: "/crisis-mode", slug: "crisis-mode", emoji: "🛟", title: "SAYA DI SINI", desc: "Crisis Companion full flow: somatic anchor → konek manusia → temenin 10 menit. Tap pas berat banget." },
 ];
 
 const REFLECTIVE = [

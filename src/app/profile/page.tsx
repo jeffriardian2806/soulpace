@@ -6,6 +6,7 @@ import { getProfilesService } from "@/modules/profiles";
 import { PostCard } from "@/components/PostCard";
 import { PremiumStatusCard } from "@/components/PremiumStatusCard";
 import { SafetyPlanEntryCard } from "@/components/safety-plan/SafetyPlanEntryCard";
+import { AnchorAlbumEntryCard } from "@/components/anchor-album/AnchorAlbumEntryCard";
 
 type GameSummary = { title: string; headline: string; value?: string; secondary?: string; emoji?: string };
 type GameResultRow = { game_key: string; summary: GameSummary; created_at: string };
@@ -139,6 +140,9 @@ export default async function ProfilePage() {
 
       {/* === Entry point: Daftar Aman (Safety Plan) === */}
       <SafetyPlanEntryCard />
+
+      {/* === Entry point: Anchor Album === */}
+      <AnchorAlbumEntryCard />
 
       {/* === Tes & Pengenalan Diri === */}
       <section className="glass rounded-2xl p-4">

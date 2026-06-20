@@ -6,6 +6,9 @@ import { GuestPrompt } from "@/components/GuestPrompt";
 import { getDailyQuote } from "@/lib/dailyQuote";
 import { resolveSupportMessage } from "@/lib/support/resolveMessage";
 import { FeedSupportBanner } from "@/components/FeedSupportBanner";
+import { PatternNudgeBanner } from "@/components/patterns/PatternNudgeBanner";
+import { LateNightNudge } from "@/components/patterns/LateNightNudge";
+import { detectPatternNudge } from "@/lib/patterns/detect";
 
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString("id-ID", {
@@ -128,12 +131,24 @@ export default async function FeedPage({
     }
   }
 
+  const patternNudge = user ? await detectPatternNudge() : null;
+
   const isGuest = !user;
   return (
     <>
       {supportMessage && supportTriggeredAt && (
         <div className="mx-auto max-w-2xl px-5 pt-4">
           <FeedSupportBanner message={supportMessage} triggeredAt={supportTriggeredAt} />
+        </div>
+      )}
+      {patternNudge && (
+        <div className="mx-auto max-w-2xl px-5 pt-4">
+          <PatternNudgeBanner nudge={patternNudge} />
+        </div>
+      )}
+      {user && (
+        <div className="mx-auto max-w-2xl px-5 pt-4">
+          <LateNightNudge />
         </div>
       )}
       <FeedShell

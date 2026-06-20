@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { CrisisModeFAB } from "@/components/crisis-mode/CrisisModeFAB";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -38,6 +39,7 @@ export default function RootLayout({
     <html lang="id" className={jakarta.variable}>
       <body className="font-sans">
         {children}
+        <CrisisModeFAB />
         <ServiceWorkerRegister />
         <InstallPrompt />
       </body>
