@@ -22,6 +22,8 @@ const INTERACTIVE = [
   { href: "/main/mata-pertama", slug: "mata-pertama", emoji: "👁️", title: "Mata Pertama", desc: "Refleksi visual: apa yang lo lihat pertama → vibe insight playful." },
   { href: "/main/pilih-vibe", slug: "pilih-vibe", emoji: "🎨", title: "Pilih Vibe", desc: "Forced choice grafis: pilih A atau B → vibe profile hari ini." },
   { href: "/scream", slug: "scream", emoji: "📢", title: "Lampias Suara", desc: "Teriak, hum, helaan napas keras. Real-time, zero recording. Lampiasin biar plong." },
+  { href: "/ambient", slug: "ambient-media", emoji: "🎵", title: "Suara Tenang", desc: "Audio & video ambient buat grounding & relaksasi. Sungai mengalir, hujan, api unggun, ombak." },
+  { href: "/anchor-album", slug: "anchor-album", emoji: "📸", title: "Anchor Album", desc: "Foto pribadi visual anchor pas crisis. Private, encrypted, cuma lo yang bisa lihat." },
   { href: "/crisis-mode", slug: "crisis-mode", emoji: "🛟", title: "SAYA DI SINI", desc: "Crisis Companion full flow: somatic anchor → konek manusia → temenin 10 menit. Tap pas berat banget." },
 ];
 

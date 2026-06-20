@@ -3,7 +3,6 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { createStoryAction } from "@/app/cerita/actions";
-import { VoiceTextarea } from "@/components/voice/VoiceTextarea";
 
 function SubmitBtn() {
   const { pending } = useFormStatus();
@@ -42,12 +41,12 @@ export function StoryForm() {
         placeholder="Judul cerita"
         className="rounded-xl border border-ink/10 bg-white/60 p-3 text-base font-semibold text-ink outline-none focus:border-sky-300"
       />
-      <VoiceTextarea
+      <textarea
         name="body"
         required
         rows={16}
-        placeholder="Tulis ceritamu di sini... sepanjang yang kamu mau. Atau tap 🎤 buat input pakai suara."
-        className="w-full rounded-xl border border-ink/10 bg-white/60 p-3 pr-20 text-sm leading-relaxed text-ink outline-none focus:border-sky-300"
+        placeholder="Tulis ceritamu di sini... sepanjang yang kamu mau."
+        className="rounded-xl border border-ink/10 bg-white/60 p-3 text-sm leading-relaxed text-ink outline-none focus:border-sky-300"
       />
       <input
         name="content_warning"
