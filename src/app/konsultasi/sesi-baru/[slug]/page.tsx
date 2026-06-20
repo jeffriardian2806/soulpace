@@ -152,7 +152,7 @@ export default async function SesiBaruPage({ params }: Props) {
                 </div>
               ))}
               <Link
-                href={`/feed?kategori=${kategori.slug}`}
+                href={`/feed?cat=${kategori.slug}`}
                 className="text-xs font-semibold text-sky-700 hover:underline"
               >
                 Liat semua cerita {kategori.name.toLowerCase()} →

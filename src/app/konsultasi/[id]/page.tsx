@@ -147,7 +147,7 @@ export default async function SessionDetailPage({ params }: Props) {
 
         <p className="mt-4 text-xs font-semibold text-ink/60">📞 Konsultasi lebih lanjut:</p>
         <div className="mt-2 flex flex-col gap-2">
-          <Link href={`/feed?kategori=${session.category.slug}`} className="rounded-xl bg-sky-50 p-3 text-xs ring-1 ring-sky-100">
+          <Link href={`/feed?cat=${session.category.slug}`} className="rounded-xl bg-sky-50 p-3 text-xs ring-1 ring-sky-100">
             📖 Baca cerita user lain di kategori {session.category.name} →
           </Link>
           <Link href="/safety-plan" className="rounded-xl bg-rose-50 p-3 text-xs ring-1 ring-rose-100">
