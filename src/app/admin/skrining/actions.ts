@@ -96,8 +96,25 @@ export async function saveInstrumentAction(
   const err = r1.error || r2.error || r3.error;
   if (err) return { ok: false, error: err.message };
 
+  // === Junction: skrining ↔ kategori (M:N) ===
+  // Delete existing, insert fresh sesuai p.categoryIds
+  await supabase
+    .from("screening_instrument_categories")
+    .delete()
+    .eq("instrument_id", instrumentId);
+
+  if (p.categoryIds && p.categoryIds.length > 0) {
+    const catRows = p.categoryIds.map((cid) => ({
+      instrument_id: instrumentId,
+      category_id: cid,
+    }));
+    const rCat = await supabase.from("screening_instrument_categories").insert(catRows);
+    if (rCat.error) return { ok: false, error: "Kategori save error: " + rCat.error.message };
+  }
+
   revalidatePath("/admin/skrining");
   revalidatePath("/skrining");
+  revalidatePath("/konsultasi");
   return { ok: true };
 }
 

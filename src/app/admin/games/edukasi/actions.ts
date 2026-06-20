@@ -21,6 +21,7 @@ export async function saveTopicAction(p: {
   definition: string;
   sort_order: number;
   is_active: boolean;
+  categoryIds?: number[];
 }): Promise<{ error: string | null }> {
   const { error: authErr, supabase } = await assertMod();
   if (authErr || !supabase) return { error: authErr ?? "Auth failed" };
@@ -43,8 +44,22 @@ export async function saveTopicAction(p: {
   const { error } = await q;
   if (error) return { error: error.message };
 
+  // === Junction: tip_topic ↔ kategori (M:N) ===
+  // Delete existing, insert fresh sesuai categoryIds
+  await supabase.from("tip_topic_categories").delete().eq("topic_slug", row.slug);
+
+  if (p.categoryIds && p.categoryIds.length > 0) {
+    const catRows = p.categoryIds.map((cid) => ({
+      topic_slug: row.slug,
+      category_id: cid,
+    }));
+    const rCat = await supabase.from("tip_topic_categories").insert(catRows);
+    if (rCat.error) return { error: "Kategori save error: " + rCat.error.message };
+  }
+
   revalidatePath("/edukasi");
   revalidatePath("/admin/games/edukasi");
+  revalidatePath("/konsultasi");
   return { error: null };
 }
 

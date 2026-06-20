@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { KategoriMultiSelect } from "@/components/admin/KategoriMultiSelect";
 import { useRouter } from "next/navigation";
 import {
   saveTopicAction,
@@ -30,7 +31,15 @@ type Tip = {
   is_active: boolean;
 };
 
-export function TipsEditor({ topics, tips }: { topics: Topic[]; tips: Tip[] }) {
+type Category = { id: number; slug: string; name: string };
+type TopicCategoryLink = { topic_slug: string; category_id: number };
+
+export function TipsEditor({ topics, tips, topicCategoryLinks = [], categories = [] }: { 
+  topics: Topic[]; 
+  tips: Tip[]; 
+  topicCategoryLinks?: TopicCategoryLink[];
+  categories?: Category[];
+}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [openTopic, setOpenTopic] = useState<string | null>(topics[0]?.slug ?? null);
@@ -42,8 +51,11 @@ export function TipsEditor({ topics, tips }: { topics: Topic[]; tips: Tip[] }) {
 
   const refresh = () => router.refresh();
 
+  const getCategoryIdsForTopic = (slug: string) =>
+    topicCategoryLinks.filter((l) => l.topic_slug === slug).map((l) => l.category_id);
+
   // ==== TOPIC HANDLERS ====
-  const onSaveTopic = (data: { id?: string; slug: string; title: string; emoji: string; definition: string; sort_order: number; is_active: boolean }) => {
+  const onSaveTopic = (data: { id?: string; slug: string; title: string; emoji: string; definition: string; sort_order: number; is_active: boolean; categoryIds?: number[] }) => {
     startTransition(async () => {
       const r = await saveTopicAction(data);
       if (r.error) setMsg("⚠️ " + r.error);
@@ -111,6 +123,8 @@ export function TipsEditor({ topics, tips }: { topics: Topic[]; tips: Tip[] }) {
       {addingNewTopic && (
         <TopicForm
           topic={null}
+          categories={categories}
+          initialCategoryIds={[]}
           onSave={onSaveTopic}
           onCancel={() => setAddingNewTopic(false)}
           isPending={isPending}
@@ -157,6 +171,8 @@ export function TipsEditor({ topics, tips }: { topics: Topic[]; tips: Tip[] }) {
                 ) : (
                   <TopicForm
                     topic={topic}
+                    categories={categories}
+                    initialCategoryIds={getCategoryIdsForTopic(topic.slug)}
                     onSave={onSaveTopic}
                     onCancel={() => setEditingTopic(null)}
                     isPending={isPending}
@@ -218,9 +234,11 @@ export function TipsEditor({ topics, tips }: { topics: Topic[]; tips: Tip[] }) {
 }
 
 // ==== TOPIC FORM ====
-function TopicForm({ topic, onSave, onCancel, isPending }: {
+function TopicForm({ topic, onSave, onCancel, isPending, categories = [], initialCategoryIds = [] }: {
   topic: Topic | null;
-  onSave: (data: { id?: string; slug: string; title: string; emoji: string; definition: string; sort_order: number; is_active: boolean }) => void;
+  onSave: (data: { id?: string; slug: string; title: string; emoji: string; definition: string; sort_order: number; is_active: boolean; categoryIds?: number[] }) => void;
+  categories?: Category[];
+  initialCategoryIds?: number[];
   onCancel: () => void;
   isPending: boolean;
 }) {
@@ -230,8 +248,9 @@ function TopicForm({ topic, onSave, onCancel, isPending }: {
   const [definition, setDefinition] = useState(topic?.definition ?? "");
   const [sortOrder, setSortOrder] = useState(topic?.sort_order ?? 99);
   const [isActive, setIsActive] = useState(topic?.is_active ?? true);
+  const [categoryIds, setCategoryIds] = useState<number[]>(initialCategoryIds);
 
-  const submit = () => onSave({ id: topic?.id, slug, title, emoji, definition, sort_order: sortOrder, is_active: isActive });
+  const submit = () => onSave({ id: topic?.id, slug, title, emoji, definition, sort_order: sortOrder, is_active: isActive, categoryIds });
 
   return (
     <div className="rounded-xl bg-sky-50 p-3 ring-1 ring-sky-200 flex flex-col gap-2">
@@ -250,6 +269,11 @@ function TopicForm({ topic, onSave, onCancel, isPending }: {
           <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} /> Active
         </label>
       </div>
+      <KategoriMultiSelect
+        categories={categories}
+        selectedIds={categoryIds}
+        onChange={setCategoryIds}
+      />
       <div className="flex gap-2 pt-1">
         <button onClick={submit} disabled={isPending} className="flex-1 rounded-full bg-emerald-500 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50">
           {isPending ? "Saving..." : "💾 Simpan"}

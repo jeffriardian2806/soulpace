@@ -7,6 +7,7 @@ import {
   deleteInstrumentAction,
 } from "@/app/admin/skrining/actions";
 import type { InstrumentPayload } from "@/app/admin/skrining/types";
+import { KategoriMultiSelect } from "@/components/admin/KategoriMultiSelect";
 
 const DEFAULT_OPTIONS = [
   { label: "Tidak pernah", value: 0 },
@@ -27,13 +28,16 @@ function blank(): InstrumentPayload {
     options: DEFAULT_OPTIONS.map((o) => ({ ...o })),
     items: [{ text: "", reverse: false }],
     bands: [{ min: 0, max: 0, label: "", advice: "" }],
+    categoryIds: [],
   };
 }
 
 const inputCls =
   "w-full rounded-xl border border-ink/10 bg-white/60 p-2.5 text-sm text-ink outline-none focus:border-sky-300";
 
-export function InstrumentForm({ initial }: { initial?: InstrumentPayload }) {
+type Category = { id: number; slug: string; name: string };
+
+export function InstrumentForm({ initial, categories = [] }: { initial?: InstrumentPayload; categories?: Category[] }) {
   const router = useRouter();
   const [f, setF] = useState<InstrumentPayload>(initial ?? blank());
   const [error, setError] = useState<string | null>(null);
@@ -91,6 +95,13 @@ export function InstrumentForm({ initial }: { initial?: InstrumentPayload }) {
             <input type="number" className="w-16 rounded-lg border border-ink/10 bg-white/60 p-1 text-sm" value={f.crisisItemPosition ?? ""} onChange={(e) => set("crisisItemPosition", e.target.value === "" ? null : Number(e.target.value))} />
           </label>
         </div>
+
+        {/* Kategori multi-select untuk Konsultasi flow */}
+        <KategoriMultiSelect
+          categories={categories}
+          selectedIds={f.categoryIds}
+          onChange={(ids) => set("categoryIds", ids)}
+        />
       </section>
 
       {/* Opsi jawaban */}

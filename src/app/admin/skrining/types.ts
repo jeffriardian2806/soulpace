@@ -10,4 +10,5 @@ export type InstrumentPayload = {
   options: { label: string; value: number }[];
   items: { text: string; reverse: boolean }[];
   bands: { min: number; max: number; label: string; advice: string }[];
+  categoryIds: number[];
 };

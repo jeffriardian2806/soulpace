@@ -24,13 +24,17 @@ export default async function AdminSkriningEditPage({
     .maybeSingle();
   if (prof?.role !== "moderator") redirect("/feed");
 
-  const { data } = await supabase
-    .from("screening_instruments")
-    .select(
-      "id, slug, name, subtitle, prompt, crisis_item_position, sort_order, is_active, screening_items(position, text, reverse), screening_options(label, value, sort_order), screening_bands(min_score, max_score, label, advice)"
-    )
-    .eq("id", id)
-    .maybeSingle();
+  const [{ data }, { data: catLinks }, { data: allCategories }] = await Promise.all([
+    supabase
+      .from("screening_instruments")
+      .select(
+        "id, slug, name, subtitle, prompt, crisis_item_position, sort_order, is_active, screening_items(position, text, reverse), screening_options(label, value, sort_order), screening_bands(min_score, max_score, label, advice)"
+      )
+      .eq("id", id)
+      .maybeSingle(),
+    supabase.from("screening_instrument_categories").select("category_id").eq("instrument_id", id),
+    supabase.from("categories").select("id, slug, name").eq("is_active", true).order("sort_order"),
+  ]);
 
   if (!data) {
     return (
@@ -73,6 +77,7 @@ export default async function AdminSkriningEditPage({
     bands: [...d.screening_bands]
       .sort((a, b) => a.min_score - b.min_score)
       .map((b) => ({ min: b.min_score, max: b.max_score, label: b.label, advice: b.advice })),
+    categoryIds: (catLinks ?? []).map((r: { category_id: number }) => r.category_id),
   };
 
   return (
@@ -81,7 +86,7 @@ export default async function AdminSkriningEditPage({
         <Link href="/admin/skrining" className="text-sm text-ink/50">← Kembali</Link>
         <h1 className="text-xl font-medium text-ink">Edit: {d.name}</h1>
       </header>
-      <InstrumentForm initial={initial} />
+      <InstrumentForm initial={initial} categories={(allCategories ?? []) as { id: number; slug: string; name: string }[]} />
     </main>
   );
 }

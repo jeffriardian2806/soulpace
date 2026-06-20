@@ -68,6 +68,24 @@ export default async function MainPage() {
         </div>
       )}
 
+      {/* === KONSULTASI (rekam medis style) === */}
+      <Link
+        href="/konsultasi"
+        className="block rounded-2xl bg-gradient-to-br from-sky-500 to-purple-500 p-5 text-white shadow-lg hover:shadow-xl"
+      >
+        <div className="flex items-start gap-3">
+          <span className="text-3xl">🩺</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs uppercase tracking-wide text-white/70">Konsultasi</p>
+            <p className="mt-1 text-lg font-bold leading-tight">Apa yang lagi lo alami?</p>
+            <p className="mt-1 text-xs leading-relaxed text-white/80">
+              Pilih kategori → ceritain keluhan → pemeriksaan → saran. Privat, jadi rekam medis lo.
+            </p>
+          </div>
+          <span className="text-white/70">→</span>
+        </div>
+      </Link>
+
       {(vibes?.length ?? 0) > 0 && (
         <section className="glass rounded-2xl p-4">
           <p className="mb-2 text-sm font-bold text-ink">Lagi pengen apa?</p>

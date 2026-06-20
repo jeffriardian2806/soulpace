@@ -12,16 +12,20 @@ export default async function AdminEdukasiPage() {
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
   if (!profile || (profile.role !== "moderator" && profile.role !== "admin")) redirect("/feed");
 
-  const [topicsRes, tipsRes] = await Promise.all([
+  const [topicsRes, tipsRes, topicCatRes, catsRes] = await Promise.all([
     supabase.from("tip_topics").select("id, slug, title, emoji, definition, sort_order, is_active").order("sort_order"),
     supabase.from("tips").select("id, topic_slug, topic_title, topic_emoji, tip_title, tip_content, sort_order, is_active").order("topic_slug").order("sort_order"),
+    supabase.from("tip_topic_categories").select("topic_slug, category_id"),
+    supabase.from("categories").select("id, slug, name").eq("is_active", true).order("sort_order"),
   ]);
 
   return (
-    <AdminPageShell title="📚 Tips & Edukasi" subtitle="Topic per kondisi (definisi + tips actionable). Klik topic buat expand & edit.">
+    <AdminPageShell title="📚 Tips & Edukasi" subtitle="Topic per kondisi (definisi + tips actionable). Klik topic buat expand & edit. Tag kategori biar muncul di Konsultasi flow.">
       <TipsEditor
         topics={(topicsRes.data ?? []) as Parameters<typeof TipsEditor>[0]["topics"]}
         tips={(tipsRes.data ?? []) as Parameters<typeof TipsEditor>[0]["tips"]}
+        topicCategoryLinks={(topicCatRes.data ?? []) as { topic_slug: string; category_id: number }[]}
+        categories={(catsRes.data ?? []) as { id: number; slug: string; name: string }[]}
       />
     </AdminPageShell>
   );
