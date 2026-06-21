@@ -244,6 +244,9 @@ function TopicForm({ topic, onSave, onCancel, isPending, categories = [], initia
 }) {
   const [slug, setSlug] = useState(topic?.slug ?? "");
   const [title, setTitle] = useState(topic?.title ?? "");
+  // slugTouched = true kalau user udah edit slug manual (override auto-sync).
+  // Untuk edit existing topic, langsung true (slug udah ke-set, jangan overwrite saat title diubah).
+  const [slugTouched, setSlugTouched] = useState(!!topic?.slug);
   const [emoji, setEmoji] = useState(topic?.emoji ?? "");
   const [definition, setDefinition] = useState(topic?.definition ?? "");
   const [sortOrder, setSortOrder] = useState(topic?.sort_order ?? 99);
@@ -257,26 +260,45 @@ function TopicForm({ topic, onSave, onCancel, isPending, categories = [], initia
       <p className="text-xs font-bold uppercase tracking-wide text-sky-700">{topic ? "Edit topic" : "Topic baru"}</p>
       <div className="flex gap-2">
         <input value={emoji} onChange={(e) => setEmoji(e.target.value)} placeholder="🎯" className="w-16 rounded-lg border border-ink/15 px-3 py-2 text-sm text-center" maxLength={4} />
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Judul (mis. Overthinking)" className="flex-1 rounded-lg border border-ink/15 px-3 py-2 text-sm" />
+        <input
+          value={title}
+          onChange={(e) => {
+            const v = e.target.value;
+            setTitle(v);
+            if (!slugTouched) setSlug(slugify(v));
+          }}
+          placeholder="Judul (mis. Overthinking)"
+          className="flex-1 rounded-lg border border-ink/15 px-3 py-2 text-sm"
+        />
       </div>
       <div className="flex flex-col gap-1">
         <input
           value={slug}
-          onChange={(e) => setSlug(slugify(e.target.value))}
+          onChange={(e) => {
+            setSlug(slugify(e.target.value));
+            setSlugTouched(true);
+          }}
           onBlur={(e) => setSlug(slugify(e.target.value))}
-          placeholder="slug-unik (mis. overthinking)"
+          placeholder="otomatis dari judul"
           className="rounded-lg border border-ink/15 px-3 py-2 text-sm font-mono"
         />
         <p className="px-1 text-[10px] leading-relaxed text-ink/50">
-          URL: <span className="font-mono text-ink/70">/edukasi/{slug || "your-slug"}</span>
-          {!slug && title && (
+          URL: <span className="font-mono text-ink/70">/edukasi/{slug || "..."}</span>
+          {slugTouched && title && (
             <button
               type="button"
-              onClick={() => setSlug(slugify(title))}
+              onClick={() => {
+                setSlug(slugify(title));
+                setSlugTouched(false);
+              }}
               className="ml-2 rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700"
+              title="Reset slug ngikut judul lagi"
             >
-              Auto-generate dari judul
+              ↺ Sync dari judul
             </button>
+          )}
+          {!slugTouched && (
+            <span className="ml-2 text-[10px] italic text-emerald-700">auto-sync ✓</span>
           )}
         </p>
       </div>
