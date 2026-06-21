@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { detectContactLeak } from "@/lib/telekonsul/antiLeak";
+import { detectContactLeakCombined } from "@/lib/telekonsul/antiLeak";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SESSION_WINDOW_HOURS = 24;
@@ -279,7 +279,12 @@ export async function sendMessageAction(
     return { ok: false, error: "Sesi udah expired. Buka sesi baru ya." };
   }
 
-  const leak = detectContactLeak(text);
+  // Fetch dynamic blocklist (admin-managed). Hardcode fallback tetap jalan di dalam combined.
+  const { data: blocklistRows } = await supabase
+    .from("leak_blocklist")
+    .select("pattern, match_type")
+    .eq("is_active", true);
+  const leak = detectContactLeakCombined(text, blocklistRows ?? []);
   if (leak.found) {
     return {
       ok: false,

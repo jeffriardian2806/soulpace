@@ -95,7 +95,7 @@ export default async function SettingsPage() {
         </section>
       )}
 
-      {profile?.role === "moderator" && (
+      {((profile?.role as string) === "moderator" || (profile?.role as string) === "admin") && (
         <section className="glass rounded-2xl p-2">
           <h2 className="px-2 py-1 text-sm font-semibold text-ink">Admin</h2>
           <Link
@@ -131,6 +131,13 @@ export default async function SettingsPage() {
             className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
           >
             <span>📊 Polling &amp; Ruang</span>
+            <span className="text-ink/40">→</span>
+          </Link>
+          <Link
+            href="/admin/telekonsul-blocklist"
+            className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+          >
+            <span>🛡️ Anti-Leak Blocklist</span>
             <span className="text-ink/40">→</span>
           </Link>
         </section>
