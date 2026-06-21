@@ -259,11 +259,32 @@ function TopicForm({ topic, onSave, onCancel, isPending, categories = [], initia
         <input value={emoji} onChange={(e) => setEmoji(e.target.value)} placeholder="🎯" className="w-16 rounded-lg border border-ink/15 px-3 py-2 text-sm text-center" maxLength={4} />
         <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Judul (mis. Overthinking)" className="flex-1 rounded-lg border border-ink/15 px-3 py-2 text-sm" />
       </div>
-      <input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="slug-unik (mis. overthinking)" className="rounded-lg border border-ink/15 px-3 py-2 text-sm font-mono" />
+      <div className="flex flex-col gap-1">
+        <input
+          value={slug}
+          onChange={(e) => setSlug(slugify(e.target.value))}
+          onBlur={(e) => setSlug(slugify(e.target.value))}
+          placeholder="slug-unik (mis. overthinking)"
+          className="rounded-lg border border-ink/15 px-3 py-2 text-sm font-mono"
+        />
+        <p className="px-1 text-[10px] leading-relaxed text-ink/50">
+          URL: <span className="font-mono text-ink/70">/edukasi/{slug || "your-slug"}</span>
+          {!slug && title && (
+            <button
+              type="button"
+              onClick={() => setSlug(slugify(title))}
+              className="ml-2 rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700"
+            >
+              Auto-generate dari judul
+            </button>
+          )}
+        </p>
+      </div>
       <textarea value={definition} onChange={(e) => setDefinition(e.target.value)} placeholder="Definisi: Apa itu [kondisi]? Penjelasan singkat dari psikologi..." rows={4} className="rounded-lg border border-ink/15 px-3 py-2 text-sm" />
       <div className="flex items-center gap-3">
-        <label className="flex items-center gap-2 text-xs text-ink/70">
+        <label className="flex items-center gap-2 text-xs text-ink/70" title="Urutan tampil — kecil = paling atas, besar = paling bawah">
           Sort: <input type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)} className="w-16 rounded border border-ink/15 px-2 py-1 text-xs" />
+          <span className="text-[10px] text-ink/45">(kecil = atas)</span>
         </label>
         <label className="flex items-center gap-2 text-xs text-ink/70">
           <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} /> Active
@@ -284,6 +305,16 @@ function TopicForm({ topic, onSave, onCancel, isPending, categories = [], initia
       </div>
     </div>
   );
+}
+
+// ==== SLUGIFY UTIL ====
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 // ==== TIP FORM ====
