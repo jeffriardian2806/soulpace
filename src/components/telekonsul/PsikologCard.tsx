@@ -2,10 +2,19 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Psikolog } from "@/lib/telekonsul/types";
 
-export function PsikologCard({ psikolog }: { psikolog: Psikolog }) {
+export function PsikologCard({
+  psikolog,
+  fromSession,
+}: {
+  psikolog: Psikolog;
+  fromSession?: string;
+}) {
+  const href = fromSession
+    ? `/telekonsul/${psikolog.slug}?from_session=${fromSession}`
+    : `/telekonsul/${psikolog.slug}`;
   return (
     <Link
-      href={`/telekonsul/${psikolog.slug}`}
+      href={href}
       className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-ink/10 transition hover:ring-sky-200"
     >
       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-sky-100">

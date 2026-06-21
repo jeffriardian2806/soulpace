@@ -112,3 +112,18 @@ export async function maybeAutoCloseExpiredThread(threadId: string): Promise<voi
       .eq("id", threadId);
   }
 }
+
+// Fetch consultation_sessions context for thread display
+// Returns null kalau session_id invalid atau RLS deny (gak akses)
+export async function getConsultationContextById(sessionId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("consultation_sessions")
+    .select(
+      "id, user_id, category_id, keluhan_text, pemeriksaan_results, saran_taken, created_at, category:categories(name, slug)"
+    )
+    .eq("id", sessionId)
+    .maybeSingle();
+  return data;
+}
+

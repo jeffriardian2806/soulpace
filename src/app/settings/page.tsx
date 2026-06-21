@@ -15,6 +15,13 @@ export default async function SettingsPage() {
   const svc = await getProfilesService();
   const profile = await svc.getProfile(user.id);
 
+  // Cek apakah user adalah psikolog (additive identity via row di psikologs)
+  const { data: psikolog } = await supabase
+    .from("psikologs")
+    .select("id, slug, full_name, is_active")
+    .eq("id", user.id)
+    .maybeSingle();
+
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-6 px-5 py-6">
       <header className="flex items-center gap-3">
@@ -49,6 +56,31 @@ export default async function SettingsPage() {
           <span className="text-ink/40">→</span>
         </Link>
       </section>
+
+      {psikolog && (
+        <section className="glass rounded-2xl p-2">
+          <h2 className="px-2 py-1 text-sm font-semibold text-ink">Psikolog</h2>
+          <Link
+            href="/telekonsul/chat"
+            className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+          >
+            <span>📥 Inbox Telekonsul</span>
+            <span className="text-ink/40">→</span>
+          </Link>
+          <Link
+            href={`/telekonsul/${psikolog.slug}`}
+            className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+          >
+            <span>👤 Profile Publik Lo</span>
+            <span className="text-ink/40">→</span>
+          </Link>
+          {!psikolog.is_active && (
+            <p className="px-2 py-1 text-[11px] italic text-amber-700">
+              ⚠️ Profile lo sedang non-aktif — patient ga bisa cari/booking lo.
+            </p>
+          )}
+        </section>
+      )}
 
       {profile?.role === "moderator" && (
         <section className="glass rounded-2xl p-2">

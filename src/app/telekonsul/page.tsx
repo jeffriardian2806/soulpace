@@ -9,7 +9,7 @@ export const metadata = { title: "Telekonsul — Soulpace" };
 export default async function TelekonsulLandingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ err?: string }>;
+  searchParams: Promise<{ err?: string; from_session?: string }>;
 }) {
   const sp = await searchParams;
   const supabase = await createClient();
@@ -46,6 +46,12 @@ export default async function TelekonsulLandingPage({
         </div>
       )}
 
+      {sp.from_session && (
+        <div className="rounded-xl bg-emerald-50 p-3 text-xs leading-relaxed text-emerald-900 ring-1 ring-emerald-200">
+          📋 Rekam medis konsultasi mandiri lo bakal auto-share ke psikolog yang lo pilih di bawah. Psikolog akan liat keluhan + hasil skrining tanpa perlu lo cerita ulang.
+        </div>
+      )}
+
       <Link
         href="/telekonsul/chat"
         className="flex items-center gap-3 rounded-2xl bg-white p-4 ring-1 ring-sky-200 hover:bg-sky-50"
@@ -67,7 +73,7 @@ export default async function TelekonsulLandingPage({
             Belum ada psikolog aktif. Tim Soulpace lagi onboarding.
           </div>
         ) : (
-          psikologs.map((p) => <PsikologCard key={p.id} psikolog={p} />)
+          psikologs.map((p) => <PsikologCard key={p.id} psikolog={p} fromSession={sp.from_session} />)
         )}
       </section>
     </main>

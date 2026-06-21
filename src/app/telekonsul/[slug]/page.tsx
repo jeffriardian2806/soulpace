@@ -7,10 +7,14 @@ import { startChatRedirectAction } from "@/app/telekonsul/actions";
 
 export default async function PsikologProfilePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ from_session?: string }>;
 }) {
   const { slug } = await params;
+  const sp = await searchParams;
+  const fromSession = sp.from_session;
   const supabase = await createClient();
   const {
     data: { user },
@@ -117,8 +121,15 @@ export default async function PsikologProfilePage({
         </div>
       </section>
 
+      {fromSession && (
+        <div className="rounded-xl bg-emerald-50 p-3 text-xs leading-relaxed text-emerald-900 ring-1 ring-emerald-200">
+          📋 Rekam medis konsultasi mandiri lo bakal auto-share ke <strong>{psikolog.full_name}</strong>. Saat sesi mulai, mereka langsung liat keluhan + hasil skrining lo.
+        </div>
+      )}
+
       <form action={startChatRedirectAction}>
         <input type="hidden" name="psikolog_id" value={psikolog.id} />
+        {fromSession && <input type="hidden" name="consultation_session_id" value={fromSession} />}
         <button
           type="submit"
           disabled={!psikolog.accepts_new_patient}

@@ -60,6 +60,31 @@ export default async function SessionDetailPage({ params }: Props) {
         </p>
       </div>
 
+      {/* Bridge ke Telekonsul — konsul lanjut dengan psikolog dengan auto-share rekam medis ini */}
+      <form
+        action="/telekonsul"
+        method="get"
+        className="block"
+      >
+        <div className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-4 text-white shadow-md">
+          <span className="text-3xl">👨‍⚕️</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">Bridge · Live psikolog</p>
+            <p className="mt-0.5 text-base font-bold leading-tight">Konsul lanjut sama psikolog</p>
+            <p className="mt-0.5 text-[11px] leading-relaxed text-white/85">
+              Rekam medis ini auto-share ke psikolog biar mereka ga nanya ulang dari nol.
+            </p>
+          </div>
+        </div>
+        <input type="hidden" name="from_session" value={session.id} />
+        <button
+          type="submit"
+          className="mt-2 w-full rounded-xl bg-white py-2.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200 hover:bg-emerald-50"
+        >
+          Pilih psikolog →
+        </button>
+      </form>
+
       {/* Keluhan */}
       <section className="rounded-2xl bg-white p-4 ring-1 ring-ink/10">
         <div className="flex items-center gap-2 border-b border-ink/5 pb-2">

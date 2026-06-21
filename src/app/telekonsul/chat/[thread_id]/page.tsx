@@ -7,6 +7,7 @@ import {
   maybeAutoCloseExpiredThread,
 } from "@/lib/telekonsul/queries";
 import { ChatThreadView } from "@/components/telekonsul/ChatThreadView";
+import { RekamMedisPanel } from "@/components/telekonsul/RekamMedisPanel";
 
 export const metadata = { title: "Chat — Telekonsul" };
 
@@ -72,6 +73,15 @@ export default async function ChatThreadPage({
           </p>
         </div>
       </header>
+
+      {thread.consultation_session_id && (
+        <div className="px-3 pt-2">
+          <RekamMedisPanel
+            consultationSessionId={thread.consultation_session_id}
+            viewerRole={thread.patient_id === user.id ? "patient" : "psikolog"}
+          />
+        </div>
+      )}
 
       <div className="px-3">
         <ChatThreadView thread={thread} initialMessages={messages} currentUserId={user.id} />
