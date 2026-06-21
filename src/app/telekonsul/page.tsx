@@ -46,6 +46,20 @@ export default async function TelekonsulLandingPage({
         </div>
       )}
 
+      <Link
+        href="/telekonsul/chat"
+        className="flex items-center gap-3 rounded-2xl bg-white p-4 ring-1 ring-sky-200 hover:bg-sky-50"
+      >
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-100 text-lg">
+          📥
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold text-ink">Inbox sesi lo</p>
+          <p className="text-[11px] text-ink/55">Liat semua sesi chat — patient atau psikolog</p>
+        </div>
+        <span className="text-ink/30">→</span>
+      </Link>
+
       <section className="flex flex-col gap-3">
         <h2 className="text-sm font-bold text-ink/85">Psikolog tersedia</h2>
         {psikologs.length === 0 ? (
@@ -56,13 +70,6 @@ export default async function TelekonsulLandingPage({
           psikologs.map((p) => <PsikologCard key={p.id} psikolog={p} />)
         )}
       </section>
-
-      <Link
-        href="/telekonsul/chat"
-        className="mt-2 rounded-xl bg-white p-3 text-center text-sm font-medium text-sky-700 ring-1 ring-sky-200 hover:bg-sky-50"
-      >
-        📥 Inbox sesi lo
-      </Link>
     </main>
   );
 }
