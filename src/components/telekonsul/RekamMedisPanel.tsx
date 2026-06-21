@@ -22,7 +22,13 @@ export async function RekamMedisPanel({ consultationSessionId, viewerRole }: Pro
   const skrinings = pemeriksaanList.filter((p) => p.type === "screening");
   const moods = pemeriksaanList.filter((p) => p.type === "mood");
 
-  const cat = session.category as { name: string; slug: string } | { name: string; slug: string }[] | null;
+  const saranList =
+    (session.saran_taken as Array<{ type: string; slug?: string }>) ?? [];
+
+  const cat = session.category as
+    | { name: string; slug: string }
+    | { name: string; slug: string }[]
+    | null;
   const catName = Array.isArray(cat) ? cat[0]?.name : cat?.name;
 
   return (
@@ -36,6 +42,7 @@ export async function RekamMedisPanel({ consultationSessionId, viewerRole }: Pro
           <p className="text-[10px] text-amber-700/80">
             {catName && `Kategori: ${catName} · `}
             {new Date(session.created_at).toLocaleDateString("id-ID", {
+              timeZone: "Asia/Jakarta",
               day: "numeric",
               month: "short",
               year: "numeric",
@@ -87,14 +94,28 @@ export async function RekamMedisPanel({ consultationSessionId, viewerRole }: Pro
           </>
         )}
 
-        {viewerRole === "patient" && (
-          <Link
-            href={`/konsultasi/${session.id}`}
-            className="mt-3 inline-block text-[11px] font-semibold text-emerald-700 hover:underline"
-          >
-            Liat full rekam medis →
-          </Link>
+        {saranList.length > 0 && (
+          <>
+            <p className="mt-3 text-[10px] font-bold uppercase tracking-wide text-amber-900/70">
+              Saran Yang Sudah Diambil
+            </p>
+            <ul className="mt-1 flex flex-col gap-1">
+              {saranList.map((s, i) => (
+                <li key={i} className="text-xs text-ink/75">
+                  ✓ <strong>{s.type}</strong>
+                  {s.slug && <span className="text-ink/55"> · {s.slug}</span>}
+                </li>
+              ))}
+            </ul>
+          </>
         )}
+
+        <Link
+          href={`/konsultasi/${session.id}`}
+          className="mt-3 inline-block rounded-full bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-emerald-700"
+        >
+          📄 Liat full rekam medis →
+        </Link>
       </div>
     </details>
   );
