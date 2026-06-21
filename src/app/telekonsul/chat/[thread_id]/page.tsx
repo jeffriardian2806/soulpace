@@ -61,11 +61,12 @@ export default async function ChatThreadPage({
               <>
                 {" "}· Expired{" "}
                 {new Date(thread.session_expires_at).toLocaleString("id-ID", {
+                  timeZone: "Asia/Jakarta",
                   day: "numeric",
                   month: "short",
                   hour: "2-digit",
                   minute: "2-digit",
-                })}
+                })} WIB
               </>
             )}
           </p>

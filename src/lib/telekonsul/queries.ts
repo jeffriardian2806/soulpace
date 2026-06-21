@@ -37,17 +37,33 @@ export async function getChatFreeFlag(): Promise<boolean> {
   return data?.is_active === true && data?.is_premium === false;
 }
 
-// Inbox: list threads for patient (sorted by last activity)
-export async function getInboxForPatient(userId: string): Promise<ChatThread[]> {
+// Inbox: list threads dimana user adalah participant (patient OR psikolog)
+// Returns enriched with patient_handle + viewer_role
+export async function getInboxForUser(userId: string): Promise<ChatThread[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("chat_threads")
     .select(
       "*, psikolog:psikologs!chat_threads_psikolog_id_fkey(id, slug, full_name, gelar, photo_url)"
     )
-    .eq("patient_id", userId)
+    .or(`patient_id.eq.${userId},psikolog_id.eq.${userId}`)
     .order("created_at", { ascending: false });
-  return (data ?? []) as ChatThread[];
+
+  if (!data || data.length === 0) return [];
+
+  // Fetch patient handles via separate query (FK to auth.users, profiles is 1:1 logical)
+  const patientIds = Array.from(new Set(data.map((t: { patient_id: string }) => t.patient_id)));
+  const { data: profs } = await supabase
+    .from("profiles")
+    .select("id, handle")
+    .in("id", patientIds);
+  const handleMap = new Map((profs ?? []).map((p: { id: string; handle: string }) => [p.id, p.handle]));
+
+  return data.map((t: { patient_id: string }) => ({
+    ...t,
+    patient_handle: handleMap.get(t.patient_id),
+    viewer_role: t.patient_id === userId ? "patient" : "psikolog",
+  })) as ChatThread[];
 }
 
 export async function getThreadById(

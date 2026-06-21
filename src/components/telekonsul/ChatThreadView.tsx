@@ -100,6 +100,7 @@ export function ChatThreadView({ thread, initialMessages, currentUserId }: Props
                     className={`mt-1 text-[10px] ${isOwn ? "text-white/70" : "text-ink/40"}`}
                   >
                     {new Date(m.created_at).toLocaleTimeString("id-ID", {
+                      timeZone: "Asia/Jakarta",
                       hour: "2-digit",
                       minute: "2-digit",
                     })}

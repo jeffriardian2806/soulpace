@@ -44,6 +44,9 @@ export type ChatThread = {
   psikolog?: Pick<Psikolog, "id" | "slug" | "full_name" | "gelar" | "photo_url">;
   last_message?: { body_text: string; created_at: string; sender_role: SenderRole };
   unread_count?: number;
+  // Inbox enrichment (computed in queries)
+  patient_handle?: string;
+  viewer_role?: "patient" | "psikolog";
 };
 
 export type ChatMessage = {
