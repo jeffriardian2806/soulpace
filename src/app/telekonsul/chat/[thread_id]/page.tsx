@@ -42,11 +42,15 @@ export default async function ChatThreadPage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col bg-sky-50/30">
-      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-ink/10 bg-white px-5 py-3 shadow-sm">
-        <Link href="/telekonsul/chat" className="text-sm text-ink/50">
-          ←
+      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-ink/10 bg-white px-3 py-3 shadow-sm">
+        <Link
+          href="/telekonsul/chat"
+          className="flex items-center gap-1 rounded-lg bg-ink/5 px-2 py-1.5 text-xs font-medium text-ink/70 hover:bg-sky-50 hover:text-sky-700"
+        >
+          <span>←</span>
+          <span>Inbox</span>
         </Link>
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-lg">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-100 text-lg">
           🧑‍⚕️
         </div>
         <div className="flex-1 min-w-0">

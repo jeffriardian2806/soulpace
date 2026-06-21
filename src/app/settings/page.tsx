@@ -22,6 +22,14 @@ export default async function SettingsPage() {
     .eq("id", user.id)
     .maybeSingle();
 
+  // Cek apakah user pernah punya chat_thread (sebagai patient atau psikolog)
+  // Buat tampil shortcut inbox Telekonsul
+  const { count: threadCount } = await supabase
+    .from("chat_threads")
+    .select("id", { count: "exact", head: true })
+    .or(`patient_id.eq.${user.id},psikolog_id.eq.${user.id}`);
+  const hasThreads = (threadCount ?? 0) > 0;
+
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-6 px-5 py-6">
       <header className="flex items-center gap-3">
@@ -57,27 +65,32 @@ export default async function SettingsPage() {
         </Link>
       </section>
 
-      {psikolog && (
+      {/* Telekonsul shortcut — visible kalau user punya thread (patient/psikolog) atau terdaftar psikolog */}
+      {(hasThreads || psikolog) && (
         <section className="glass rounded-2xl p-2">
-          <h2 className="px-2 py-1 text-sm font-semibold text-ink">Psikolog</h2>
+          <h2 className="px-2 py-1 text-sm font-semibold text-ink">Telekonsul</h2>
           <Link
             href="/telekonsul/chat"
             className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
           >
-            <span>📥 Inbox Telekonsul</span>
+            <span>📥 Inbox Chat Psikolog</span>
             <span className="text-ink/40">→</span>
           </Link>
-          <Link
-            href={`/telekonsul/${psikolog.slug}`}
-            className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
-          >
-            <span>👤 Profile Publik Lo</span>
-            <span className="text-ink/40">→</span>
-          </Link>
-          {!psikolog.is_active && (
-            <p className="px-2 py-1 text-[11px] italic text-amber-700">
-              ⚠️ Profile lo sedang non-aktif — patient ga bisa cari/booking lo.
-            </p>
+          {psikolog && (
+            <>
+              <Link
+                href={`/telekonsul/${psikolog.slug}`}
+                className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+              >
+                <span>👤 Profile Publik Lo (sebagai Psikolog)</span>
+                <span className="text-ink/40">→</span>
+              </Link>
+              {!psikolog.is_active && (
+                <p className="px-2 py-1 text-[11px] italic text-amber-700">
+                  ⚠️ Profile lo sedang non-aktif — patient ga bisa cari/booking lo.
+                </p>
+              )}
+            </>
           )}
         </section>
       )}
