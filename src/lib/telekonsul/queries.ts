@@ -127,3 +127,16 @@ export async function getConsultationContextById(sessionId: string) {
   return data;
 }
 
+// Fetch SEMUA laporan pemeriksaan pasien dari user_game_results
+// (skrining, MHCU, games). Read-only buat psikolog via thread.
+// RLS: butuh policy yang allow psikolog baca via chat_thread (migration 0052).
+export async function getPatientMedicalReports(patientId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("user_game_results")
+    .select("id, game_key, summary, detail, created_at")
+    .eq("user_id", patientId)
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}
+

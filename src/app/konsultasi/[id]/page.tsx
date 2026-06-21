@@ -26,23 +26,6 @@ export default async function SessionDetailPage({ params }: Props) {
   const session = await getConsultationSessionById(id);
   if (!session) notFound();
 
-  // Detect viewer role: patient (own session) vs psikolog (linked via chat_thread)
-  const isOwner = session.user_id === user.id;
-  let viewerRole: "patient" | "psikolog" = "patient";
-  let linkedThreadId: string | null = null;
-  if (!isOwner) {
-    // Cek apakah user adalah psikolog yang punya thread linked ke session ini
-    const { data: thread } = await supabase
-      .from("chat_threads")
-      .select("id")
-      .eq("consultation_session_id", id)
-      .eq("psikolog_id", user.id)
-      .maybeSingle();
-    if (!thread) notFound(); // RLS should already block, but defensive
-    viewerRole = "psikolog";
-    linkedThreadId = thread.id;
-  }
-
   const [skrinings, tipTopics] = await Promise.all([
     getScreeningsByCategoryId(session.category_id),
     getTipTopicsByCategoryId(session.category_id),
@@ -54,24 +37,8 @@ export default async function SessionDetailPage({ params }: Props) {
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-5 px-5 py-6">
       <header className="flex items-center justify-between">
-        {viewerRole === "psikolog" ? (
-          <Link
-            href={linkedThreadId ? `/telekonsul/chat/${linkedThreadId}` : "/telekonsul/chat"}
-            className="text-sm text-ink/50"
-          >
-            ← Kembali ke chat
-          </Link>
-        ) : (
-          <Link href="/konsultasi/history" className="text-sm text-ink/50">← Riwayat</Link>
-        )}
-        {viewerRole === "patient" && (
-          <Link href="/konsultasi" className="text-sm font-medium text-sky-700">+ Sesi baru</Link>
-        )}
-        {viewerRole === "psikolog" && (
-          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
-            👁️ View Psikolog
-          </span>
-        )}
+        <Link href="/konsultasi/history" className="text-sm text-ink/50">← Riwayat</Link>
+        <Link href="/konsultasi" className="text-sm font-medium text-sky-700">+ Sesi baru</Link>
       </header>
 
       {/* Rekam medis header */}
@@ -93,8 +60,7 @@ export default async function SessionDetailPage({ params }: Props) {
         </p>
       </div>
 
-      {/* Bridge ke Telekonsul — cuma patient yang liat */}
-      {viewerRole === "patient" && (
+      {/* Bridge ke Telekonsul — konsul lanjut dengan psikolog dengan auto-share rekam medis ini */}
       <form
         action="/telekonsul"
         method="get"
@@ -118,7 +84,6 @@ export default async function SessionDetailPage({ params }: Props) {
           Pilih psikolog →
         </button>
       </form>
-      )}
 
       {/* Keluhan */}
       <section className="rounded-2xl bg-white p-4 ring-1 ring-ink/10">

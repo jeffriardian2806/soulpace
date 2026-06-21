@@ -78,14 +78,13 @@ export default async function ChatThreadPage({
         </div>
       </header>
 
-      {thread.consultation_session_id && (
-        <div className="px-3 pt-2">
-          <RekamMedisPanel
-            consultationSessionId={thread.consultation_session_id}
-            viewerRole={thread.patient_id === user.id ? "patient" : "psikolog"}
-          />
-        </div>
-      )}
+      <div className="px-3 pt-2">
+        <RekamMedisPanel
+          consultationSessionId={thread.consultation_session_id}
+          patientId={thread.patient_id}
+          viewerRole={thread.patient_id === user.id ? "patient" : "psikolog"}
+        />
+      </div>
 
       <div className="px-3">
         <ChatThreadView thread={thread} initialMessages={messages} currentUserId={user.id} />
