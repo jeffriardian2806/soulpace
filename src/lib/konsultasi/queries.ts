@@ -189,6 +189,9 @@ export async function getConsultationSessionById(id: string): Promise<(Consultat
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
+  // NOTE: tidak hardcode .eq("user_id") — biar RLS yang handle access:
+  //   consult_select_own (0048): patient liat own session
+  //   consult_select_via_thread (0051): psikolog liat session via chat_thread linked
   const { data } = await supabase
     .from("consultation_sessions")
     .select(`
@@ -197,7 +200,6 @@ export async function getConsultationSessionById(id: string): Promise<(Consultat
       categories ( id, slug, name )
     `)
     .eq("id", id)
-    .eq("user_id", user.id)
     .maybeSingle();
 
   if (!data) return null;
