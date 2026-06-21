@@ -128,6 +128,7 @@ export function TipsEditor({ topics, tips, topicCategoryLinks = [], categories =
           onSave={onSaveTopic}
           onCancel={() => setAddingNewTopic(false)}
           isPending={isPending}
+          nextSortOrder={topics.length + 1}
         />
       )}
 
@@ -195,6 +196,7 @@ export function TipsEditor({ topics, tips, topicCategoryLinks = [], categories =
                     onSave={onSaveTip}
                     onCancel={() => setAddingTipFor(null)}
                     isPending={isPending}
+                    nextSortOrder={topicTips.length + 1}
                   />
                 )}
 
@@ -234,13 +236,14 @@ export function TipsEditor({ topics, tips, topicCategoryLinks = [], categories =
 }
 
 // ==== TOPIC FORM ====
-function TopicForm({ topic, onSave, onCancel, isPending, categories = [], initialCategoryIds = [] }: {
+function TopicForm({ topic, onSave, onCancel, isPending, categories = [], initialCategoryIds = [], nextSortOrder = 1 }: {
   topic: Topic | null;
   onSave: (data: { id?: string; slug: string; title: string; emoji: string; definition: string; sort_order: number; is_active: boolean; categoryIds?: number[] }) => void;
   categories?: Category[];
   initialCategoryIds?: number[];
   onCancel: () => void;
   isPending: boolean;
+  nextSortOrder?: number;
 }) {
   const [slug, setSlug] = useState(topic?.slug ?? "");
   const [title, setTitle] = useState(topic?.title ?? "");
@@ -249,17 +252,19 @@ function TopicForm({ topic, onSave, onCancel, isPending, categories = [], initia
   const [slugTouched, setSlugTouched] = useState(!!topic?.slug);
   const [emoji, setEmoji] = useState(topic?.emoji ?? "");
   const [definition, setDefinition] = useState(topic?.definition ?? "");
-  const [sortOrder, setSortOrder] = useState(topic?.sort_order ?? 99);
+  const [sortOrder] = useState(topic?.sort_order ?? nextSortOrder);
   const [isActive, setIsActive] = useState(topic?.is_active ?? true);
   const [categoryIds, setCategoryIds] = useState<number[]>(initialCategoryIds);
 
   const submit = () => onSave({ id: topic?.id, slug, title, emoji, definition, sort_order: sortOrder, is_active: isActive, categoryIds });
 
   return (
-    <div className="rounded-xl bg-sky-50 p-3 ring-1 ring-sky-200 flex flex-col gap-2">
-      <p className="text-xs font-bold uppercase tracking-wide text-sky-700">{topic ? "Edit topic" : "Topic baru"}</p>
-      <div className="flex gap-2">
-        <input value={emoji} onChange={(e) => setEmoji(e.target.value)} placeholder="🎯" className="w-16 rounded-lg border border-ink/15 px-3 py-2 text-sm text-center" maxLength={4} />
+    <div className="rounded-xl bg-sky-50 p-3 ring-1 ring-sky-200 flex flex-col gap-3">
+      <p className="text-xs font-bold uppercase tracking-wide text-sky-700">{topic ? "Edit topik" : "Topik baru"}</p>
+
+      {/* JUDUL */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-semibold text-ink/70">Judul topik</label>
         <input
           value={title}
           onChange={(e) => {
@@ -267,67 +272,88 @@ function TopicForm({ topic, onSave, onCancel, isPending, categories = [], initia
             setTitle(v);
             if (!slugTouched) setSlug(slugify(v));
           }}
-          placeholder="Judul (mis. Overthinking)"
-          className="flex-1 rounded-lg border border-ink/15 px-3 py-2 text-sm"
+          placeholder="mis. Overthinking, Cara Hadapi NPD"
+          className="rounded-lg border border-ink/15 px-3 py-2 text-sm"
         />
       </div>
+
+      {/* EMOJI quick-pick */}
       <div className="flex flex-col gap-1">
-        <input
-          value={slug}
-          onChange={(e) => {
-            setSlug(slugify(e.target.value));
-            setSlugTouched(true);
-          }}
-          onBlur={(e) => setSlug(slugify(e.target.value))}
-          placeholder="otomatis dari judul"
-          className="rounded-lg border border-ink/15 px-3 py-2 text-sm font-mono"
-        />
-        <p className="px-1 text-[10px] leading-relaxed text-ink/50">
-          URL: <span className="font-mono text-ink/70">/edukasi/{slug || "..."}</span>
-          {slugTouched && title && (
+        <label className="text-xs font-semibold text-ink/70">Ikon <span className="font-normal text-ink/45">(pilih satu, opsional)</span></label>
+        <div className="flex flex-wrap gap-1.5">
+          {EMOJI_CHOICES.map((em) => (
             <button
+              key={em}
               type="button"
-              onClick={() => {
-                setSlug(slugify(title));
-                setSlugTouched(false);
-              }}
-              className="ml-2 rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700"
-              title="Reset slug ngikut judul lagi"
+              onClick={() => setEmoji(em === emoji ? "" : em)}
+              className={`flex h-9 w-9 items-center justify-center rounded-lg text-lg transition ${
+                emoji === em ? "bg-sky-500 ring-2 ring-sky-300" : "bg-white ring-1 ring-ink/10 hover:bg-sky-100"
+              }`}
             >
-              ↺ Sync dari judul
+              {em}
             </button>
-          )}
-          {!slugTouched && (
-            <span className="ml-2 text-[10px] italic text-emerald-700">auto-sync ✓</span>
-          )}
-        </p>
+          ))}
+        </div>
       </div>
-      <textarea value={definition} onChange={(e) => setDefinition(e.target.value)} placeholder="Definisi: Apa itu [kondisi]? Penjelasan singkat dari psikologi..." rows={4} className="rounded-lg border border-ink/15 px-3 py-2 text-sm" />
-      <div className="flex items-center gap-3">
-        <label className="flex items-center gap-2 text-xs text-ink/70" title="Urutan tampil — kecil = paling atas, besar = paling bawah">
-          Sort: <input type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)} className="w-16 rounded border border-ink/15 px-2 py-1 text-xs" />
-          <span className="text-[10px] text-ink/45">(kecil = atas)</span>
-        </label>
-        <label className="flex items-center gap-2 text-xs text-ink/70">
-          <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} /> Active
-        </label>
+
+      {/* PENJELASAN */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-semibold text-ink/70">Penjelasan singkat <span className="font-normal text-ink/45">(opsional)</span></label>
+        <textarea
+          value={definition}
+          onChange={(e) => setDefinition(e.target.value)}
+          placeholder="Apa itu [kondisi]? Penjelasan singkat yang gampang dimengerti pembaca..."
+          rows={4}
+          className="rounded-lg border border-ink/15 px-3 py-2 text-sm"
+        />
       </div>
-      <KategoriMultiSelect
-        categories={categories}
-        selectedIds={categoryIds}
-        onChange={setCategoryIds}
-      />
+
+      {/* KATEGORI */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-semibold text-ink/70">Kategori <span className="font-normal text-rose-500">(wajib pilih min. 1)</span></label>
+        <KategoriMultiSelect
+          categories={categories}
+          selectedIds={categoryIds}
+          onChange={setCategoryIds}
+        />
+      </div>
+
+      {/* PUBLISH toggle — bahasa manusia */}
+      <label className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm text-ink/80 ring-1 ring-ink/10">
+        <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="h-4 w-4" />
+        <span>{isActive ? "✅ Tampil ke pengguna" : "🔒 Disembunyikan (draft)"}</span>
+      </label>
+
+      {/* ADVANCED — slug disembunyiin, cuma buka kalau perlu */}
+      <details className="rounded-lg bg-white/60 ring-1 ring-ink/10">
+        <summary className="cursor-pointer px-3 py-2 text-[11px] font-medium text-ink/50">⚙️ Pengaturan lanjutan (biasanya gak perlu diubah)</summary>
+        <div className="border-t border-ink/8 px-3 py-2">
+          <label className="text-[11px] text-ink/55">Alamat URL (otomatis dari judul)</label>
+          <input
+            value={slug}
+            onChange={(e) => { setSlug(slugify(e.target.value)); setSlugTouched(true); }}
+            onBlur={(e) => setSlug(slugify(e.target.value))}
+            placeholder="otomatis"
+            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 text-sm font-mono"
+          />
+          <p className="mt-1 text-[10px] text-ink/40">soulpace.app/edukasi/{slug || "..."}</p>
+        </div>
+      </details>
+
       <div className="flex gap-2 pt-1">
-        <button onClick={submit} disabled={isPending} className="flex-1 rounded-full bg-emerald-500 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50">
-          {isPending ? "Saving..." : "💾 Simpan"}
+        <button onClick={submit} disabled={isPending} className="flex-1 rounded-full bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+          {isPending ? "Menyimpan..." : "💾 Simpan topik"}
         </button>
-        <button onClick={onCancel} className="rounded-full bg-white px-4 py-2 text-xs font-medium text-ink/70 ring-1 ring-ink/15">
-          Cancel
+        <button onClick={onCancel} className="rounded-full bg-white px-4 py-2.5 text-sm font-medium text-ink/70 ring-1 ring-ink/15">
+          Batal
         </button>
       </div>
     </div>
   );
 }
+
+// Emoji pilihan umum buat topik mental health (Rey tinggal klik, gak usah ngetik)
+const EMOJI_CHOICES = ["🧠","💭","😰","😢","😡","😴","🪞","💔","🌱","🤝","🛡️","💪","🌧️","☀️","🧩","❤️‍🩹","🆘","📌"];
 
 // ==== SLUGIFY UTIL ====
 function slugify(s: string): string {
@@ -340,16 +366,18 @@ function slugify(s: string): string {
 }
 
 // ==== TIP FORM ====
-function TipForm({ tip, topic, onSave, onCancel, isPending }: {
+function TipForm({ tip, topic, onSave, onCancel, isPending, nextSortOrder = 1 }: {
   tip: Tip | null;
   topic: Topic;
   onSave: (data: { id?: string; topic_slug: string; topic_title: string; topic_emoji: string; tip_title: string; tip_content: string; sort_order: number; is_active: boolean }) => void;
   onCancel: () => void;
   isPending: boolean;
+  nextSortOrder?: number;
 }) {
   const [tipTitle, setTipTitle] = useState(tip?.tip_title ?? "");
   const [tipContent, setTipContent] = useState(tip?.tip_content ?? "");
-  const [sortOrder, setSortOrder] = useState(tip?.sort_order ?? 99);
+  // Tip lama: pakai sort existing. Tip baru: auto = paling bawah (nextSortOrder).
+  const [sortOrder] = useState(tip?.sort_order ?? nextSortOrder);
   const [isActive, setIsActive] = useState(tip?.is_active ?? true);
 
   const submit = () => onSave({
@@ -365,23 +393,25 @@ function TipForm({ tip, topic, onSave, onCancel, isPending }: {
 
   return (
     <div className="rounded-xl bg-emerald-50 p-3 ring-1 ring-emerald-200 flex flex-col gap-2">
-      <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">{tip ? "Edit tip" : "Tip baru"} di {topic.emoji} {topic.title}</p>
-      <input value={tipTitle} onChange={(e) => setTipTitle(e.target.value)} placeholder="Tip title (mis. 'Brain dump ke kertas')" className="rounded-lg border border-ink/15 px-3 py-2 text-sm" />
-      <textarea value={tipContent} onChange={(e) => setTipContent(e.target.value)} placeholder="Content: penjelasan actionable, casual Indonesia. Boleh refer ke fitur Soulpace yang relevan." rows={5} className="rounded-lg border border-ink/15 px-3 py-2 text-sm" />
-      <div className="flex items-center gap-3">
-        <label className="flex items-center gap-2 text-xs text-ink/70">
-          Sort: <input type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)} className="w-16 rounded border border-ink/15 px-2 py-1 text-xs" />
-        </label>
-        <label className="flex items-center gap-2 text-xs text-ink/70">
-          <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} /> Active
-        </label>
+      <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">{tip ? "Edit artikel" : "Artikel baru"} di {topic.emoji} {topic.title}</p>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-semibold text-ink/70">Judul artikel</label>
+        <input value={tipTitle} onChange={(e) => setTipTitle(e.target.value)} placeholder="mis. Cara hadapi orang dengan NPD" className="rounded-lg border border-ink/15 px-3 py-2 text-sm" />
       </div>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-semibold text-ink/70">Isi artikel</label>
+        <textarea value={tipContent} onChange={(e) => setTipContent(e.target.value)} placeholder="Tulis penjelasan yang actionable & gampang dimengerti pembaca..." rows={6} className="rounded-lg border border-ink/15 px-3 py-2 text-sm" />
+      </div>
+      <label className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm text-ink/80 ring-1 ring-ink/10">
+        <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="h-4 w-4" />
+        <span>{isActive ? "✅ Tampil ke pengguna" : "🔒 Disembunyikan (draft)"}</span>
+      </label>
       <div className="flex gap-2 pt-1">
-        <button onClick={submit} disabled={isPending} className="flex-1 rounded-full bg-emerald-500 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50">
-          {isPending ? "Saving..." : "💾 Simpan"}
+        <button onClick={submit} disabled={isPending} className="flex-1 rounded-full bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+          {isPending ? "Menyimpan..." : "💾 Simpan artikel"}
         </button>
-        <button onClick={onCancel} className="rounded-full bg-white px-4 py-2 text-xs font-medium text-ink/70 ring-1 ring-ink/15">
-          Cancel
+        <button onClick={onCancel} className="rounded-full bg-white px-4 py-2.5 text-sm font-medium text-ink/70 ring-1 ring-ink/15">
+          Batal
         </button>
       </div>
     </div>

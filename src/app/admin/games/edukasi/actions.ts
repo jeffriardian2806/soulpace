@@ -3,6 +3,17 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
+// Server-side slugify — enforce slug rapi walau bukan dari UI.
+// Mirror slugify di TipsEditor (client) biar konsisten.
+function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 async function assertMod() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -26,13 +37,26 @@ export async function saveTopicAction(p: {
   const { error: authErr, supabase } = await assertMod();
   if (authErr || !supabase) return { error: authErr ?? "Auth failed" };
 
-  if (!p.slug.trim() || !p.title.trim()) return { error: "Slug & title wajib." };
+  // Enforce slugify server-side (jangan cuma trim — slug HARUS rapi).
+  const cleanSlug = slugify(p.slug || p.title);
+  if (!cleanSlug || !p.title.trim()) return { error: "Slug & title wajib (slug jadi kosong setelah dirapikan)." };
   if (!p.categoryIds || p.categoryIds.length === 0) {
     return { error: "Wajib pilih minimal 1 kategori — biar muncul di Konsultasi flow." };
   }
 
+  // Kalau EDIT: cek slug lama buat deteksi perubahan slug.
+  let oldSlug: string | null = null;
+  if (p.id) {
+    const { data: existing } = await supabase
+      .from("tip_topics")
+      .select("slug")
+      .eq("id", p.id)
+      .maybeSingle();
+    oldSlug = existing?.slug ?? null;
+  }
+
   const row = {
-    slug: p.slug.trim(),
+    slug: cleanSlug,
     title: p.title.trim(),
     emoji: p.emoji.trim() || null,
     definition: p.definition.trim() || null,
@@ -47,13 +71,23 @@ export async function saveTopicAction(p: {
   const { error } = await q;
   if (error) return { error: error.message };
 
-  // === Junction: tip_topic ↔ kategori (M:N) ===
-  // Delete existing, insert fresh sesuai categoryIds
-  await supabase.from("tip_topic_categories").delete().eq("topic_slug", row.slug);
+  // Kalau slug BERUBAH saat edit: FK ON UPDATE CASCADE (migration 0054)
+  // otomatis nyebar slug baru ke tips & tip_topic_categories. Jadi kita
+  // TIDAK perlu manual update tips. Tapi junction kita rebuild dari categoryIds
+  // di bawah, jadi pakai cleanSlug (slug baru) — udah konsisten.
+  const slugChanged = !!(oldSlug && oldSlug !== cleanSlug);
+
+  // === Junction: tip_topic ↔ kategori (M:N) — rebuild dari categoryIds ===
+  // Delete by slug baru (kalau slug berubah, cascade udah pindahin row lama ke slug baru).
+  // Delete juga by slug lama buat jaga-jaga (defensive, kalau cascade belum jalan).
+  await supabase.from("tip_topic_categories").delete().eq("topic_slug", cleanSlug);
+  if (slugChanged && oldSlug) {
+    await supabase.from("tip_topic_categories").delete().eq("topic_slug", oldSlug);
+  }
 
   if (p.categoryIds && p.categoryIds.length > 0) {
     const catRows = p.categoryIds.map((cid) => ({
-      topic_slug: row.slug,
+      topic_slug: cleanSlug,
       category_id: cid,
     }));
     const rCat = await supabase.from("tip_topic_categories").insert(catRows);
