@@ -305,7 +305,6 @@ export function FeedShell({
             { href: "/main", icon: "✨", label: "Main" },
             { href: "/skrining", icon: "📋", label: "Skrining" },
             { href: "/konsultasi", icon: "🩺", label: "Konsultasi" },
-            { href: "/telekonsul", icon: "👨‍⚕️", label: "Telekonsul" },
             { href: "/refleksi", icon: "✍️", label: "Refleksi" },
             { href: "/mood", icon: "🙂", label: "Mood" },
             { href: "/syukur", icon: "🙏", label: "Afirmasi" },

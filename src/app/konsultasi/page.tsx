@@ -45,10 +45,27 @@ export default async function KonsultasiPage() {
         <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">🩺 Konsultasi</p>
         <h1 className="mt-1 text-xl font-bold text-ink">Apa yang lagi lo alami?</h1>
         <p className="mt-2 text-sm leading-relaxed text-ink/65">
-          Ceritain dulu — kita periksa bareng & cari saran. Semua sesi privat, cuma lo yang lihat
-          (kecuali lo pilih share ke feed).
+          Pilih cara konsultasi yang sesuai — langsung sama psikolog, atau mandiri AI-guided.
         </p>
       </div>
+
+      {/* Telekonsul CTA — Live psikolog */}
+      <Link
+        href="/telekonsul"
+        className="block rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-4 text-white shadow-md hover:shadow-lg"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">👨‍⚕️</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">Live · 1-on-1</p>
+            <p className="mt-0.5 text-base font-bold leading-tight">Konsul langsung sama psikolog</p>
+            <p className="mt-0.5 text-[11px] leading-relaxed text-white/85">
+              Chat real-time dengan psikolog mitra Soulpace. Privat. Gratis di beta.
+            </p>
+          </div>
+          <span className="text-white/70">→</span>
+        </div>
+      </Link>
 
       {/* Recent sessions shortcut */}
       {recentSessions.length > 0 && (
@@ -76,9 +93,15 @@ export default async function KonsultasiPage() {
         </section>
       )}
 
-      {/* Kategori picker */}
+      {/* Kategori picker — sesi mandiri (AI-guided rekam medis) */}
       <section>
-        <p className="mb-2 text-sm font-bold text-ink">Pilih kategori yang sesuai:</p>
+        <div className="mb-2 flex items-center gap-2">
+          <span className="text-sm font-bold text-ink">📝 Atau, konsul mandiri</span>
+          <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10px] font-medium text-ink/55">AI-guided</span>
+        </div>
+        <p className="mb-3 text-[11px] leading-relaxed text-ink/55">
+          Pilih kategori → tulis keluhan → liat saran. Hasil tersimpan sebagai rekam medis lo.
+        </p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {categories.map((cat) => (
             <Link
