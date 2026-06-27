@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { TarotEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Tarot Refleksi — Admin Soulpace" };
+export const metadata = { title: "Tarot Refleksi — Admin Flouwell" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

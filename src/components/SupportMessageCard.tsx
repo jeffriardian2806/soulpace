@@ -7,7 +7,7 @@ export function SupportMessageCard({ message, dismissible = false, onDismiss }: 
       <div className="flex items-start gap-3">
         <div className="text-2xl">💙</div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs uppercase tracking-wide text-sky-700 font-semibold">Pesan dari Soulpace</p>
+          <p className="text-xs uppercase tracking-wide text-sky-700 font-semibold">Pesan dari Flouwell</p>
           <p className="mt-1 text-sm leading-relaxed text-ink/85">{message}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <TTSButton text={message} label="Dengerin" />

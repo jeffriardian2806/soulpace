@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CrisisMessagesEditor } from "@/components/admin/CrisisMessagesEditor";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Crisis Mode Messages — Admin Soulpace" };
+export const metadata = { title: "Crisis Mode Messages — Admin Flouwell" };
 
 export default async function AdminCrisisMessagesPage() {
   const supabase = await createClient();

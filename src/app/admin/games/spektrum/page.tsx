@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PersonalityCategoryEditor, PersonalityQuestionEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Spektrum Sosial — Admin Soulpace" };
+export const metadata = { title: "Spektrum Sosial — Admin Flouwell" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

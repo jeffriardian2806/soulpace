@@ -5,7 +5,7 @@ import { MoodTracker } from "@/components/MoodTracker";
 import { MoodInsight } from "@/components/MoodInsight";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Mood Tracker — Soulpace" };
+export const metadata = { title: "Mood Tracker — Flouwell" };
 
 export default async function MoodPage() {
   const _blocked_ = await checkPremiumAccess("mood");

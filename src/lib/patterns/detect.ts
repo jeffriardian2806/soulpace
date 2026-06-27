@@ -95,7 +95,7 @@ export async function detectPatternNudge(): Promise<PatternNudge | null> {
         priority: 90,
         emoji: "🌿",
         title: "Skrining lo recent nunjukin tingkat yang significant.",
-        message: "Skrining bukan diagnosis, tapi sinyal. Worth ngobrol sama profesional yang qualified. Soulpace bukan terapi.",
+        message: "Skrining bukan diagnosis, tapi sinyal. Worth ngobrol sama profesional yang qualified. Flouwell bukan terapi.",
         primary_action: { label: "🌐 Lihat Pusat Bantuan", href: "/resource" },
         secondary_action: { label: "🛟 Cek Safety Plan", href: "/safety-plan" },
       });

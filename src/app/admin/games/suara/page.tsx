@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { VoiceEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Suara Dalam Kepala — Admin Soulpace" };
+export const metadata = { title: "Suara Dalam Kepala — Admin Flouwell" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

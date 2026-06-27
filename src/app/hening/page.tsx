@@ -2,7 +2,7 @@ import { QuietRoom } from "@/components/QuietRoom";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata = {
-  title: "Ruang Hening — Soulpace",
+  title: "Ruang Hening — Flouwell",
   description: "Ruang untuk diam sejenak. Nggak harus cerita, cukup hadir.",
 };
 

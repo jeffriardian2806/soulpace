@@ -4,8 +4,8 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { Stars } from "@/components/Stars";
 
 export const metadata: Metadata = {
-  title: "Ulasan Pengguna — Soulpace",
-  description: "Apa kata pengguna tentang Soulpace, apa adanya.",
+  title: "Ulasan Pengguna — Flouwell",
+  description: "Apa kata pengguna tentang Flouwell, apa adanya.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/ulasan" },
 };

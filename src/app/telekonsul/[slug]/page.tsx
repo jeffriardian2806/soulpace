@@ -141,7 +141,7 @@ export default async function PsikologProfilePage({
 
       <p className="text-center text-[10px] leading-relaxed text-ink/40">
         Dengan mulai sesi, lo setuju identitas (nama + email) di-share ke psikolog ini.
-        Soulpace policy: dilarang share kontak off-platform (WA/IG/email pribadi).
+        Flouwell policy: dilarang share kontak off-platform (WA/IG/email pribadi).
       </p>
     </main>
   );

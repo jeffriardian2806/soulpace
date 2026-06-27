@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getFeatureFlagMap, PremiumBadgeInline } from "@/components/PremiumGate";
 
-export const metadata = { title: "Main & Kenali Diri — Soulpace" };
+export const metadata = { title: "Main & Kenali Diri — Flouwell" };
 
 // Permainan interaktif — slug = key feature_flags
 const INTERACTIVE = [

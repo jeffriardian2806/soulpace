@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { BatteryEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Energi Sosial — Admin Soulpace" };
+export const metadata = { title: "Energi Sosial — Admin Flouwell" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

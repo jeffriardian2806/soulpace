@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { TarotPlayer, type TarotCard } from "@/components/games/TarotPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Tarot Refleksi — Soulpace" };
+export const metadata = { title: "Tarot Refleksi — Flouwell" };
 
 export default async function TarotPage() {
   const _blocked_ = await checkPremiumAccess("tarot");

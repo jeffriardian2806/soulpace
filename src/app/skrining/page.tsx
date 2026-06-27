@@ -5,7 +5,7 @@ import { getFeatureFlagMap, PremiumBadgeInline } from "@/components/PremiumGate"
 import { MhcuActionList } from "@/components/MhcuActionList";
 
 export const metadata: Metadata = {
-  title: "Tes & Skrining — Soulpace",
+  title: "Tes & Skrining — Flouwell",
   description:
     "Tes kepribadian (Spektrum, Kompas), Mental Health Check-Up (Burnout, Self-Esteem, dll), dan skrining klinis (PHQ-9, GAD-7).",
   robots: { index: true, follow: true },

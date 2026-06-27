@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Jurnal Pribadi — Soulpace" };
+export const metadata = { title: "Jurnal Pribadi — Flouwell" };
 
 function fmt(iso: string): string {
   return new Date(iso).toLocaleDateString("id-ID", {

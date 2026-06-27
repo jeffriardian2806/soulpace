@@ -4,7 +4,7 @@ import { checkPremiumAccess } from "@/components/PremiumGate";
 import { VisualFirstSightPlayer } from "@/components/visual/VisualFirstSightPlayer";
 
 export const metadata = {
-  title: "Mata Pertama — Soulpace",
+  title: "Mata Pertama — Flouwell",
   description: "Refleksi visual: apa yang kamu lihat pertama. Bukan diagnosis, just reflection.",
 };
 

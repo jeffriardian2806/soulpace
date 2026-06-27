@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { RoomForm } from "@/components/RoomForm";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Ruang Hari Ini — Soulpace" };
+export const metadata = { title: "Ruang Hari Ini — Flouwell" };
 
 function timeAgo(iso: string): string {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);

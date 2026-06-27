@@ -2,7 +2,7 @@ import Link from "next/link";
 import { LepasPlayer } from "@/components/games/LepasPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Lepasin Pikiran — Soulpace" };
+export const metadata = { title: "Lepasin Pikiran — Flouwell" };
 
 export default async function LepasPage() {
   const _blocked_ = await checkPremiumAccess("lepas");

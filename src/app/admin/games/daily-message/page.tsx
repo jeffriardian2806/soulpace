@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { DailyMessageEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Pesan Hari Ini — Admin Soulpace" };
+export const metadata = { title: "Pesan Hari Ini — Admin Flouwell" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAllCategories, getUserConsultationSessions } from "@/lib/konsultasi/queries";
 
-export const metadata = { title: "Konsultasi — Soulpace" };
+export const metadata = { title: "Konsultasi — Flouwell" };
 
 const CATEGORY_EMOJI: Record<string, string> = {
   "keluarga": "👨‍👩‍👧",
@@ -60,7 +60,7 @@ export default async function KonsultasiPage() {
             <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">Live · 1-on-1</p>
             <p className="mt-0.5 text-base font-bold leading-tight">Konsul langsung sama psikolog</p>
             <p className="mt-0.5 text-[11px] leading-relaxed text-white/85">
-              Chat real-time dengan psikolog mitra Soulpace. Privat. Gratis di beta.
+              Chat real-time dengan psikolog mitra Flouwell. Privat. Gratis di beta.
             </p>
           </div>
           <span className="text-white/70">→</span>

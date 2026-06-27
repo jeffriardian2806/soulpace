@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { DetektifPlayer, type DetectiveCase } from "@/components/games/DetektifPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Detektif Emosi — Soulpace" };
+export const metadata = { title: "Detektif Emosi — Flouwell" };
 
 export default async function DetektifPage() {
   const _blocked_ = await checkPremiumAccess("detektif");

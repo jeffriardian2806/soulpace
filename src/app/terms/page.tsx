@@ -5,7 +5,7 @@ export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Ketentuan Layanan",
-  description: "Ketentuan Layanan Soulpace.",
+  description: "Ketentuan Layanan Flouwell.",
   robots: { index: true, follow: true },
 };
 
@@ -18,16 +18,16 @@ export default function TermsPage() {
 
       <section className="flex flex-col gap-4 text-sm leading-relaxed text-ink/75">
         <div>
-          <h2 className="mb-1 font-semibold text-ink">1. Tentang Soulpace</h2>
-          <p>Soulpace adalah ruang untuk berbagi keluh kesah dan saling menguatkan secara anonim. Saat ini Soulpace berada dalam tahap beta dan masih dikembangkan. Dengan memakai Soulpace, kamu setuju dengan ketentuan ini.</p>
+          <h2 className="mb-1 font-semibold text-ink">1. Tentang Flouwell</h2>
+          <p>Flouwell adalah ruang untuk berbagi keluh kesah dan saling menguatkan secara anonim. Saat ini Flouwell berada dalam tahap beta dan masih dikembangkan. Dengan memakai Flouwell, kamu setuju dengan ketentuan ini.</p>
         </div>
         <div>
           <h2 className="mb-1 font-semibold text-ink">2. Bukan layanan darurat atau medis</h2>
-          <p>Soulpace bukan pengganti bantuan profesional, terapi, atau layanan darurat. Kalau kamu sedang dalam krisis atau berpikir menyakiti diri, segera hubungi tenaga profesional atau layanan SEJIWA/Healing119 di <b>119 ext. 8</b> (gratis, 24 jam) atau <a className="text-sky-600 underline" href="https://www.healing119.id" target="_blank" rel="nofollow noopener noreferrer">healing119.id</a>.</p>
+          <p>Flouwell bukan pengganti bantuan profesional, terapi, atau layanan darurat. Kalau kamu sedang dalam krisis atau berpikir menyakiti diri, segera hubungi tenaga profesional atau layanan SEJIWA/Healing119 di <b>119 ext. 8</b> (gratis, 24 jam) atau <a className="text-sky-600 underline" href="https://www.healing119.id" target="_blank" rel="nofollow noopener noreferrer">healing119.id</a>.</p>
         </div>
         <div>
           <h2 className="mb-1 font-semibold text-ink">3. Usia</h2>
-          <p>Soulpace ditujukan untuk pengguna berusia minimal 17 tahun. Jika kamu di bawah itu, gunakan dengan pendampingan orang dewasa yang dipercaya.</p>
+          <p>Flouwell ditujukan untuk pengguna berusia minimal 17 tahun. Jika kamu di bawah itu, gunakan dengan pendampingan orang dewasa yang dipercaya.</p>
         </div>
         <div>
           <h2 className="mb-1 font-semibold text-ink">4. Akun & anonimitas</h2>

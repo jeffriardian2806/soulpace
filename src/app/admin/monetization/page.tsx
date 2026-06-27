@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { FeatureFlagsTable } from "./FeatureFlagsTable";
 import { VouchersPanel } from "./VouchersPanel";
 
-export const metadata = { title: "Monetisasi — Admin Soulpace" };
+export const metadata = { title: "Monetisasi — Admin Flouwell" };
 
 export default async function AdminMonetizationPage() {
   const supabase = await createClient();

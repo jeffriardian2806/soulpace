@@ -9,7 +9,7 @@ import { ScreeningLaporan } from "@/components/laporan/ScreeningLaporan";
 
 export async function generateMetadata({ params }: { params: Promise<{ gameKey: string }> }): Promise<Metadata> {
   const { gameKey } = await params;
-  return { title: `Laporan ${gameKey} — Soulpace`, robots: { index: false, follow: false } };
+  return { title: `Laporan ${gameKey} — Flouwell`, robots: { index: false, follow: false } };
 }
 
 type ResultRow = {

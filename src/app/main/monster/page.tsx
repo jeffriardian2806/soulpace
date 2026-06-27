@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { MonsterPlayer, type MonsterSituation } from "@/components/games/MonsterPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Monster Cemas — Soulpace" };
+export const metadata = { title: "Monster Cemas — Flouwell" };
 
 export default async function MonsterPage() {
   const _blocked_ = await checkPremiumAccess("monster");

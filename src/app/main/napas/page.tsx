@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NapasPlayer, type BreathProtocol } from "@/components/games/NapasPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Tarik Napas — Soulpace" };
+export const metadata = { title: "Tarik Napas — Flouwell" };
 
 export default async function NapasPage() {
   const _blocked_ = await checkPremiumAccess("napas");

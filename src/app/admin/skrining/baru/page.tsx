@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { InstrumentForm } from "@/components/InstrumentForm";
 
-export const metadata = { title: "Admin · Tambah Instrumen — Soulpace" };
+export const metadata = { title: "Admin · Tambah Instrumen — Flouwell" };
 
 export default async function AdminSkriningBaruPage() {
   const supabase = await createClient();

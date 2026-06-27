@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ThisOrThat } from "@/components/ThisOrThat";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Ini atau Itu — Soulpace" };
+export const metadata = { title: "Ini atau Itu — Flouwell" };
 
 export default async function PilihanPage() {
   const _blocked_ = await checkPremiumAccess("pilihan");

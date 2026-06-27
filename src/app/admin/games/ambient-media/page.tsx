@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AmbientMediaEditor } from "@/components/admin/AmbientMediaEditor";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Ambient Media — Admin Soulpace" };
+export const metadata = { title: "Ambient Media — Admin Flouwell" };
 
 export default async function AdminAmbientMediaPage() {
   const supabase = await createClient();

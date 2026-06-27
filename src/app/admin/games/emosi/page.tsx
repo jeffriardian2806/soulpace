@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { EmotionEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Tebak Emosi — Admin Soulpace" };
+export const metadata = { title: "Tebak Emosi — Admin Flouwell" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

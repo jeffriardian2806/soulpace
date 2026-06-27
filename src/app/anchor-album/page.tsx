@@ -6,7 +6,7 @@ import { AnchorAlbumManager } from "@/components/anchor-album/AnchorAlbumManager
 import { listAnchorPhotosAction } from "./actions";
 
 export const metadata = {
-  title: "Anchor Album — Soulpace",
+  title: "Anchor Album — Flouwell",
   description: "Foto pribadi buat visual anchor pas crisis. Private, encrypted.",
 };
 

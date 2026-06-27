@@ -18,7 +18,7 @@ export function ShareCard({ text }: { text: string }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "soulpace.png";
+    a.download = "flouwell.png";
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -28,7 +28,7 @@ export function ShareCard({ text }: { text: string }) {
     try {
       const blob = await toBlob();
       if (!blob) return;
-      const file = new File([blob], "soulpace.png", { type: "image/png" });
+      const file = new File([blob], "flouwell.png", { type: "image/png" });
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file] });
       } else {
@@ -69,7 +69,7 @@ export function ShareCard({ text }: { text: string }) {
           &ldquo;{text}&rdquo;
         </div>
         <div style={{ fontSize: 13, opacity: 0.9, marginTop: 28 }}>
-          Soulpace — ruang melampiaskan beban
+          Flouwell — ruang melampiaskan beban
         </div>
       </div>
 

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { EmosiPlayer, type EmotionCard } from "@/components/games/EmosiPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Tebak Emosi — Soulpace" };
+export const metadata = { title: "Tebak Emosi — Flouwell" };
 
 export default async function EmosiPage() {
   const _blocked_ = await checkPremiumAccess("emosi");

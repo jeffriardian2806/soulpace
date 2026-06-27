@@ -6,7 +6,7 @@ import { SafetyPlanForm } from "@/components/safety-plan/SafetyPlanForm";
 import { getSafetyPlanAction } from "./actions";
 
 export const metadata = {
-  title: "Daftar Aman — Soulpace",
+  title: "Daftar Aman — Flouwell",
   description: "Safety Plan ala Stanley-Brown — emergency kit yang lo siapin di moment tenang.",
 };
 

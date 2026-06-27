@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getConsultationSessionById, getScreeningsByCategoryId, getTipTopicsByCategoryId } from "@/lib/konsultasi/queries";
 
-export const metadata = { title: "Sesi Konsultasi — Soulpace" };
+export const metadata = { title: "Sesi Konsultasi — Flouwell" };
 
 const CATEGORY_EMOJI: Record<string, string> = {
   "keluarga": "👨‍👩‍👧",

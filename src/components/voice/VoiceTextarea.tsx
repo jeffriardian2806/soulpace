@@ -145,7 +145,7 @@ export function VoiceTextarea({
         <p className="text-[10px] text-rose-600 animate-pulse">🔴 Lagi denger... ngomong aja, hasil masuk otomatis ke textarea</p>
       )}
       {isSupported && !isListening && !error && (
-        <p className="text-[10px] italic text-ink/40">💡 Tap 🎤 buat input pakai suara. Suara diproses browser, cuma teks-nya disimpan ke Soulpace.</p>
+        <p className="text-[10px] italic text-ink/40">💡 Tap 🎤 buat input pakai suara. Suara diproses browser, cuma teks-nya disimpan ke Flouwell.</p>
       )}
     </div>
   );

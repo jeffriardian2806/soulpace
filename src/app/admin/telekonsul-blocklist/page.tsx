@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { BlocklistEditor } from "./BlocklistEditor";
 
-export const metadata = { title: "Anti-Leak Blocklist — Admin Soulpace" };
+export const metadata = { title: "Anti-Leak Blocklist — Admin Flouwell" };
 
 export default async function BlocklistPage() {
   const supabase = await createClient();

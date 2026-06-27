@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { MhcuComprehensiveReport } from "@/components/laporan/MhcuComprehensiveReport";
 
 export const metadata: Metadata = {
-  title: "Laporan MHCU Komprehensif — Soulpace",
+  title: "Laporan MHCU Komprehensif — Flouwell",
   robots: { index: false, follow: false },
 };
 

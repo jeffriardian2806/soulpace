@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { QuestSeven } from "@/components/QuestSeven";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "7 Hari Kenal Diri — Soulpace" };
+export const metadata = { title: "7 Hari Kenal Diri — Flouwell" };
 
 export default async function QuestPage() {
   const _blocked_ = await checkPremiumAccess("quest");

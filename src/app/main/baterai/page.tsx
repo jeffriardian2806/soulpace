@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { BateraiPlayer, type BatteryAction } from "@/components/games/BateraiPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Energi Sosial — Soulpace" };
+export const metadata = { title: "Energi Sosial — Flouwell" };
 
 export default async function BateraiPage() {
   const _blocked_ = await checkPremiumAccess("baterai");

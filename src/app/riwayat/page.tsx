@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Riwayat Psikologi 30 Hari — Soulpace",
+  title: "Riwayat Psikologi 30 Hari — Flouwell",
   robots: { index: false, follow: false },
 };
 
@@ -110,7 +110,7 @@ export default async function RiwayatPage() {
         <h1 className="text-xl font-bold text-ink">📅 Riwayat 30 Hari</h1>
       </header>
       <p className="text-sm leading-relaxed text-ink/60">
-        Pattern aktivitas kamu di Soulpace 30 hari terakhir. Mood, jurnal, syukur, surat, curhat, tes & skrining — semua dalam satu timeline.
+        Pattern aktivitas kamu di Flouwell 30 hari terakhir. Mood, jurnal, syukur, surat, curhat, tes & skrining — semua dalam satu timeline.
       </p>
 
       {/* === Summary stats === */}

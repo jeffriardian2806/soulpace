@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createGratitudeAction, deleteGratitudeAction } from "@/app/syukur/actions";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Rasa Syukur — Soulpace" };
+export const metadata = { title: "Rasa Syukur — Flouwell" };
 
 function fmt(iso: string): string {
   return new Date(iso).toLocaleDateString("id-ID", {

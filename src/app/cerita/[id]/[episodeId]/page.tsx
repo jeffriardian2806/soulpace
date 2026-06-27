@@ -32,7 +32,7 @@ export async function generateMetadata({
   const epExtra = (data.title as string) ? `: ${data.title}` : "";
   const title = `${storyTitle} · Episode ${data.episode_number}${epExtra}`;
   const desc =
-    ((data.body as string) ?? "").replace(/\s+/g, " ").slice(0, 160) || "Cerita di Soulpace.";
+    ((data.body as string) ?? "").replace(/\s+/g, " ").slice(0, 160) || "Cerita di Flouwell.";
   const url = `https://soulpace.vercel.app/cerita/${id}/${episodeId}`;
   return {
     title,

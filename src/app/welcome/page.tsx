@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -12,7 +13,8 @@ export default async function WelcomePage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-6 px-6 py-10">
       <div>
-        <h1 className="text-2xl font-bold text-ink">Selamat datang di Soulpace</h1>
+        <Image src="/logo-full.png" alt="Flouwell" width={220} height={73} priority className="mb-4 h-auto w-[180px]" />
+        <h1 className="text-2xl font-bold text-ink">Selamat datang di Flouwell</h1>
         <p className="mt-2 text-ink/65">
           Ini ruang aman untuk melampiaskan beban. Sebelum mulai, beberapa hal
           kecil yang kita jaga bareng:
@@ -31,7 +33,7 @@ export default async function WelcomePage() {
       <div className="rounded-2xl bg-sky-50 p-4 text-xs leading-relaxed text-ink/70">
         <p className="font-semibold text-ink/80">Penting</p>
         <p className="mt-1">
-          Soulpace bukan pengganti bantuan profesional. Kalau kamu sedang dalam
+          Flouwell bukan pengganti bantuan profesional. Kalau kamu sedang dalam
           krisis atau butuh penanganan medis, hubungi tenaga profesional atau
           layanan darurat. Kami ada untuk menemani, bukan menggantikan terapi.
         </p>

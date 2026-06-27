@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { deleteJournalAction } from "@/app/jurnal/actions";
 
-export const metadata = { title: "Jurnal — Soulpace" };
+export const metadata = { title: "Jurnal — Flouwell" };
 
 function fmt(iso: string): string {
   return new Date(iso).toLocaleDateString("id-ID", {

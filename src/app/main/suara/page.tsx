@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SuaraPlayer, type VoiceScenario } from "@/components/games/SuaraPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Suara Dalam Kepala — Soulpace" };
+export const metadata = { title: "Suara Dalam Kepala — Flouwell" };
 
 export default async function SuaraPage() {
   const _blocked_ = await checkPremiumAccess("suara");

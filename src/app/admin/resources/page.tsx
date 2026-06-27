@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ResourceEditor } from "./ResourceEditor";
 
-export const metadata = { title: "Resources — Admin Soulpace" };
+export const metadata = { title: "Resources — Admin Flouwell" };
 
 export default async function AdminResourcesPage() {
   const supabase = await createClient();

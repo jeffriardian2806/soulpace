@@ -3,7 +3,7 @@ import { checkPremiumAccess } from "@/components/PremiumGate";
 import { TrailGame } from "@/components/trail/TrailGame";
 
 export const metadata = {
-  title: "Trail Making Test — Soulpace",
+  title: "Trail Making Test — Flouwell",
   description: "Game penalaran: hubungin titik berurutan secepet & seakurat mungkin. Ngukur cognitive flexibility & atensi.",
 };
 

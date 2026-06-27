@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { GroundingEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Grounding 5-4-3-2-1 — Admin Soulpace" };
+export const metadata = { title: "Grounding 5-4-3-2-1 — Admin Flouwell" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

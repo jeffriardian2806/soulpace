@@ -17,7 +17,7 @@ export function FeedbackForm({ action }: { action: Action }) {
       <div className="rounded-2xl bg-sky-50 p-4 text-sm">
         <p className="font-semibold text-ink">Makasih atas masukannya 🙏</p>
         <p className="mt-1 leading-relaxed text-ink/70">
-          Setiap masukan bantu Soulpace jadi lebih baik.
+          Setiap masukan bantu Flouwell jadi lebih baik.
         </p>
       </div>
     );

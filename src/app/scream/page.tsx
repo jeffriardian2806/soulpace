@@ -3,7 +3,7 @@ import { checkPremiumAccess } from "@/components/PremiumGate";
 import { ScreamRelease } from "@/components/scream/ScreamRelease";
 
 export const metadata = {
-  title: "Lampias Suara — Soulpace",
+  title: "Lampias Suara — Flouwell",
   description: "Real-time audio release tool. Audio diproses di browser, NOL recording.",
 };
 

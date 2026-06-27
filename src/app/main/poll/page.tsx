@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PollWidget } from "@/components/PollWidget";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Polling Hari Ini — Soulpace" };
+export const metadata = { title: "Polling Hari Ini — Flouwell" };
 
 export default async function PollPage() {
   const _blocked_ = await checkPremiumAccess("poll");

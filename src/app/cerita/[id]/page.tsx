@@ -25,7 +25,7 @@ export async function generateMetadata({
     .eq("id", id)
     .maybeSingle();
   if (!data) return { title: "Cerita", robots: { index: false, follow: true } };
-  const desc = ((data.summary as string) ?? "").slice(0, 160) || "Cerita di Soulpace.";
+  const desc = ((data.summary as string) ?? "").slice(0, 160) || "Cerita di Flouwell.";
   const url = `https://soulpace.vercel.app/cerita/${id}`;
   return {
     title: data.title as string,

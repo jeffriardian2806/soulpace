@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createJournalAction } from "@/app/jurnal/actions";
 
-export const metadata = { title: "Tulis Jurnal — Soulpace" };
+export const metadata = { title: "Tulis Jurnal — Flouwell" };
 
 export default function JurnalBaruPage() {
   return (

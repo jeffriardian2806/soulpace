@@ -4,14 +4,14 @@ import { CRISIS_RESOURCE } from "@/core/crisisResources";
 export const revalidate = 86400;
 
 export const metadata = {
-  title: "Panduan & FAQ — Soulpace",
-  description: "Pertanyaan umum seputar Soulpace: anonimitas, cara curhat, cerita, peluk, dan fitur lainnya.",
+  title: "Panduan & FAQ — Flouwell",
+  description: "Pertanyaan umum seputar Flouwell: anonimitas, cara curhat, cerita, peluk, dan fitur lainnya.",
 };
 
 const FAQ: { q: string; a: string }[] = [
   {
-    q: "Apa itu Soulpace?",
-    a: "Soulpace adalah ruang aman untuk melampiaskan beban dan keluh kesah secara anonim, tanpa dihakimi. Di sini kamu bisa curhat, baca cerita orang lain, melacak mood, menulis jurnal, dan lainnya.",
+    q: "Apa itu Flouwell?",
+    a: "Flouwell adalah ruang aman untuk melampiaskan beban dan keluh kesah secara anonim, tanpa dihakimi. Di sini kamu bisa curhat, baca cerita orang lain, melacak mood, menulis jurnal, dan lainnya.",
   },
   {
     q: "Apakah benar-benar anonim?",
@@ -39,7 +39,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Bagaimana kalau ada konten yang tidak pantas?",
-    a: "Gunakan tombol 'Laporkan' pada unggahan tersebut. Tim moderasi akan meninjau. Kami ingin Soulpace tetap jadi ruang yang aman dan saling mendukung.",
+    a: "Gunakan tombol 'Laporkan' pada unggahan tersebut. Tim moderasi akan meninjau. Kami ingin Flouwell tetap jadi ruang yang aman dan saling mendukung.",
   },
   {
     q: "Saya sedang dalam keadaan darurat / berpikir menyakiti diri. Harus apa?",
@@ -57,7 +57,7 @@ export default function PanduanPage() {
         </Link>
       </header>
       <p className="text-sm leading-relaxed text-ink/60">
-        Pertanyaan yang sering ditanyakan seputar Soulpace.
+        Pertanyaan yang sering ditanyakan seputar Flouwell.
       </p>
 
       <div className="flex flex-col gap-3">

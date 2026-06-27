@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getActivePsikologs } from "@/lib/telekonsul/queries";
 import { PsikologCard } from "@/components/telekonsul/PsikologCard";
 
-export const metadata = { title: "Telekonsul — Soulpace" };
+export const metadata = { title: "Telekonsul — Flouwell" };
 
 export default async function TelekonsulLandingPage({
   searchParams,
@@ -70,7 +70,7 @@ export default async function TelekonsulLandingPage({
         <h2 className="text-sm font-bold text-ink/85">Psikolog tersedia</h2>
         {psikologs.length === 0 ? (
           <div className="rounded-xl bg-ink/5 p-6 text-center text-sm text-ink/50">
-            Belum ada psikolog aktif. Tim Soulpace lagi onboarding.
+            Belum ada psikolog aktif. Tim Flouwell lagi onboarding.
           </div>
         ) : (
           psikologs.map((p) => <PsikologCard key={p.id} psikolog={p} fromSession={sp.from_session} />)

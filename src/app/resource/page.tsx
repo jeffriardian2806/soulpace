@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Pusat Bantuan — Soulpace",
+  title: "Pusat Bantuan — Flouwell",
   description: "Daftar crisis line, psikolog, dan artikel edukasi mental health terpercaya di Indonesia.",
   robots: { index: true, follow: true },
 };
@@ -55,7 +55,7 @@ export default async function ResourcePage() {
         <Link href="/feed" className="text-xs font-medium text-sky-600 underline">Kembali ke beranda</Link>
       </header>
       <p className="text-sm leading-relaxed text-ink/60">
-        Soulpace bukan pengganti bantuan profesional. Di sini ada daftar layanan darurat, psikolog, & sumber edukasi terpercaya yang bisa kamu hubungi langsung.
+        Flouwell bukan pengganti bantuan profesional. Di sini ada daftar layanan darurat, psikolog, & sumber edukasi terpercaya yang bisa kamu hubungi langsung.
       </p>
 
       {KIND_ORDER.map((kind) => {

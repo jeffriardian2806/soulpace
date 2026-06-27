@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CbtScenarioEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Tantang Pikiran (CBT) — Admin Soulpace" };
+export const metadata = { title: "Tantang Pikiran (CBT) — Admin Flouwell" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateStoryAction } from "@/app/cerita/actions";
 
-export const metadata = { title: "Edit Cerita — Soulpace" };
+export const metadata = { title: "Edit Cerita — Flouwell" };
 
 export default async function EditCeritaPage({
   params,

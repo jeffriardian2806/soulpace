@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { addEpisodeAction } from "@/app/cerita/actions";
 
-export const metadata = { title: "Tambah Episode — Soulpace" };
+export const metadata = { title: "Tambah Episode — Flouwell" };
 
 export default async function TulisEpisodePage({
   params,

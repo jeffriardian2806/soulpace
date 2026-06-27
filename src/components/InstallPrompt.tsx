@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type BeforeInstallPromptEvent = Event & {
@@ -63,17 +64,21 @@ export function InstallPrompt() {
   return (
     <div className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-md rounded-2xl bg-white p-3 shadow-lg shadow-sky-900/15 ring-1 ring-sky-100">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-lg font-bold text-white">
-          S
-        </div>
+        <Image
+          src="/icon-192.png"
+          alt="Flouwell"
+          width={40}
+          height={40}
+          className="h-10 w-10 shrink-0 rounded-xl"
+        />
         <div className="flex-1 text-sm leading-snug">
           {isIOS ? (
             <p className="text-ink/80">
-              Pasang Soulpace: tap ikon <b>Bagikan</b>, lalu pilih{" "}
+              Pasang Flouwell: tap ikon <b>Bagikan</b>, lalu pilih{" "}
               <b>&ldquo;Add to Home Screen&rdquo;</b>.
             </p>
           ) : (
-            <p className="font-medium text-ink">Pasang Soulpace di HP kamu</p>
+            <p className="font-medium text-ink">Pasang Flouwell di HP kamu</p>
           )}
         </div>
         {!isIOS && (

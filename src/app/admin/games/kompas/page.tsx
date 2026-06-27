@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CompassTypeEditor, CompassQuestionEditor, CompassMajorEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Kompas Jurusan — Admin Soulpace" };
+export const metadata = { title: "Kompas Jurusan — Admin Flouwell" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

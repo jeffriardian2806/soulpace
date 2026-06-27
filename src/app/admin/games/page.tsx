@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "Admin Games — Soulpace" };
+export const metadata = { title: "Admin Games — Flouwell" };
 
 type CardItem = { href: string; emoji: string; title: string; desc: string };
 

@@ -3,7 +3,7 @@ import type { ProfilesRepository } from "../data/profiles.repository";
 import type { Profile } from "@/core/entities/profile";
 
 const RESERVED = [
-  "admin", "administrator", "moderator", "mod", "soulpace",
+  "admin", "administrator", "moderator", "mod", "soulpace", "flouwell",
   "support", "official", "root", "system",
 ];
 

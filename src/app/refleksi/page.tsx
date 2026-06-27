@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getFeatureFlagMap, PremiumBadgeInline } from "@/components/PremiumGate";
 
 export const metadata: Metadata = {
-  title: "Refleksi — Soulpace",
+  title: "Refleksi — Flouwell",
   description: "Tulis & baca: jurnal pribadi, surat untuk diri sendiri, dan cerita pemulihan dari orang lain.",
   robots: { index: true, follow: true },
 };

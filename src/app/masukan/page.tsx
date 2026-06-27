@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { createFeedbackAction } from "./actions";
 
-export const metadata = { title: "Kritik & Saran — Soulpace" };
+export const metadata = { title: "Kritik & Saran — Flouwell" };
 
 export default async function MasukanPage() {
   const supabase = await createClient();
@@ -20,7 +20,7 @@ export default async function MasukanPage() {
         <h1 className="text-xl font-bold text-ink">Kritik &amp; Saran</h1>
       </header>
       <p className="text-sm leading-relaxed text-ink/60">
-        Gimana pengalamanmu pakai Soulpace? Kasih bintang dan ceritain. Masukanmu privat — cuma
+        Gimana pengalamanmu pakai Flouwell? Kasih bintang dan ceritain. Masukanmu privat — cuma
         tim yang baca.
       </p>
       <FeedbackForm action={createFeedbackAction} />

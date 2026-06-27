@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { StoryForm } from "@/components/StoryForm";
 
-export const metadata = { title: "Tulis Cerita — Soulpace" };
+export const metadata = { title: "Tulis Cerita — Flouwell" };
 
 export default async function CeritaBaruPage() {
   const supabase = await createClient();

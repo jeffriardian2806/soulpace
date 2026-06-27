@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserPremiumStatus } from "@/lib/monetization/access";
 import { RedeemForm } from "./RedeemForm";
 
-export const metadata = { title: "Redeem Voucher — Soulpace" };
+export const metadata = { title: "Redeem Voucher — Flouwell" };
 
 export default async function RedeemPage() {
   const supabase = await createClient();
@@ -39,7 +39,7 @@ export default async function RedeemPage() {
 
       <div className="rounded-2xl bg-sky-50 p-4 text-xs leading-relaxed text-ink/65">
         <p className="font-semibold text-ink">Gimana cara dapet voucher?</p>
-        <p className="mt-1">Voucher dikeluarin Soulpace lewat promo / partner / referral. Kalau kamu dapet kode dari teman atau partner kami, tinggal masukin di atas.</p>
+        <p className="mt-1">Voucher dikeluarin Flouwell lewat promo / partner / referral. Kalau kamu dapet kode dari teman atau partner kami, tinggal masukin di atas.</p>
       </div>
     </main>
   );

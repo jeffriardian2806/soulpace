@@ -336,7 +336,7 @@ function TopicForm({ topic, onSave, onCancel, isPending, categories = [], initia
             placeholder="otomatis"
             className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 text-sm font-mono"
           />
-          <p className="mt-1 text-[10px] text-ink/40">soulpace.app/edukasi/{slug || "..."}</p>
+          <p className="mt-1 text-[10px] text-ink/40">flouwell.app/edukasi/{slug || "..."}</p>
         </div>
       </details>
 

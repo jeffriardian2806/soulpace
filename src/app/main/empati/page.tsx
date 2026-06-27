@@ -4,7 +4,7 @@ import type { EmpathyScenario } from "@/core/empathyScenarios";
 import { EmpathyGame } from "@/components/EmpathyGame";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Pilih Respons Terbaik — Soulpace" };
+export const metadata = { title: "Pilih Respons Terbaik — Flouwell" };
 
 export default async function EmpatiPage() {
   const _blocked_ = await checkPremiumAccess("empati");

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
 export const metadata: Metadata = {
-  title: "Cerita — Soulpace",
+  title: "Cerita — Flouwell",
   description: "Kisah dan perjalanan hidup yang dibagikan secara anonim.",
   robots: { index: true, follow: true },
 };

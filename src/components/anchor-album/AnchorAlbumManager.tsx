@@ -158,7 +158,7 @@ export function AnchorAlbumManager({ initialItems, userId }: { initialItems: Anc
       <div className="rounded-2xl bg-emerald-50 p-4 ring-1 ring-emerald-200">
         <p className="text-xs uppercase tracking-wide font-semibold text-emerald-700">🔒 Privacy</p>
         <p className="mt-1 text-xs leading-relaxed text-ink/70">
-          Foto kamu disimpan <strong>private</strong>. Cuma kamu yang bisa lihat. Disimpan encrypted di Supabase Storage. Bukan moderator, bukan admin, bukan Soulpace.
+          Foto kamu disimpan <strong>private</strong>. Cuma kamu yang bisa lihat. Disimpan encrypted di Supabase Storage. Bukan moderator, bukan admin, bukan Flouwell.
         </p>
       </div>
 

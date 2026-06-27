@@ -4,7 +4,7 @@ import { checkPremiumAccess } from "@/components/PremiumGate";
 import { VisualPairChoicePlayer } from "@/components/visual/VisualPairChoicePlayer";
 
 export const metadata = {
-  title: "Pilih Vibe — Soulpace",
+  title: "Pilih Vibe — Flouwell",
   description: "Refleksi visual: forced choice pair grafis. Vibe profile kamu hari ini.",
 };
 

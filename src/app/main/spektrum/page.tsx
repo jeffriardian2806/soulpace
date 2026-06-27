@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SpektrumPlayer, type SpektrumCategory, type SpektrumQuestion } from "@/components/games/SpektrumPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Spektrum Sosial — Soulpace" };
+export const metadata = { title: "Spektrum Sosial — Flouwell" };
 
 export default async function SpektrumPage() {
   const _blocked_ = await checkPremiumAccess("spektrum");

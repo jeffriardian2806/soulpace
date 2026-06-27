@@ -49,9 +49,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     .eq("slug", slug)
     .eq("is_active", true)
     .single();
-  if (!data) return { title: "Skrining — Soulpace" };
+  if (!data) return { title: "Skrining — Flouwell" };
   return {
-    title: `${data.name} — Soulpace`,
+    title: `${data.name} — Flouwell`,
     description: data.subtitle,
     robots: { index: true, follow: true },
   };

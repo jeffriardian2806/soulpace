@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { KompasPlayer, type CompassQuestion, type CompassType, type CompassMajor } from "@/components/games/KompasPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Kompas Jurusan — Soulpace" };
+export const metadata = { title: "Kompas Jurusan — Flouwell" };
 
 export default async function KompasPage() {
   const _blocked_ = await checkPremiumAccess("kompas");

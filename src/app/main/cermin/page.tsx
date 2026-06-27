@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { MirrorPlayer, type MirrorScenario, type MirrorProfile } from "@/components/games/MirrorPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Pikiran Mirror — Soulpace" };
+export const metadata = { title: "Pikiran Mirror — Flouwell" };
 
 export default async function CerminPage() {
   const _blocked_ = await checkPremiumAccess("mirror");

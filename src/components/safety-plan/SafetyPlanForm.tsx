@@ -89,7 +89,7 @@ export function SafetyPlanForm({ initialData }: Props) {
           Isi pas lo lagi <strong>tenang</strong>, jangan pas crisis. Ini bukan terapi — ini <strong>emergency kit</strong> yang lo siapin buat diri sendiri dari moment stable. Pas crisis nanti, tinggal buka & tap. Ga perlu mikir lagi.
         </p>
         <p className="mt-2 text-[10px] italic text-ink/55">
-          Data ini private. Cuma lo yang bisa lihat. Bukan moderator, bukan admin, bukan Soulpace.
+          Data ini private. Cuma lo yang bisa lihat. Bukan moderator, bukan admin, bukan Flouwell.
         </p>
       </div>
 
