@@ -3,8 +3,6 @@ import type { Metadata } from "next";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 import { createClient } from "@/lib/supabase/server";
-import { getActiveVideos } from "@/lib/videos/queries";
-import { VideoSection } from "@/components/videos/VideoSection";
 
 export const metadata: Metadata = {
   title: "Edukasi & Tips Kesehatan Mental — Flouwell",
@@ -27,7 +25,6 @@ export default async function EdukasiPage() {
     .order("sort_order");
 
   const topics = (data ?? []) as Topic[];
-  const videos = await getActiveVideos();
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
@@ -75,7 +72,13 @@ export default async function EdukasiPage() {
         </section>
       )}
 
-      <VideoSection videos={videos} />
+      <Link href="/video" className="glass mt-2 flex items-center justify-between rounded-2xl p-4 transition-colors hover:bg-sky-100">
+        <span className="text-sm font-medium text-ink">
+          🎬 Video Edukasi
+          <span className="block text-xs font-normal text-ink/55">Tonton dari psikolog & psikiater berlisensi</span>
+        </span>
+        <span className="text-sky-600">→</span>
+      </Link>
 
       <Link href="/skrining" className="glass mt-2 flex items-center justify-between rounded-2xl p-4 transition-colors hover:bg-sky-100">
         <span className="text-sm font-medium text-ink">

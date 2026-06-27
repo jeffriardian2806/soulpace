@@ -20,9 +20,8 @@ export function VideoSection({ videos }: { videos: VideoRow[] }) {
   if (videos.length === 0) return null;
 
   return (
-    <section className="mt-2">
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-base font-bold text-ink">🎬 Video Edukasi</h2>
+    <section className="mt-1">
+      <div className="mb-3 flex justify-end">
         <div className="flex gap-1 rounded-full bg-ink/5 p-0.5 text-xs">
           <button
             onClick={() => setSort("terbaru")}
