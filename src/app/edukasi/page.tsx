@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveVideos } from "@/lib/videos/queries";
+import { VideoPlayer } from "@/components/videos/VideoPlayer";
 
 export const metadata: Metadata = {
   title: "Edukasi & Tips Kesehatan Mental — Flouwell",
@@ -25,6 +27,7 @@ export default async function EdukasiPage() {
     .order("sort_order");
 
   const topics = (data ?? []) as Topic[];
+  const videos = await getActiveVideos();
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 px-5 py-6">
@@ -69,6 +72,32 @@ export default async function EdukasiPage() {
               <span className="text-sky-600 shrink-0">→</span>
             </Link>
           ))}
+        </section>
+      )}
+
+      {videos.length > 0 && (
+        <section className="mt-2">
+          <h2 className="mb-2 text-base font-bold text-ink">🎬 Video Edukasi</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {videos.map((v) => (
+              <div key={v.id} className="flex flex-col gap-2">
+                <VideoPlayer
+                  videoId={v.id}
+                  youtubeId={v.youtube_id}
+                  title={v.title}
+                  thumbnailUrl={v.thumbnail_url}
+                />
+                <div>
+                  <p className="text-sm font-semibold text-ink">{v.title}</p>
+                  {v.description && (
+                    <p className="mt-0.5 text-xs leading-relaxed text-ink/60 line-clamp-2">
+                      {v.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
