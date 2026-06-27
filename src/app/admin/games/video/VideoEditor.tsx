@@ -12,14 +12,14 @@ type Video = {
   description: string | null;
   youtube_id: string;
   thumbnail_url: string | null;
-  category_id: number | null;
+  category_slug: string | null;
   is_active: boolean;
   total_views: number;
   unique_viewers: number;
 };
-type Category = { id: number; name: string };
+type Topic = { slug: string; title: string; emoji: string | null };
 
-export function VideoEditor({ videos, categories }: { videos: Video[]; categories: Category[] }) {
+export function VideoEditor({ videos, topics }: { videos: Video[]; topics: Topic[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export function VideoEditor({ videos, categories }: { videos: Video[]; categorie
       {(adding || editing) && (
         <VideoForm
           video={editing}
-          categories={categories}
+          topics={topics}
           isPending={pending}
           error={error}
           onSave={(data) => {
@@ -91,10 +91,10 @@ export function VideoEditor({ videos, categories }: { videos: Video[]; categorie
   );
 }
 
-function VideoForm({ video, categories, onSave, onCancel, isPending, error }: {
+function VideoForm({ video, topics, onSave, onCancel, isPending, error }: {
   video: Video | null;
-  categories: Category[];
-  onSave: (d: { id?: string; title: string; description: string; url: string; category_id: number | null; is_active: boolean }) => void;
+  topics: Topic[];
+  onSave: (d: { id?: string; title: string; description: string; url: string; category_slug: string | null; is_active: boolean }) => void;
   onCancel: () => void;
   isPending: boolean;
   error: string | null;
@@ -102,7 +102,7 @@ function VideoForm({ video, categories, onSave, onCancel, isPending, error }: {
   const [title, setTitle] = useState(video?.title ?? "");
   const [description, setDescription] = useState(video?.description ?? "");
   const [url, setUrl] = useState(video ? `https://www.youtube.com/watch?v=${video.youtube_id}` : "");
-  const [categoryId, setCategoryId] = useState<number | null>(video?.category_id ?? null);
+  const [categorySlug, setCategorySlug] = useState<string | null>(video?.category_slug ?? null);
   const [isActive, setIsActive] = useState(video?.is_active ?? true);
 
   const previewId = extractYouTubeId(url);
@@ -135,9 +135,9 @@ function VideoForm({ video, categories, onSave, onCancel, isPending, error }: {
 
       <div className="flex flex-col gap-1">
         <label className="text-xs font-semibold text-ink/70">Kategori <span className="font-normal text-ink/45">(opsional)</span></label>
-        <select value={categoryId ?? ""} onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : null)} className="rounded-lg border border-ink/15 px-2 py-2 text-sm">
+        <select value={categorySlug ?? ""} onChange={(e) => setCategorySlug(e.target.value || null)} className="rounded-lg border border-ink/15 px-2 py-2 text-sm">
           <option value="">— Tanpa kategori —</option>
-          {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          {topics.map((t) => <option key={t.slug} value={t.slug}>{t.emoji ? t.emoji + " " : ""}{t.title}</option>)}
         </select>
       </div>
 
@@ -149,7 +149,7 @@ function VideoForm({ video, categories, onSave, onCancel, isPending, error }: {
       {error && <p className="text-xs text-rose-700">⚠️ {error}</p>}
 
       <div className="flex gap-2">
-        <button onClick={() => onSave({ id: video?.id, title, description, url, category_id: categoryId, is_active: isActive })} disabled={isPending || !title.trim() || !previewId} className="flex-1 rounded-full bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+        <button onClick={() => onSave({ id: video?.id, title, description, url, category_slug: categorySlug, is_active: isActive })} disabled={isPending || !title.trim() || !previewId} className="flex-1 rounded-full bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
           {isPending ? "Menyimpan..." : "💾 Simpan"}
         </button>
         <button onClick={onCancel} className="rounded-full bg-white px-4 py-2.5 text-sm font-medium text-ink/70 ring-1 ring-ink/15">Batal</button>

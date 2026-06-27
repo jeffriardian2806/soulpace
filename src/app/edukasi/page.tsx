@@ -4,7 +4,7 @@ import { CRISIS_RESOURCE } from "@/core/crisisResources";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveVideos } from "@/lib/videos/queries";
-import { VideoPlayer } from "@/components/videos/VideoPlayer";
+import { VideoSection } from "@/components/videos/VideoSection";
 
 export const metadata: Metadata = {
   title: "Edukasi & Tips Kesehatan Mental — Flouwell",
@@ -75,31 +75,7 @@ export default async function EdukasiPage() {
         </section>
       )}
 
-      {videos.length > 0 && (
-        <section className="mt-2">
-          <h2 className="mb-2 text-base font-bold text-ink">🎬 Video Edukasi</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {videos.map((v) => (
-              <div key={v.id} className="flex flex-col gap-2">
-                <VideoPlayer
-                  videoId={v.id}
-                  youtubeId={v.youtube_id}
-                  title={v.title}
-                  thumbnailUrl={v.thumbnail_url}
-                />
-                <div>
-                  <p className="text-sm font-semibold text-ink">{v.title}</p>
-                  {v.description && (
-                    <p className="mt-0.5 text-xs leading-relaxed text-ink/60 line-clamp-2">
-                      {v.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      <VideoSection videos={videos} />
 
       <Link href="/skrining" className="glass mt-2 flex items-center justify-between rounded-2xl p-4 transition-colors hover:bg-sky-100">
         <span className="text-sm font-medium text-ink">

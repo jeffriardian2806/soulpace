@@ -20,7 +20,7 @@ export async function saveVideoAction(p: {
   title: string;
   description: string;
   url: string;
-  category_id: number | null;
+  category_slug: string | null;
   is_active: boolean;
 }): Promise<{ error: string | null }> {
   const { error: authErr, supabase, userId } = await assertAdmin();
@@ -37,7 +37,7 @@ export async function saveVideoAction(p: {
     platform: "youtube" as const,
     youtube_id: ytId,
     thumbnail_url: youtubeThumbnail(ytId),
-    category_id: p.category_id,
+    category_slug: p.category_slug,
     is_active: p.is_active,
     updated_at: new Date().toISOString(),
   };
