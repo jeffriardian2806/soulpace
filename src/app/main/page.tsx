@@ -20,6 +20,7 @@ const INTERACTIVE = [
   { href: "/main/grounding", slug: "grounding", emoji: "🧭", title: "Grounding 5-4-3-2-1", desc: "Cemas? Balik ke sekarang lewat indra." },
   { href: "/main/trail", slug: "trail", emoji: "🛤️", title: "Trail Making Test", desc: "Game penalaran: connect dots berurutan. Ngukur cognitive flexibility." },
   { href: "/main/mata-pertama", slug: "mata-pertama", emoji: "👁️", title: "Mata Pertama", desc: "Refleksi visual: apa yang lo lihat pertama → vibe insight playful." },
+  { href: "/main/aura", slug: "aura", emoji: "🔮", title: "Cek Aura AR", desc: "Kamera baca ekspresi wajah kamu real-time, tampilin warna aura. Seru-seruan, pakai AR." },
   { href: "/main/pilih-vibe", slug: "pilih-vibe", emoji: "🎨", title: "Pilih Vibe", desc: "Forced choice grafis: pilih A atau B → vibe profile hari ini." },
   { href: "/scream", slug: "scream", emoji: "📢", title: "Lampias Suara", desc: "Teriak, hum, helaan napas keras. Real-time, zero recording. Lampiasin biar plong." },
   { href: "/ambient", slug: "ambient-media", emoji: "🎵", title: "Suara Tenang", desc: "Audio & video ambient buat grounding & relaksasi. Sungai mengalir, hujan, api unggun, ombak." },
