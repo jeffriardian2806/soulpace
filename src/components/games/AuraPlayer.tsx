@@ -61,7 +61,7 @@ export function AuraPlayer({ moods }: { moods: AuraMood[] }) {
   const [bodySignal, setBodySignal] = useState("—");
   const [effect, setEffect] = useState<"mystic" | "particle">("mystic");
   const [mode, setMode] = useState<Mode>("self");
-  const [locked, setLocked] = useState<null | { aura: AuraMood; energy: number; body: string }>(null);
+  const [locked, setLocked] = useState<null | { aura: AuraMood; energy: number; body: string; mode: Mode }>(null);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   const rafRef = useRef<number | null>(null);
@@ -216,7 +216,7 @@ export function AuraPlayer({ moods }: { moods: AuraMood[] }) {
   };
 
   const lockAura = () => {
-    if (auraRef.current) setLocked({ aura: auraRef.current, energy: energyRef.current, body: bodyRef.current });
+    if (auraRef.current) setLocked({ aura: auraRef.current, energy: energyRef.current, body: bodyRef.current, mode });
   };
 
   const save = async () => {
@@ -254,8 +254,8 @@ export function AuraPlayer({ moods }: { moods: AuraMood[] }) {
       {/* Mode pilih: Cek Diri / Scan Orang */}
       {status === "idle" && (
         <div className="flex gap-2">
-          <button onClick={() => setMode("self")} className={`flex-1 rounded-xl px-3 py-2 text-sm font-medium ring-1 transition ${mode === "self" ? "bg-sky-500 text-white ring-sky-500" : "bg-white text-ink/60 ring-ink/15"}`}>🙂 Cek Diri</button>
-          <button onClick={() => setMode("scan")} className={`flex-1 rounded-xl px-3 py-2 text-sm font-medium ring-1 transition ${mode === "scan" ? "bg-purple-500 text-white ring-purple-500" : "bg-white text-ink/60 ring-ink/15"}`}>👁️ Scan Orang</button>
+          <button onClick={() => { setMode("self"); setLocked(null); setSaveState("idle"); }} className={`flex-1 rounded-xl px-3 py-2 text-sm font-medium ring-1 transition ${mode === "self" ? "bg-sky-500 text-white ring-sky-500" : "bg-white text-ink/60 ring-ink/15"}`}>🙂 Cek Diri</button>
+          <button onClick={() => { setMode("scan"); setLocked(null); setSaveState("idle"); }} className={`flex-1 rounded-xl px-3 py-2 text-sm font-medium ring-1 transition ${mode === "scan" ? "bg-purple-500 text-white ring-purple-500" : "bg-white text-ink/60 ring-ink/15"}`}>👁️ Scan Orang</button>
         </div>
       )}
 
@@ -321,7 +321,7 @@ export function AuraPlayer({ moods }: { moods: AuraMood[] }) {
           {effect === "mystic" && <p className="mt-2 text-xs italic leading-relaxed text-ink/65">&ldquo;{locked.aura.desc_mystic}&rdquo;</p>}
           <p className="mt-3 text-[11px] text-ink/45">Flouwell · Cek Aura AR · {today}</p>
 
-          {mode === "self" && (
+          {locked.mode === "self" && (
             <div className="mt-3">
               {saveState === "saved" ? (
                 <p className="text-xs font-semibold text-emerald-600">✓ Tersimpan ke riwayat kamu</p>
@@ -333,7 +333,7 @@ export function AuraPlayer({ moods }: { moods: AuraMood[] }) {
               {saveState === "error" && <p className="mt-1 text-xs text-rose-600">Gagal simpan. Coba lagi.</p>}
             </div>
           )}
-          {mode === "scan" && <p className="mt-3 text-[11px] italic text-ink/45">Mode scan orang — hasil nggak disimpan.</p>}
+          {locked.mode === "scan" && <p className="mt-3 text-[11px] italic text-ink/45">Mode scan orang — hasil nggak disimpan.</p>}
         </div>
       )}
 

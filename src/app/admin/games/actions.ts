@@ -648,3 +648,30 @@ export async function deleteAuraMoodAction(id: string): Promise<{ error: string 
   revalidatePath("/admin/games/aura"); revalidatePath("/main/aura");
   return { error: null };
 }
+
+type ScanContentPayload = {
+  id?: string; mode: string; content_key: string; emoji: string; title: string;
+  body: string; sort_order: number; is_active: boolean;
+};
+export async function saveScanContentAction(p: ScanContentPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.mode.trim() || !p.content_key.trim() || !p.title.trim()) return { error: "mode, key, title wajib." };
+  const row = {
+    mode: p.mode.trim(), content_key: p.content_key.trim(), emoji: p.emoji.trim() || null,
+    title: p.title.trim(), body: p.body.trim(), sort_order: p.sort_order, is_active: p.is_active,
+  };
+  const q = p.id
+    ? supabase.from("scan_contents").update(row).eq("id", p.id)
+    : supabase.from("scan_contents").insert(row);
+  const { error } = await q;
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/scan-diri"); revalidatePath("/main/scan"); revalidatePath("/ramalan");
+  return { error: null };
+}
+export async function deleteScanContentAction(id: string): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("scan_contents").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/scan-diri"); revalidatePath("/main/scan"); revalidatePath("/ramalan");
+  return { error: null };
+}
