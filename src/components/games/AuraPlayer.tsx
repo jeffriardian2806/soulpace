@@ -245,9 +245,14 @@ export function AuraPlayer({ moods }: { moods: AuraMood[] }) {
         )}
 
         {status === "running" && aura && (
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-center">
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-4 text-center">
             <span className="text-lg">{aura.emoji}</span>
             <span className="ml-2 font-bold" style={{ color: aura.glow }}>Aura {aura.label}</span>
+            {mode === "mystic" && (
+              <p className="mt-2 text-xs italic leading-relaxed text-white/90">
+                &ldquo;{aura.desc_mystic}&rdquo;
+              </p>
+            )}
           </div>
         )}
 
