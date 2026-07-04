@@ -37,6 +37,7 @@ export function AuraPlayer() {
   const [aura, setAura] = useState<Aura | null>(null);
   const rafRef = useRef<number | null>(null);
   const landmarkerRef = useRef<unknown>(null);
+  const runningRef = useRef(false);
 
   const start = async () => {
     setStatus("loading");
@@ -56,16 +57,31 @@ export function AuraPlayer() {
       const resolver = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
       );
-      const landmarker = await FaceLandmarker.createFromOptions(resolver, {
-        baseOptions: {
-          modelAssetPath:
-            "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-          delegate: "GPU",
-        },
-        outputFaceBlendshapes: true,
-        runningMode: "VIDEO",
-        numFaces: 1,
-      });
+      let landmarker;
+      try {
+        landmarker = await FaceLandmarker.createFromOptions(resolver, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+            delegate: "GPU",
+          },
+          outputFaceBlendshapes: true,
+          runningMode: "VIDEO",
+          numFaces: 1,
+        });
+      } catch {
+        // sebagian HP gak dukung GPU delegate → fallback CPU
+        landmarker = await FaceLandmarker.createFromOptions(resolver, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+            delegate: "CPU",
+          },
+          outputFaceBlendshapes: true,
+          runningMode: "VIDEO",
+          numFaces: 1,
+        });
+      }
       landmarkerRef.current = landmarker;
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -75,6 +91,13 @@ export function AuraPlayer() {
       const video = videoRef.current!;
       video.srcObject = stream;
       await video.play();
+      // tunggu video beneran siap (punya dimensi) sebelum loop
+      if (!video.videoWidth) {
+        await new Promise<void>((res) => {
+          video.onloadedmetadata = () => res();
+        });
+      }
+      runningRef.current = true;
       setStatus("running");
       loop();
     } catch (e) {
@@ -99,17 +122,29 @@ export function AuraPlayer() {
     canvas.height = video.videoHeight || 640;
 
     const render = () => {
-      if (!videoRef.current || status === "idle") return;
-      const now = performance.now();
-      const res = lm.detectForVideo(video, now);
+      if (!runningRef.current || !videoRef.current) return;
+      const video = videoRef.current;
 
-      // gambar video (mirror)
+      // video belum siap → skip frame, coba lagi
+      if (video.readyState < 2 || !video.videoWidth) {
+        rafRef.current = requestAnimationFrame(render);
+        return;
+      }
+
+      // gambar video (mirror) — selalu, walau muka belum kedeteksi
       ctx.save();
       ctx.scale(-1, 1);
       ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
       ctx.restore();
 
-      if (res.faceBlendshapes && res.faceBlendshapes.length > 0) {
+      let res: { faceBlendshapes?: { categories: { categoryName: string; score: number }[] }[] } | null = null;
+      try {
+        res = lm.detectForVideo(video, performance.now());
+      } catch {
+        res = null;
+      }
+
+      if (res && res.faceBlendshapes && res.faceBlendshapes.length > 0) {
         const bs: Record<string, number> = {};
         for (const c of res.faceBlendshapes[0].categories) bs[c.categoryName] = c.score;
         const mood = classifyMood(bs);
@@ -141,6 +176,7 @@ export function AuraPlayer() {
   };
 
   const stop = () => {
+    runningRef.current = false;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     const video = videoRef.current;
     if (video?.srcObject) {
