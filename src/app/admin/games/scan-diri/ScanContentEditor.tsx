@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { saveScanContentAction, deleteScanContentAction } from "../actions";
 
 type Row = { id: string; mode: string; content_key: string; emoji: string | null; title: string; body: string; sort_order: number; is_active: boolean };
-const MODES = ["persona", "karakter", "love", "umur", "masadepan", "batin", "ramalan"];
+const MODES = ["persona", "karakter", "love", "umur", "masadepan", "batin", "bohong", "ramalan"];
 
 export function ScanContentEditor({ items }: { items: Row[] }) {
   const router = useRouter();

@@ -14,7 +14,7 @@ export type ScanContent = {
   extra: Record<string, unknown> | null; sort_order: number;
 };
 
-type ScanMode = "aura" | "persona" | "bacadiri" | "love" | "umur" | "masadepan" | "batin";
+type ScanMode = "aura" | "persona" | "bacadiri" | "love" | "umur" | "masadepan" | "batin" | "bohong";
 const MODES: { key: ScanMode; icon: string; label: string }[] = [
   { key: "aura", icon: "🔮", label: "Aura" },
   { key: "persona", icon: "🎭", label: "Persona" },
@@ -23,6 +23,7 @@ const MODES: { key: ScanMode; icon: string; label: string }[] = [
   { key: "umur", icon: "⏳", label: "Umur Emosi" },
   { key: "masadepan", icon: "✨", label: "Masa Depan" },
   { key: "batin", icon: "👁️", label: "Batin" },
+  { key: "bohong", icon: "🤥", label: "Detektor" },
 ];
 
 // ==== Klasifikasi mood — UPGRADE: bobot MATA menang atas mulut ====
@@ -99,6 +100,8 @@ export function ScanDiriPlayer({ moods, contents }: { moods: AuraMood[]; content
   const blinkCountRef = useRef(0);
   const blinkStateRef = useRef(false);
   const blinkWindowStart = useRef(0);
+  const lastGazeRef = useRef({ x: 0, y: 0 });
+  const fidgetRef = useRef(0); // rolling "kegelisahan" 0..1
   const moodMap = useRef<Record<string, AuraMood>>({});
   const byMode = useRef<Record<string, ScanContent[]>>({});
 
@@ -309,6 +312,25 @@ export function ScanDiriPlayer({ moods, contents }: { moods: AuraMood[]; content
             const c = list[seedPick(dateSeed + "fut", list.length)];
             liveRef.current = { emoji: c.emoji ?? "✨", title: c.title, body: c.body, color: "#F59E0B" };
           }
+        } else if (m === "bohong") {
+          // micro-sinyal: gerak mata (gaze shift), kedip, bibir ditahan, alis gerak
+          const gazeX = ((bs.eyeLookOutLeft ?? 0) - (bs.eyeLookInLeft ?? 0)) + ((bs.eyeLookInRight ?? 0) - (bs.eyeLookOutRight ?? 0));
+          const gazeY = ((bs.eyeLookUpLeft ?? 0) + (bs.eyeLookUpRight ?? 0)) / 2 - ((bs.eyeLookDownLeft ?? 0) + (bs.eyeLookDownRight ?? 0)) / 2;
+          const gazeDelta = Math.abs(gazeX - lastGazeRef.current.x) + Math.abs(gazeY - lastGazeRef.current.y);
+          lastGazeRef.current = { x: gazeX, y: gazeY };
+          const mouthPress = ((bs.mouthPressLeft ?? 0) + (bs.mouthPressRight ?? 0)) / 2; // senyum/bibir ditahan
+          const browMove = Math.abs((bs.browInnerUp ?? 0) - 0.1) + browDown;
+          const blinkRate = Math.min(blinkCountRef.current, 10) / 10; // 0..1
+          // rolling fidget (exponential smoothing)
+          const instant = Math.min(1, gazeDelta * 4 + mouthPress * 0.8 + browMove * 0.4 + blinkRate * 0.6);
+          fidgetRef.current = fidgetRef.current * 0.92 + instant * 0.08;
+          const honesty = Math.max(0, Math.min(100, Math.round(100 - fidgetRef.current * 115)));
+          const tiers = listOf("bohong");
+          const tier = tiers.find((t) => {
+            const ex = t.extra as { min?: number; max?: number } | null;
+            return ex && honesty >= (ex.min ?? 0) && honesty <= (ex.max ?? 100);
+          }) ?? tiers[0];
+          if (tier) liveRef.current = { emoji: tier.emoji ?? "🤥", title: `${tier.title} · ${honesty}%`, body: tier.body, color: (tier.extra as { color?: string })?.color ?? "#FB923C", score: honesty };
         } else if (m === "batin") {
           const mata = eyeBlinkAvg > 0.35 ? "mata_lelah" : eyeWide > 0.3 ? "mata_waspada" : "mata_segar";
           const senyum = smile > 0.3 ? (eyeBlinkAvg > 0.3 ? "senyum_bertahan" : "senyum_tulus") : "senyum_hilang";
@@ -388,7 +410,7 @@ export function ScanDiriPlayer({ moods, contents }: { moods: AuraMood[]; content
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-xl bg-amber-50 p-3 text-xs leading-relaxed text-amber-800 ring-1 ring-amber-200">
-        ✨ Semua mode di sini hiburan, bukan pemeriksaan psikologi. {camMode === "scan" && "Mode Scan Orang: hasil nggak disimpan."}
+        ✨ Semua mode di sini hiburan, bukan pemeriksaan psikologi. {scanMode === "bohong" && "Detektor bohong ini bercandaan — bukan alat deteksi kebohongan beneran, jangan dipakai nuduh orang serius ya. "}{camMode === "scan" && "Mode Scan Orang: hasil nggak disimpan."}
       </div>
 
       {status === "idle" && (
