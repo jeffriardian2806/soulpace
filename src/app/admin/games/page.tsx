@@ -15,6 +15,7 @@ const GROUPS: { title: string; items: CardItem[] }[] = [
       { href: "/admin/games/vibe-presets",     emoji: "🎨", title: "Vibe Presets",       desc: "Shortcut emoji-label di hub /main." },
       { href: "/admin/games/edukasi",          emoji: "📚", title: "Tips & Edukasi",    desc: "Topic per kondisi (overthinking, cemas, dll) + tips actionable." },
       { href: "/admin/games/video",            emoji: "🎬", title: "Video Edukasi",     desc: "Video YouTube buat halaman Edukasi (publik) + statistik view." },
+      { href: "/admin/games/aura",             emoji: "🔮", title: "Cek Aura AR",       desc: "Mood & aura buat game AR: warna, deskripsi mistis, partikel." },
       { href: "/admin/games/ambient-media",    emoji: "🎵", title: "Ambient Media",     desc: "Audio/video calming via external link (Pixabay/YouTube/Vimeo)." },
       { href: "/admin/games/crisis-mode",      emoji: "🛟", title: "Crisis Mode Messages", desc: "Text yang muncul + dibacakan di Crisis Companion phase-phase. Edit / tambah gentle messages." },
     ],

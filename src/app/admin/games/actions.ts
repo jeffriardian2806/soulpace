@@ -604,3 +604,47 @@ export async function deleteSupportMessageAction(id: string) {
   revalidatePath("/admin/games"); revalidatePath("/feed"); revalidatePath("/skrining");
   return { error: null };
 }
+
+type AuraMoodPayload = {
+  id?: string;
+  mood_key: string;
+  emoji: string;
+  label: string;
+  color: string;
+  glow: string;
+  particle: string;
+  desc_short: string;
+  desc_mystic: string;
+  sort_order: number;
+  is_active: boolean;
+};
+export async function saveAuraMoodAction(p: AuraMoodPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.mood_key.trim() || !p.label.trim()) return { error: "mood_key & label wajib." };
+  const row = {
+    mood_key: p.mood_key.trim(),
+    emoji: p.emoji.trim() || "✨",
+    label: p.label.trim(),
+    color: p.color.trim(),
+    glow: p.glow.trim(),
+    particle: p.particle.trim() || "sparkle",
+    desc_short: p.desc_short.trim(),
+    desc_mystic: p.desc_mystic.trim(),
+    sort_order: p.sort_order,
+    is_active: p.is_active,
+  };
+  const q = p.id
+    ? supabase.from("aura_moods").update(row).eq("id", p.id)
+    : supabase.from("aura_moods").insert(row);
+  const { error } = await q;
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/aura"); revalidatePath("/main/aura");
+  return { error: null };
+}
+export async function deleteAuraMoodAction(id: string): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("aura_moods").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/aura"); revalidatePath("/main/aura");
+  return { error: null };
+}
