@@ -16,7 +16,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("daily_messages").select("id, body, sort_order, is_active").order("sort_order");
 
   return (
-    <AdminPageShell title="💬 Pesan Hari Ini" subtitle="Quote yang muncul di banner atas feed setiap hari.">
+    <AdminPageShell pageKey="daily-message" title="💬 Pesan Hari Ini" subtitle="Quote yang muncul di banner atas feed setiap hari.">
       <DailyMessageImport />
       <DailyMessageEditor items={(q0 ?? []) as { id: string; body: string; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>

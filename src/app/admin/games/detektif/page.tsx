@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("detective_cases").select("id, content, correct, options, sort_order, is_active").order("sort_order");
 
   return (
-    <AdminPageShell title="🔍 Detektif Emosi" subtitle="Kasus chat + tebakan emosi (EQ training).">
+    <AdminPageShell pageKey="detektif" title="🔍 Detektif Emosi" subtitle="Kasus chat + tebakan emosi (EQ training).">
       <DetectiveEditor items={(q0 ?? []) as { id: string; content: string; correct: string; options: { slug: string; label: string; explanation: string }[]; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>
   );

@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("this_or_that").select("id, prompt_a, prompt_b").order("sort_order");
 
   return (
-    <AdminPageShell title="🌙 This or That" subtitle="Pilihan A/B check-in cepat.">
+    <AdminPageShell pageKey="this-or-that" title="🌙 This or That" subtitle="Pilihan A/B check-in cepat.">
       <TotEditor items={(q0 ?? []) as { id: string; prompt_a: string; prompt_b: string }[]} />
     </AdminPageShell>
   );

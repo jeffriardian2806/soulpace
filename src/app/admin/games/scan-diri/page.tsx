@@ -17,7 +17,7 @@ export default async function AdminScanDiriPage() {
     .order("mode").order("sort_order");
 
   return (
-    <AdminPageShell title="🔮 Scan Diri AR — Konten" subtitle="Copy semua mode scan (persona, karakter, love, umur, masa depan, batin, ramalan). Aura diatur terpisah di menu Cek Aura AR.">
+    <AdminPageShell pageKey="scan-diri" title="🔮 Scan Diri AR — Konten" subtitle="Copy semua mode scan (persona, karakter, love, umur, masa depan, batin, ramalan). Aura diatur terpisah di menu Cek Aura AR.">
       <ScanContentEditor items={(data ?? []) as Parameters<typeof ScanContentEditor>[0]["items"]} />
     </AdminPageShell>
   );

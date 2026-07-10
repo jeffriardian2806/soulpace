@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("breathing_protocols").select("id, slug, label, in_seconds, hold_seconds, out_seconds, sort_order, is_active").order("sort_order");
 
   return (
-    <AdminPageShell title="🫧 Tarik Napas" subtitle="Protokol pernapasan (4-7-8, box breathing, dsb).">
+    <AdminPageShell pageKey="napas" title="🫧 Tarik Napas" subtitle="Protokol pernapasan (4-7-8, box breathing, dsb).">
       <BreathingEditor items={(q0 ?? []) as { id: string; slug: string; label: string; in_seconds: number; hold_seconds: number; out_seconds: number; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>
   );

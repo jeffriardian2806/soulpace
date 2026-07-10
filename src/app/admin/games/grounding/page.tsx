@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("grounding_steps").select("id, count, sense, instr, emoji, sort_order, is_active").order("sort_order");
 
   return (
-    <AdminPageShell title="🧭 Grounding 5-4-3-2-1" subtitle="5 step indera (lihat/dengar/sentuh/cium/cicipi) buat anxiety.">
+    <AdminPageShell pageKey="grounding" title="🧭 Grounding 5-4-3-2-1" subtitle="5 step indera (lihat/dengar/sentuh/cium/cicipi) buat anxiety.">
       <GroundingEditor items={(q0 ?? []) as { id: string; count: number; sense: string; instr: string; emoji: string; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>
   );

@@ -18,7 +18,7 @@ export default async function AdminAmbientMediaPage() {
     .order("sort_order");
 
   return (
-    <AdminPageShell title="🎵 Ambient Media" subtitle="Audio/video calming via external link. Default inaktif — set URL + activate biar muncul di /ambient.">
+    <AdminPageShell pageKey="ambient-media" title="🎵 Ambient Media" subtitle="Audio/video calming via external link. Default inaktif — set URL + activate biar muncul di /ambient.">
       <AmbientMediaEditor items={(data ?? []) as Parameters<typeof AmbientMediaEditor>[0]["items"]} />
     </AdminPageShell>
   );

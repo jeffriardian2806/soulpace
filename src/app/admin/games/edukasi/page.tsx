@@ -20,7 +20,7 @@ export default async function AdminEdukasiPage() {
   ]);
 
   return (
-    <AdminPageShell title="📚 Tips & Edukasi" subtitle="Topic per kondisi (definisi + tips actionable). Klik topic buat expand & edit. Tag kategori biar muncul di Konsultasi flow.">
+    <AdminPageShell pageKey="edukasi" title="📚 Tips & Edukasi" subtitle="Topic per kondisi (definisi + tips actionable). Klik topic buat expand & edit. Tag kategori biar muncul di Konsultasi flow.">
       <TipsEditor
         topics={(topicsRes.data ?? []) as Parameters<typeof TipsEditor>[0]["topics"]}
         tips={(tipsRes.data ?? []) as Parameters<typeof TipsEditor>[0]["tips"]}

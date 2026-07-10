@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("monster_situations").select("id, situation, responses, sort_order, is_active").order("sort_order");
 
   return (
-    <AdminPageShell title="👹 Monster Cemas" subtitle="Situasi cemas + respons (grow/shrink/stay) + insight.">
+    <AdminPageShell pageKey="monster" title="👹 Monster Cemas" subtitle="Situasi cemas + respons (grow/shrink/stay) + insight.">
       <MonsterEditor items={(q0 ?? []) as { id: string; situation: string; responses: { text: string; effect: "grow" | "shrink" | "stay"; insight: string }[]; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>
   );

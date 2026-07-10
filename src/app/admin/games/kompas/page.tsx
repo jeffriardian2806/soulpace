@@ -19,7 +19,7 @@ export default async function AdminEditorPage() {
   ]);
 
   return (
-    <AdminPageShell title="🧭 Kompas Jurusan" subtitle="Tipe RIASEC + pertanyaan + 30 jurusan kuliah (Holland Code).">
+    <AdminPageShell pageKey="kompas" title="🧭 Kompas Jurusan" subtitle="Tipe RIASEC + pertanyaan + 30 jurusan kuliah (Holland Code).">
       <CompassTypeEditor items={(q0 ?? []) as { letter: string; name: string; tagline: string; description: string; traits: string; sort_order: number; is_active: boolean }[]} />
       <CompassQuestionEditor items={(q1 ?? []) as { id: string; text: string; letter: string; sort_order: number; is_active: boolean }[]} />
       <CompassMajorEditor items={(q2 ?? []) as { id: string; name: string; description: string; primary_letters: string[]; careers: string[]; sort_order: number; is_active: boolean }[]} />

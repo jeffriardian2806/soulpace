@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("cbt_scenarios").select("id, context, thoughts, sort_order, is_active").order("sort_order");
 
   return (
-    <AdminPageShell title="🌀 Tantang Pikiran (CBT)" subtitle="Skenario pikiran distorsi vs netral vs sehat (CBT).">
+    <AdminPageShell pageKey="tantang" title="🌀 Tantang Pikiran (CBT)" subtitle="Skenario pikiran distorsi vs netral vs sehat (CBT).">
       <CbtScenarioEditor items={(q0 ?? []) as { id: string; context: string; thoughts: { text: string; correct: "distorsi" | "netral" | "sehat"; insight: string; distortion_type?: string | null }[]; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>
   );

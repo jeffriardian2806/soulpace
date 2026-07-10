@@ -697,3 +697,13 @@ export async function importDailyMessagesAction(bodies: string[]): Promise<{ err
   revalidatePath("/feed");
   return { error: null, inserted: rows.length };
 }
+
+export async function saveUiTextAction(key: string, value: string): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!key.trim()) return { error: "Key kosong." };
+  const { error } = await supabase.from("ui_texts").upsert({ key: key.trim(), value: value.trim(), updated_at: new Date().toISOString() });
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/teks");
+  revalidatePath("/admin/games", "layout");
+  return { error: null };
+}

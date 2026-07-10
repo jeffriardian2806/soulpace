@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("quest_prompts").select("day, prompt").order("day");
 
   return (
-    <AdminPageShell title="🗺️ 7 Hari Kenal Diri" subtitle="Prompt per hari (1-7).">
+    <AdminPageShell pageKey="quest" title="🗺️ 7 Hari Kenal Diri" subtitle="Prompt per hari (1-7).">
       <QuestPromptsEditor items={(q0 ?? []) as { day: number; prompt: string }[]} />
     </AdminPageShell>
   );

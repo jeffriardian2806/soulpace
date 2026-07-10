@@ -18,7 +18,7 @@ export default async function AdminEditorPage() {
   ]);
 
   return (
-    <AdminPageShell title="🌗 Spektrum Sosial" subtitle="Kategori + pertanyaan introvert/extrovert (Big Five).">
+    <AdminPageShell pageKey="spektrum" title="🌗 Spektrum Sosial" subtitle="Kategori + pertanyaan introvert/extrovert (Big Five).">
       <PersonalityCategoryEditor items={(q0 ?? []) as { id: string; slug: string; name: string; emoji: string; description: string; sort_order: number; is_active: boolean }[]} />
       <PersonalityQuestionEditor items={(q1 ?? []) as { id: string; category_id: string; text: string; options: { text: string; intro_weight: number; extro_weight: number }[]; sort_order: number; is_active: boolean }[]} categories={(q0 ?? []).map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }))} />
     </AdminPageShell>

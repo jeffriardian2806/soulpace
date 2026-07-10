@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("voice_scenarios").select("id, situation, critic_text, supportive_text, outcome_critic, outcome_supportive, sort_order, is_active").order("sort_order");
 
   return (
-    <AdminPageShell title="🗣️ Suara Dalam Kepala" subtitle="Skenario suara kritis vs supportive + dampak.">
+    <AdminPageShell pageKey="suara" title="🗣️ Suara Dalam Kepala" subtitle="Skenario suara kritis vs supportive + dampak.">
       <VoiceEditor items={(q0 ?? []) as { id: string; situation: string; critic_text: string; supportive_text: string; outcome_critic: string; outcome_supportive: string; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>
   );

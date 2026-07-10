@@ -1,22 +1,22 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { VibeEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
+import { UiTextEditor } from "./UiTextEditor";
 
-export const metadata = { title: "Vibe Presets — Admin Flouwell" };
+export const metadata = { title: "Teks Halaman Admin — Flouwell" };
 
-export default async function AdminEditorPage() {
+export default async function AdminUiTextPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
   if (!profile || (profile.role !== "moderator" && profile.role !== "admin")) redirect("/feed");
 
-  const { data: q0 } = await supabase.from("vibe_presets").select("id, emoji, label, href").order("sort_order");
+  const { data } = await supabase.from("ui_texts").select("key, value").order("key");
 
   return (
-    <AdminPageShell pageKey="vibe-presets" title="🎨 Vibe Presets" subtitle="Shortcut emoji-label di hub /main (Lagi pengen apa?).">
-      <VibeEditor items={(q0 ?? []) as { id: string; emoji: string; label: string; href: string }[]} />
+    <AdminPageShell title="✏️ Teks Halaman Admin" subtitle="Edit judul & penjelasan tiap halaman admin biar bahasanya lebih gampang dipahami — tanpa perlu ubah code.">
+      <UiTextEditor items={(data ?? []) as { key: string; value: string }[]} />
     </AdminPageShell>
   );
 }

@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("mood_colors").select("id, hex, label, note, sort_order, is_active").order("sort_order");
 
   return (
-    <AdminPageShell title="🎨 Warna Hari Ini" subtitle="Daftar warna + label + note pendek.">
+    <AdminPageShell pageKey="warna" title="🎨 Warna Hari Ini" subtitle="Daftar warna + label + note pendek.">
       <MoodColorEditor items={(q0 ?? []) as { id: string; hex: string; label: string; note: string; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>
   );

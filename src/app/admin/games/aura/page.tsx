@@ -17,7 +17,7 @@ export default async function AdminAuraPage() {
     .order("sort_order");
 
   return (
-    <AdminPageShell title="🔮 Cek Aura AR" subtitle="Konten mood & aura buat game AR. Edit warna, deskripsi mistis, partikel. mood_key jangan diubah (nyambung ke deteksi).">
+    <AdminPageShell pageKey="aura" title="🔮 Cek Aura AR" subtitle="Konten mood & aura buat game AR. Edit warna, deskripsi mistis, partikel. mood_key jangan diubah (nyambung ke deteksi).">
       <AuraMoodEditor items={(data ?? []) as Parameters<typeof AuraMoodEditor>[0]["items"]} />
     </AdminPageShell>
   );

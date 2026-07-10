@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("daily_challenges").select("id, body").order("sort_order");
 
   return (
-    <AdminPageShell title="🎯 Tantangan Empati" subtitle="Daily challenge yang muncul di /main hub.">
+    <AdminPageShell pageKey="daily-challenges" title="🎯 Tantangan Empati" subtitle="Daily challenge yang muncul di /main hub.">
       <DcEditor items={(q0 ?? []) as { id: string; body: string }[]} />
     </AdminPageShell>
   );

@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("tarot_cards").select("id, name, emoji, meaning_situation, meaning_feeling, meaning_action, sort_order, is_active").order("sort_order");
 
   return (
-    <AdminPageShell title="🎴 Tarot Refleksi" subtitle="Kartu + arti per posisi (situasi/perasaan/aksi).">
+    <AdminPageShell pageKey="tarot" title="🎴 Tarot Refleksi" subtitle="Kartu + arti per posisi (situasi/perasaan/aksi).">
       <TarotEditor items={(q0 ?? []) as { id: string; name: string; emoji: string; meaning_situation: string; meaning_feeling: string; meaning_action: string; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>
   );

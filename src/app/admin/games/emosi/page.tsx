@@ -15,7 +15,7 @@ export default async function AdminEditorPage() {
   const { data: q0 } = await supabase.from("emotion_cards").select("id, content, correct, options, sort_order, is_active").order("sort_order");
 
   return (
-    <AdminPageShell title="🎯 Tebak Emosi" subtitle="Kartu rapid-fire matching emosi.">
+    <AdminPageShell pageKey="emosi" title="🎯 Tebak Emosi" subtitle="Kartu rapid-fire matching emosi.">
       <EmotionEditor items={(q0 ?? []) as { id: string; content: string; correct: string; options: string[]; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>
   );

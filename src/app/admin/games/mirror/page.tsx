@@ -18,7 +18,7 @@ export default async function AdminEditorPage() {
   ]);
 
   return (
-    <AdminPageShell title="🪞 Pikiran Mirror" subtitle="Profile (archetype) + skenario 10 situasi hidup.">
+    <AdminPageShell pageKey="mirror" title="🪞 Pikiran Mirror" subtitle="Profile (archetype) + skenario 10 situasi hidup.">
       <MirrorProfileEditor items={(q0 ?? []) as { id: string; slug: string; name: string; emoji: string; description: string; insight: string; sort_order: number; is_active: boolean }[]} />
       <MirrorScenarioEditor items={(q1 ?? []) as { id: string; category: string; situation: string; options: { text: string; profile_slug: string }[]; sort_order: number; is_active: boolean }[]} profiles={(q0 ?? []).map((p: { slug: string; name: string }) => ({ slug: p.slug, name: p.name }))} />
     </AdminPageShell>

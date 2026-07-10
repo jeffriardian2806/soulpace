@@ -18,7 +18,7 @@ export default async function AdminVideoPage() {
   ]);
 
   return (
-    <AdminPageShell title="🎬 Video Edukasi" subtitle="Video YouTube buat halaman Edukasi (publik). Paste link, sistem ambil thumbnail otomatis. Statistik view buat klaim/kurasi.">
+    <AdminPageShell pageKey="video" title="🎬 Video Edukasi" subtitle="Video YouTube buat halaman Edukasi (publik). Paste link, sistem ambil thumbnail otomatis. Statistik view buat klaim/kurasi.">
       <VideoEditor
         videos={(videosRes.data ?? []) as Parameters<typeof VideoEditor>[0]["videos"]}
         topics={(topicsRes.data ?? []) as Parameters<typeof VideoEditor>[0]["topics"]}

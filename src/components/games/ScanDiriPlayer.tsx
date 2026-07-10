@@ -420,16 +420,16 @@ export function ScanDiriPlayer({ moods, contents }: { moods: AuraMood[]; content
         </div>
       )}
 
-      {/* Icon switcher mode (kayak filter IG) */}
-      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+      {/* Icon switcher mode — grid 4x2, semua keliatan tanpa scroll, lebar seragam */}
+      <div className="grid grid-cols-4 gap-1.5">
         {MODES.map((mo) => (
           <button
             key={mo.key}
             onClick={() => { setScanMode(mo.key); setLocked(null); setSaveState("idle"); }}
-            className={`flex shrink-0 flex-col items-center gap-0.5 rounded-xl px-3 py-2 transition ${scanMode === mo.key ? "scale-105 bg-white shadow-md ring-2 ring-sky-400" : "bg-white/60 ring-1 ring-ink/10"}`}
+            className={`flex flex-col items-center gap-0.5 rounded-xl px-1 py-2 transition ${scanMode === mo.key ? "scale-105 bg-white shadow-md ring-2 ring-sky-400" : "bg-white/60 ring-1 ring-ink/10"}`}
           >
             <span className="text-xl">{mo.icon}</span>
-            <span className="text-[10px] font-medium text-ink/70">{mo.label}</span>
+            <span className="w-full truncate text-center text-[10px] font-medium text-ink/70">{mo.label}</span>
           </button>
         ))}
       </div>
