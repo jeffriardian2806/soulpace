@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { KategoriMultiSelect } from "@/components/admin/KategoriMultiSelect";
+import { TipsImport } from "@/components/admin/TipsImport";
 import { useRouter } from "next/navigation";
 import {
   saveTopicAction,
@@ -186,6 +187,11 @@ export function TipsEditor({ topics, tips, topicCategoryLinks = [], categories =
                     <p className="font-semibold uppercase tracking-wide text-sky-700 text-[10px] mb-1">Definition</p>
                     {topic.definition}
                   </div>
+                )}
+
+                {/* Import Excel per topik — cuma masuk ke topik ini */}
+                {!isEditing && (
+                  <TipsImport topic={{ slug: topic.slug, title: topic.title, emoji: topic.emoji }} />
                 )}
 
                 {/* Add new tip form */}

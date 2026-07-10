@@ -159,3 +159,46 @@ export async function deleteTipAction(id: string): Promise<{ error: string | nul
   revalidatePath("/admin/games/edukasi");
   return { error: null };
 }
+
+export async function importTipsAction(p: {
+  topic_slug: string;
+  topic_title: string;
+  topic_emoji: string | null;
+  rows: { title: string; content: string }[];
+}): Promise<{ error: string | null; inserted: number }> {
+  const { error: authErr, supabase } = await assertMod();
+  if (authErr || !supabase) return { error: authErr ?? "Auth failed", inserted: 0 };
+
+  if (!p.topic_slug.trim()) return { error: "Topic tidak valid.", inserted: 0 };
+  const clean = p.rows
+    .map((r) => ({ title: r.title.trim(), content: r.content.trim() }))
+    .filter((r) => r.title.length > 0 && r.content.length > 0);
+  if (clean.length === 0) return { error: "Tidak ada artikel valid (judul & isi wajib terisi).", inserted: 0 };
+  if (clean.length > 300) return { error: "Maksimal 300 artikel per import.", inserted: 0 };
+
+  // sort_order lanjut dari artikel terakhir DI TOPIK INI
+  const { data: last } = await supabase
+    .from("tips")
+    .select("sort_order")
+    .eq("topic_slug", p.topic_slug)
+    .order("sort_order", { ascending: false })
+    .limit(1);
+  const startSort = (last?.[0]?.sort_order ?? 0) + 1;
+
+  const rows = clean.map((r, i) => ({
+    topic_slug: p.topic_slug.trim(),          // SEMUA baris terikat topik ini
+    topic_title: p.topic_title.trim(),
+    topic_emoji: p.topic_emoji?.trim() || null,
+    tip_title: r.title,
+    tip_content: r.content,
+    sort_order: startSort + i,
+    is_active: true,
+    updated_at: new Date().toISOString(),
+  }));
+  const { error } = await supabase.from("tips").insert(rows);
+  if (error) return { error: error.message, inserted: 0 };
+
+  revalidatePath("/edukasi");
+  revalidatePath("/admin/games/edukasi");
+  return { error: null, inserted: rows.length };
+}
