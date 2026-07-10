@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DailyMessageEditor } from "@/components/admin/MiscEditors";
+import { DailyMessageImport } from "@/components/admin/DailyMessageImport";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
 export const metadata = { title: "Pesan Hari Ini — Admin Flouwell" };
@@ -16,6 +17,7 @@ export default async function AdminEditorPage() {
 
   return (
     <AdminPageShell title="💬 Pesan Hari Ini" subtitle="Quote yang muncul di banner atas feed setiap hari.">
+      <DailyMessageImport />
       <DailyMessageEditor items={(q0 ?? []) as { id: string; body: string; sort_order: number; is_active: boolean }[]} />
     </AdminPageShell>
   );

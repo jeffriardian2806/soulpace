@@ -675,3 +675,25 @@ export async function deleteScanContentAction(id: string): Promise<{ error: stri
   revalidatePath("/admin/games/scan-diri"); revalidatePath("/main/scan"); revalidatePath("/ramalan");
   return { error: null };
 }
+
+export async function importDailyMessagesAction(bodies: string[]): Promise<{ error: string | null; inserted: number }> {
+  const supabase = await createClient();
+  const clean = bodies.map((b) => b.trim()).filter((b) => b.length > 0);
+  if (clean.length === 0) return { error: "Tidak ada pesan untuk diimport.", inserted: 0 };
+  if (clean.length > 500) return { error: "Maksimal 500 pesan per import.", inserted: 0 };
+
+  // sort_order lanjut dari yang terakhir
+  const { data: last } = await supabase
+    .from("daily_messages")
+    .select("sort_order")
+    .order("sort_order", { ascending: false })
+    .limit(1);
+  const startSort = (last?.[0]?.sort_order ?? 0) + 1;
+
+  const rows = clean.map((body, i) => ({ body, sort_order: startSort + i, is_active: true }));
+  const { error } = await supabase.from("daily_messages").insert(rows);
+  if (error) return { error: error.message, inserted: 0 };
+  revalidatePath("/admin/games/daily-message");
+  revalidatePath("/feed");
+  return { error: null, inserted: rows.length };
+}
