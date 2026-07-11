@@ -14,6 +14,7 @@ const GROUPS: { title: string; items: CardItem[] }[] = [
       { href: "/admin/games/daily-challenges", emoji: "🎯", title: "Tantangan Empati",   desc: "Daily challenge yang muncul di /main." },
       { href: "/admin/games/vibe-presets",     emoji: "🎨", title: "Vibe Presets",       desc: "Shortcut emoji-label di hub /main." },
       { href: "/admin/games/edukasi",          emoji: "📚", title: "Tips & Edukasi",    desc: "Topic per kondisi (overthinking, cemas, dll) + tips actionable." },
+      { href: "/admin/games/workshop",         emoji: "🎓", title: "Workshop & Training",  desc: "Event Rey (workshop/kelas/training) — banner otomatis muncul di app selama tayang." },
       { href: "/admin/games/teks",             emoji: "✏️", title: "Teks Halaman Admin", desc: "Ganti judul & penjelasan halaman admin biar lebih human friendly." },
       { href: "/admin/games/video",            emoji: "🎬", title: "Video Edukasi",     desc: "Video YouTube buat halaman Edukasi (publik) + statistik view." },
       { href: "/admin/games/aura",             emoji: "🔮", title: "Cek Aura AR",       desc: "Mood & aura buat game AR: warna, deskripsi mistis, partikel." },

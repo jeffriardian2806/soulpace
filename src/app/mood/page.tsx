@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WorkshopBannerSlot } from "@/components/workshops/WorkshopBannerSlot";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MoodTracker } from "@/components/MoodTracker";
@@ -38,6 +39,7 @@ export default async function MoodPage() {
           Kembali ke beranda
         </Link>
       </header>
+      <WorkshopBannerSlot />
       <p className="text-sm leading-relaxed text-ink/60">
         Catat perasaanmu setiap hari untuk memahami perjalanan emosimu. Hanya kamu yang dapat melihatnya.
       </p>

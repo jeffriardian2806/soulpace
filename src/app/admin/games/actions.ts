@@ -707,3 +707,41 @@ export async function saveUiTextAction(key: string, value: string): Promise<{ er
   revalidatePath("/admin/games", "layout");
   return { error: null };
 }
+
+type WorkshopPayload = {
+  id?: string; title: string; description: string;
+  event_date: string | null; price_text: string;
+  form_url: string | null; materi_url: string | null;
+  posted_at: string; unposted_at: string; is_active: boolean;
+};
+export async function saveWorkshopAction(p: WorkshopPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.title.trim()) return { error: "Judul wajib." };
+  if (!p.unposted_at) return { error: "Tanggal berhenti tayang (unposted) wajib." };
+  const row = {
+    title: p.title.trim(),
+    description: p.description.trim(),
+    event_date: p.event_date || null,
+    price_text: p.price_text.trim() || "Gratis",
+    form_url: p.form_url?.trim() || null,
+    materi_url: p.materi_url?.trim() || null,
+    posted_at: p.posted_at || new Date().toISOString(),
+    unposted_at: p.unposted_at,
+    is_active: p.is_active,
+    updated_at: new Date().toISOString(),
+  };
+  const q = p.id ? supabase.from("workshops").update(row).eq("id", p.id) : supabase.from("workshops").insert(row);
+  const { error } = await q;
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/workshop");
+  revalidatePath("/feed"); revalidatePath("/main"); revalidatePath("/skrining"); revalidatePath("/mood");
+  revalidatePath("/workshop", "layout");
+  return { error: null };
+}
+export async function deleteWorkshopAction(id: string): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("workshops").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/workshop");
+  return { error: null };
+}

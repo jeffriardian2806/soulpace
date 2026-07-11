@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WorkshopBannerSlot } from "@/components/workshops/WorkshopBannerSlot";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getFeatureFlagMap, PremiumBadgeInline } from "@/components/PremiumGate";
@@ -83,6 +84,7 @@ export default async function SkriningPage() {
           Kembali ke beranda
         </Link>
       </header>
+      <WorkshopBannerSlot />
       <p className="text-sm leading-relaxed text-ink/60">
         Eksplorasi diri lewat tes interaktif + cek gejala dengan instrumen klinis. Semuanya ada ilmu psikologinya, hasilnya cuma buat kamu sendiri.
       </p>
