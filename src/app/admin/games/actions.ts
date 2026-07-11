@@ -775,3 +775,35 @@ export async function deleteEventCategoryAction(id: string): Promise<{ error: st
   revalidatePath("/admin/games/event-category");
   return { error: null };
 }
+
+type WellbeingContentPayload = {
+  id?: string; kind: string; content_key: string; emoji: string;
+  title: string; body: string; extra_json: string;
+  sort_order: number; is_active: boolean;
+};
+export async function saveWellbeingContentAction(p: WellbeingContentPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.kind.trim() || !p.content_key.trim()) return { error: "kind & content_key wajib." };
+  let extra: Record<string, unknown> | null = null;
+  if (p.extra_json.trim()) {
+    try { extra = JSON.parse(p.extra_json); } catch { return { error: "Extra harus JSON valid (contoh: {\"inhale\":4,\"exhale\":8})." }; }
+  }
+  const row = {
+    kind: p.kind.trim(), content_key: p.content_key.trim(),
+    emoji: p.emoji.trim() || null, title: p.title.trim() || null,
+    body: p.body.trim() || null, extra,
+    sort_order: p.sort_order, is_active: p.is_active,
+  };
+  const q = p.id ? supabase.from("wellbeing_contents").update(row).eq("id", p.id) : supabase.from("wellbeing_contents").insert(row);
+  const { error } = await q;
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/wellbeing"); revalidatePath("/main/wellbeing");
+  return { error: null };
+}
+export async function deleteWellbeingContentAction(id: string): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("wellbeing_contents").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/wellbeing"); revalidatePath("/main/wellbeing");
+  return { error: null };
+}

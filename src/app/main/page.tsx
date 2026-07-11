@@ -13,6 +13,7 @@ const GROUPS: { key: string; emoji: string; title: string; tagline: string; open
     items: [
       { href: "/main/scan", slug: "scan-diri", emoji: "🔮", title: "Scan Diri", desc: "Kamera baca aura, persona, karakter, love meter, umur emosi, batin, sampai detektor bohong — 8 mode. Hiburan." },
       { href: "/ramalan", slug: "ramalan", emoji: "🌙", title: "Ramalan Harianmu", desc: "Ramalan pagi yang dibaca dari jejak datamu sendiri — bukan horoskop random." },
+      { href: "/main/wellbeing", slug: "wellbeing", emoji: "🌿", title: "Wellbeing AR", desc: "4 latihan: napas terpandu, focus orb, positive hunt, kupu tenang. Buat nurunin tegang & latih fokus." },
     ],
   },
   {
