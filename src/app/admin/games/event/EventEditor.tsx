@@ -2,9 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { saveEventAction, deleteEventAction } from "../actions";
+import { saveEventAction, deleteEventAction, saveEventCategoryAction, deleteEventCategoryAction } from "../actions";
 
-type Category = { id: string; label: string; emoji: string | null };
+type Category = { id: string; label: string; emoji: string | null; sort_order: number; is_active: boolean };
 type Row = {
   id: string; category_id: string | null; category_label: string | null; category_emoji: string | null;
   title: string; description: string; event_date: string | null; price_text: string;
@@ -30,6 +30,7 @@ export function EventEditor({ items, categories }: { items: Row[]; categories: C
   const [adding, setAdding] = useState(false);
   const [filter, setFilter] = useState<"all" | "active" | "draft" | "done">("all");
   const [err, setErr] = useState<string | null>(null);
+  const [catOpen, setCatOpen] = useState(false);
 
   const filtered = items.filter((r) => {
     if (filter === "all") return true;
@@ -44,10 +45,23 @@ export function EventEditor({ items, categories }: { items: Row[]; categories: C
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="rounded-lg bg-sky-50 p-2 text-[11px] leading-relaxed text-sky-800 ring-1 ring-sky-200">
-        Kategori event (Workshop/Training/dll) diatur di menu <b>🏷️ Kategori Event</b>. Bebas tambah/edit sesukanya.
-      </p>
+      {/* KATEGORI — collapse di atas */}
+      <details open={catOpen} onToggle={(e) => setCatOpen((e.target as HTMLDetailsElement).open)} className="rounded-2xl bg-white p-3 ring-1 ring-ink/10">
+        <summary className="cursor-pointer list-none">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-bold text-ink">🏷️ Kategori Event <span className="ml-1 rounded-full bg-orange-100 px-1.5 py-0.5 text-[10px] font-semibold text-orange-700">{categories.length}</span></p>
+              <p className="text-[11px] text-ink/55">Pilihan buat dropdown saat bikin event (mis. Workshop, Training, Pelatihan). Bebas tambah/edit.</p>
+            </div>
+            <span className="text-ink/40">{catOpen ? "▴" : "▾"}</span>
+          </div>
+        </summary>
+        <div className="mt-3">
+          <CategoryManager categories={categories} />
+        </div>
+      </details>
 
+      {/* FILTER + ADD */}
       <div className="-mx-1 flex gap-1 overflow-x-auto px-1">
         {[
           { k: "all", label: "Semua" },
@@ -64,7 +78,7 @@ export function EventEditor({ items, categories }: { items: Row[]; categories: C
       )}
 
       {(adding || editing) && (
-        <Form
+        <EventForm
           row={editing} categories={categories} pending={pending} err={err}
           onCancel={() => { setAdding(false); setEditing(null); setErr(null); }}
           onSave={(d) => {
@@ -107,12 +121,102 @@ export function EventEditor({ items, categories }: { items: Row[]; categories: C
   );
 }
 
-function Form({ row, categories, onSave, onCancel, pending, err }: {
+// ==== Category manager inline (chips + add + edit + delete) ====
+function CategoryManager({ categories }: { categories: Category[] }) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-1.5">
+        {categories.map((c) => (
+          <div key={c.id} className="flex items-center gap-1 rounded-full bg-orange-50 px-2 py-1 text-xs font-medium text-orange-800 ring-1 ring-orange-200">
+            <span>{c.emoji ?? "🎉"}</span>
+            <span>{c.label}</span>
+            <button onClick={() => setEditingId(editingId === c.id ? null : c.id)} className="ml-1 text-ink/40 hover:text-sky-600" title="Edit">✏️</button>
+            <button
+              onClick={() => { if (confirm(`Hapus kategori "${c.label}"? Event yang pakai kategori ini jadi tanpa kategori.`)) start(async () => { await deleteEventCategoryAction(c.id); router.refresh(); }); }}
+              className="text-ink/40 hover:text-rose-600" title="Hapus"
+            >🗑️</button>
+          </div>
+        ))}
+        {!adding && !editingId && (
+          <button onClick={() => setAdding(true)} className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white">+ Tambah kategori</button>
+        )}
+      </div>
+
+      {adding && (
+        <CategoryInlineForm
+          onCancel={() => setAdding(false)}
+          onDone={() => { setAdding(false); router.refresh(); }}
+          nextSort={categories.length + 1}
+          pending={pending}
+          start={start}
+        />
+      )}
+      {editingId && (
+        <CategoryInlineForm
+          row={categories.find((c) => c.id === editingId) ?? null}
+          onCancel={() => setEditingId(null)}
+          onDone={() => { setEditingId(null); router.refresh(); }}
+          nextSort={0}
+          pending={pending}
+          start={start}
+        />
+      )}
+    </div>
+  );
+}
+
+function CategoryInlineForm({ row, onCancel, onDone, nextSort, pending, start }: {
+  row?: Category | null; onCancel: () => void; onDone: () => void; nextSort: number;
+  pending: boolean; start: (fn: () => Promise<void>) => void;
+}) {
+  const [label, setLabel] = useState(row?.label ?? "");
+  const [emoji, setEmoji] = useState(row?.emoji ?? "🎉");
+  const [active, setActive] = useState(row?.is_active ?? true);
+  const [err, setErr] = useState<string | null>(null);
+  const save = () => {
+    setErr(null);
+    start(async () => {
+      const r = await saveEventCategoryAction({
+        id: row?.id, label, emoji, sort_order: row?.sort_order ?? nextSort, is_active: active,
+      });
+      if (r.error) { setErr(r.error); return; }
+      onDone();
+    });
+  };
+  return (
+    <div className="flex flex-col gap-2 rounded-xl bg-sky-50 p-3 ring-1 ring-sky-200">
+      <div className="flex gap-2">
+        <input value={emoji} onChange={(e) => setEmoji(e.target.value)} maxLength={4} className="w-14 rounded-lg border border-ink/15 px-2 py-1.5 text-center text-lg" />
+        <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Nama kategori (mis. Workshop, Pelatihan)" className="flex-1 rounded-lg border border-ink/15 px-3 py-1.5 text-sm" autoFocus />
+      </div>
+      <label className="flex items-center gap-2 text-xs text-ink/70">
+        <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4" />
+        {active ? "Aktif" : "Nonaktif"}
+      </label>
+      {err && <p className="text-xs text-rose-700">⚠️ {err}</p>}
+      <div className="flex gap-2">
+        <button onClick={save} disabled={pending || !label.trim()} className="flex-1 rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50">
+          {pending ? "Menyimpan..." : "💾 Simpan"}
+        </button>
+        <button onClick={onCancel} className="rounded-full bg-white px-3 py-1.5 text-xs font-medium text-ink/70 ring-1 ring-ink/15">Batal</button>
+      </div>
+    </div>
+  );
+}
+
+// ==== Event form (dropdown kategori + tombol tambah kategori inline) ====
+function EventForm({ row, categories, onSave, onCancel, pending, err }: {
   row: Row | null;
   categories: Category[];
   onSave: (d: { id?: string; category_id: string | null; title: string; description: string; event_date: string | null; price_text: string; form_url: string | null; materi_url: string | null; posted_at: string; unposted_at: string; is_active: boolean }) => void;
   onCancel: () => void; pending: boolean; err: string | null;
 }) {
+  const router = useRouter();
   const nowIso = new Date().toISOString().slice(0, 16);
   const in14 = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 16);
   const [f, setF] = useState<{ category_id: string | null; title: string; description: string; event_date: string; price_text: string; form_url: string; materi_url: string; posted_at: string; unposted_at: string; is_active: boolean }>({
@@ -128,16 +232,32 @@ function Form({ row, categories, onSave, onCancel, pending, err }: {
     is_active: row?.is_active ?? true,
   });
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((s) => ({ ...s, [k]: v }));
+  const [addCatMode, setAddCatMode] = useState(false);
+  const [pendingCat, startCat] = useTransition();
 
   return (
     <div className="flex flex-col gap-2 rounded-2xl bg-sky-50 p-4 ring-1 ring-sky-200">
       <label className="flex flex-col gap-0.5 text-[11px] text-ink/60">
         Kategori
-        <select value={f.category_id ?? ""} onChange={(e) => set("category_id", e.target.value || null)} className="rounded-lg border border-ink/15 px-2 py-2 text-sm">
-          <option value="">— tanpa kategori —</option>
-          {categories.map((c) => <option key={c.id} value={c.id}>{c.emoji ? c.emoji + " " : ""}{c.label}</option>)}
-        </select>
+        <div className="flex gap-1">
+          <select value={f.category_id ?? ""} onChange={(e) => set("category_id", e.target.value || null)} className="flex-1 rounded-lg border border-ink/15 px-2 py-2 text-sm">
+            <option value="">— tanpa kategori —</option>
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.emoji ? c.emoji + " " : ""}{c.label}</option>)}
+          </select>
+          {!addCatMode && (
+            <button type="button" onClick={() => setAddCatMode(true)} className="shrink-0 rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-white">+ Baru</button>
+          )}
+        </div>
       </label>
+      {addCatMode && (
+        <CategoryInlineForm
+          onCancel={() => setAddCatMode(false)}
+          onDone={() => { setAddCatMode(false); router.refresh(); }}
+          nextSort={categories.length + 1}
+          pending={pendingCat}
+          start={startCat}
+        />
+      )}
 
       <input value={f.title} onChange={(e) => set("title", e.target.value)} placeholder="Judul event" className="rounded-lg border border-ink/15 px-3 py-2 text-sm font-semibold" />
       <textarea value={f.description} onChange={(e) => set("description", e.target.value)} placeholder="Deskripsi — apa yang dibahas, siapa yang cocok ikut, dll" rows={4} className="rounded-lg border border-ink/15 px-3 py-2 text-sm" />
