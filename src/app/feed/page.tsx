@@ -9,7 +9,7 @@ import { FeedSupportBanner } from "@/components/FeedSupportBanner";
 import { PatternNudgeBanner } from "@/components/patterns/PatternNudgeBanner";
 import { CrisisModeTopBanner } from "@/components/crisis-mode/CrisisModeTopBanner";
 import { LateNightNudge } from "@/components/patterns/LateNightNudge";
-import { WorkshopBannerSlot } from "@/components/workshops/WorkshopBannerSlot";
+import { EventBannerSlot } from "@/components/events/EventBannerSlot";
 import { detectPatternNudge } from "@/lib/patterns/detect";
 
 function fmtDate(iso: string): string {
@@ -154,7 +154,7 @@ export default async function FeedPage({
         </div>
       )}
       <div className="mx-auto max-w-2xl px-5 pt-4">
-        <WorkshopBannerSlot />
+        <EventBannerSlot />
       </div>
       {user && (
         <div className="mx-auto max-w-2xl px-5 pt-4">

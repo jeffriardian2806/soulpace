@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { WorkshopBannerSlot } from "@/components/workshops/WorkshopBannerSlot";
+import { EventBannerSlot } from "@/components/events/EventBannerSlot";
 import { createClient } from "@/lib/supabase/server";
 import { getFeatureFlagMap, PremiumBadgeInline } from "@/components/PremiumGate";
 
@@ -89,7 +89,7 @@ export default async function MainPage() {
         Tempat buat ngenalin diri pelan-pelan. Semua di sini refleksi, bukan diagnosis.
       </p>
 
-      <WorkshopBannerSlot />
+      <EventBannerSlot />
 
       {todaysChallenge && (
         <div className="rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 p-4 text-white">

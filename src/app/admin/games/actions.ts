@@ -708,17 +708,26 @@ export async function saveUiTextAction(key: string, value: string): Promise<{ er
   return { error: null };
 }
 
-type WorkshopPayload = {
-  id?: string; title: string; description: string;
-  event_date: string | null; price_text: string;
-  form_url: string | null; materi_url: string | null;
-  posted_at: string; unposted_at: string; is_active: boolean;
+
+type EventPayload = {
+  id?: string;
+  category_id: string | null;
+  title: string;
+  description: string;
+  event_date: string | null;
+  price_text: string;
+  form_url: string | null;
+  materi_url: string | null;
+  posted_at: string;
+  unposted_at: string;
+  is_active: boolean;
 };
-export async function saveWorkshopAction(p: WorkshopPayload): Promise<{ error: string | null }> {
+export async function saveEventAction(p: EventPayload): Promise<{ error: string | null }> {
   const supabase = await createClient();
   if (!p.title.trim()) return { error: "Judul wajib." };
-  if (!p.unposted_at) return { error: "Tanggal berhenti tayang (unposted) wajib." };
+  if (!p.unposted_at) return { error: "Tanggal berhenti tayang wajib." };
   const row = {
+    category_id: p.category_id,
     title: p.title.trim(),
     description: p.description.trim(),
     event_date: p.event_date || null,
@@ -730,18 +739,39 @@ export async function saveWorkshopAction(p: WorkshopPayload): Promise<{ error: s
     is_active: p.is_active,
     updated_at: new Date().toISOString(),
   };
-  const q = p.id ? supabase.from("workshops").update(row).eq("id", p.id) : supabase.from("workshops").insert(row);
+  const q = p.id ? supabase.from("events").update(row).eq("id", p.id) : supabase.from("events").insert(row);
   const { error } = await q;
   if (error) return { error: error.message };
-  revalidatePath("/admin/games/workshop");
+  revalidatePath("/admin/games/event");
   revalidatePath("/feed"); revalidatePath("/main"); revalidatePath("/skrining"); revalidatePath("/mood");
-  revalidatePath("/workshop", "layout");
+  revalidatePath("/event", "layout");
   return { error: null };
 }
-export async function deleteWorkshopAction(id: string): Promise<{ error: string | null }> {
+export async function deleteEventAction(id: string): Promise<{ error: string | null }> {
   const supabase = await createClient();
-  const { error } = await supabase.from("workshops").delete().eq("id", id);
+  const { error } = await supabase.from("events").delete().eq("id", id);
   if (error) return { error: error.message };
-  revalidatePath("/admin/games/workshop");
+  revalidatePath("/admin/games/event");
+  return { error: null };
+}
+
+type EventCategoryPayload = { id?: string; label: string; emoji: string; sort_order: number; is_active: boolean };
+export async function saveEventCategoryAction(p: EventCategoryPayload): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  if (!p.label.trim()) return { error: "Nama kategori wajib." };
+  const row = { label: p.label.trim(), emoji: p.emoji.trim() || null, sort_order: p.sort_order, is_active: p.is_active };
+  const q = p.id ? supabase.from("event_categories").update(row).eq("id", p.id) : supabase.from("event_categories").insert(row);
+  const { error } = await q;
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/event-category");
+  revalidatePath("/admin/games/event");
+  revalidatePath("/feed"); revalidatePath("/main"); revalidatePath("/skrining"); revalidatePath("/mood");
+  return { error: null };
+}
+export async function deleteEventCategoryAction(id: string): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("event_categories").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/games/event-category");
   return { error: null };
 }
