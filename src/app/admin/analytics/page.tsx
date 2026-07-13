@@ -46,7 +46,7 @@ export default async function AdminAnalyticsPage() {
         <div className="rounded-2xl bg-rose-50 p-4 ring-1 ring-rose-200">
           <p className="text-sm font-bold text-rose-800">⚠️ Gagal load data</p>
           <p className="mt-1 text-xs text-rose-700">{err.message}</p>
-          <p className="mt-2 text-[11px] text-rose-600">Pastikan migration 0065 sudah di-run di Supabase.</p>
+          <p className="mt-2 text-[11px] text-rose-600">Pastikan migration analytics sudah dijalankan di database.</p>
         </div>
       ) : (
         <AnalyticsDashboard

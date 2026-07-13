@@ -9,11 +9,11 @@ type DailyRow = { day: string; active_users: number; total_events: number };
 const FEATURE_LABEL: Record<string, string> = {
   mood: "🎨 Mood Check-in",
   game_result: "🎮 Hasil Game",
-  quiz_result: "🧠 Hasil Quiz",
+  quiz_result: "🧠 Hasil Kuis",
   aura_scan: "🔮 Scan Aura",
   scan_diri: "🎭 Scan Diri AR",
   consultation: "💬 Konsultasi",
-  post: "✍️ Post Feed",
+  post: "✍️ Postingan di Feed",
 };
 
 export function AnalyticsDashboard({ registrations, activeUsers, retention, features, daily }: {
@@ -32,35 +32,35 @@ export function AnalyticsDashboard({ registrations, activeUsers, retention, feat
     <div className="flex flex-col gap-4">
       {/* Kartu ringkasan */}
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Total User" value={activeUsers.total_users} tone="sky" hint="Semua akun yang pernah register." />
-        <StatCard label="DAU · Aktif 24 jam" value={activeUsers.dau} tone="emerald" hint="Yang buka & pakai app dalam 24 jam terakhir." />
-        <StatCard label="WAU · Aktif 7 hari" value={activeUsers.wau} tone="amber" hint="Yang pakai app minggu ini." />
-        <StatCard label="MAU · Aktif 30 hari" value={activeUsers.mau} tone="rose" hint="Yang pakai app bulan ini." />
+        <StatCard label="Total Pengguna" value={activeUsers.total_users} tone="sky" hint="Semua akun yang pernah mendaftar." />
+        <StatCard label="Aktif 24 Jam (DAU)" value={activeUsers.dau} tone="emerald" hint="Pengguna yang membuka aplikasi dalam 24 jam terakhir." />
+        <StatCard label="Aktif 7 Hari (WAU)" value={activeUsers.wau} tone="amber" hint="Pengguna aktif dalam 7 hari terakhir." />
+        <StatCard label="Aktif 30 Hari (MAU)" value={activeUsers.mau} tone="rose" hint="Pengguna aktif dalam 30 hari terakhir." />
       </section>
 
       {/* Chart registrasi + aktivitas harian */}
       <section className="glass rounded-2xl p-4">
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-base font-bold text-ink">Registrasi 30 hari</h2>
-          <p className="text-xs text-ink/50">Total: <b className="text-ink">{totalReg30d}</b> user</p>
+          <h2 className="text-base font-bold text-ink">Registrasi Pengguna (30 Hari Terakhir)</h2>
+          <p className="text-xs text-ink/50">Total: <b className="text-ink">{totalReg30d}</b> pengguna</p>
         </div>
         <BarChart data={registrations.map((r) => ({ label: fmtDate(r.day), value: Number(r.count) }))} max={maxReg} color="#0ea5e9" />
       </section>
 
       <section className="glass rounded-2xl p-4">
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-base font-bold text-ink">Aktivitas harian 30 hari</h2>
-          <p className="text-xs text-ink/50">Total event: <b className="text-ink">{totalEvents30d}</b></p>
+          <h2 className="text-base font-bold text-ink">Aktivitas Harian (30 Hari Terakhir)</h2>
+          <p className="text-xs text-ink/50">Total aktivitas: <b className="text-ink">{totalEvents30d}</b></p>
         </div>
         <BarChart data={daily.map((d) => ({ label: fmtDate(d.day), value: Number(d.active_users) }))} max={maxAct} color="#10b981" />
-        <p className="mt-2 text-[11px] italic text-ink/45">Bar = unique user aktif per hari.</p>
+        <p className="mt-2 text-[11px] italic text-ink/45">Setiap batang menunjukkan jumlah pengguna unik yang aktif pada hari tersebut.</p>
       </section>
 
       {/* Fitur ranking */}
       <section className="glass rounded-2xl p-4">
-        <h2 className="mb-3 text-base font-bold text-ink">Fitur paling sering dipakai (30 hari)</h2>
+        <h2 className="mb-3 text-base font-bold text-ink">Fitur Paling Sering Digunakan (30 Hari Terakhir)</h2>
         {features.length === 0 ? (
-          <p className="text-xs italic text-ink/45">Belum ada aktivitas 30 hari terakhir.</p>
+          <p className="text-xs italic text-ink/45">Belum ada aktivitas dalam 30 hari terakhir.</p>
         ) : (
           <ul className="flex flex-col gap-2">
             {features.map((f) => {
@@ -70,7 +70,7 @@ export function AnalyticsDashboard({ registrations, activeUsers, retention, feat
                 <li key={f.feature}>
                   <div className="mb-0.5 flex items-baseline justify-between text-xs">
                     <span className="font-medium text-ink">{FEATURE_LABEL[f.feature] ?? f.feature}</span>
-                    <span className="text-ink/55"><b className="text-ink">{f.total_events}</b> event · {f.unique_users} user unik</span>
+                    <span className="text-ink/55"><b className="text-ink">{f.total_events}</b> aktivitas · {f.unique_users} pengguna unik</span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-ink/5">
                     <div className="h-full rounded-full bg-sky-500" style={{ width: `${pctBar}%` }} />
@@ -84,19 +84,19 @@ export function AnalyticsDashboard({ registrations, activeUsers, retention, feat
 
       {/* Retention kohort */}
       <section className="glass rounded-2xl p-4">
-        <h2 className="mb-1 text-base font-bold text-ink">Retention kohort (30 hari)</h2>
+        <h2 className="mb-1 text-base font-bold text-ink">Retensi Kohor (30 Hari Terakhir)</h2>
         <p className="mb-3 text-[11px] leading-relaxed text-ink/55">
-          Dari user yang register di tanggal X, berapa % yang balik lagi ke app. D1 = besoknya, D7 = 1 minggu setelahnya, D30 = 1 bulan setelahnya.
+          Dari pengguna yang mendaftar pada tanggal tertentu, berapa persen yang kembali membuka aplikasi. D1 = keesokan hari, D7 = dalam 1 minggu setelahnya, D30 = dalam 1 bulan setelahnya.
         </p>
         {retention.length === 0 ? (
-          <p className="text-xs italic text-ink/45">Belum ada data kohort.</p>
+          <p className="text-xs italic text-ink/45">Belum ada data kohor.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-ink/10 text-left text-ink/55">
-                  <th className="py-2 pr-3">Kohort</th>
-                  <th className="py-2 pr-3">Ukuran</th>
+                  <th className="py-2 pr-3">Tanggal Kohor</th>
+                  <th className="py-2 pr-3">Jumlah</th>
                   <th className="py-2 pr-3">D1</th>
                   <th className="py-2 pr-3">D7</th>
                   <th className="py-2 pr-3">D30</th>
@@ -119,8 +119,8 @@ export function AnalyticsDashboard({ registrations, activeUsers, retention, feat
       </section>
 
       <p className="rounded-lg bg-sky-50 p-3 text-[11px] leading-relaxed text-sky-800 ring-1 ring-sky-200">
-        Insight buat lo: kalau D7 &lt; 20%, retention masih lemah — perbaiki produk dulu sebelum agresif marketing.
-        Kalau D7 &gt; 30%, retensi udah oke — worth push traffic. Fitur paling atas di ranking = value proposition lo yang paling kuat.
+        <b>Panduan membaca:</b> jika D7 di bawah 20%, retensi masih lemah — sebaiknya perbaiki produk sebelum mendorong marketing besar.
+        Jika D7 di atas 30%, retensi sudah sehat — layak untuk mendorong akuisisi pengguna. Fitur teratas pada ranking menunjukkan proposisi nilai yang paling menarik pengguna.
       </p>
     </div>
   );

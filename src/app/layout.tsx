@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { RefreshAppFallback } from "@/components/RefreshAppFallback";
 import { Analytics } from "@vercel/analytics/next";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -47,6 +48,7 @@ export default function RootLayout({
         {children}
         <ServiceWorkerRegister />
         <InstallPrompt />
+        <RefreshAppFallback />
               <Analytics />
       </body>
     </html>
