@@ -1,6 +1,6 @@
 "use client";
 
-type ActiveUsersData = { total_users: number; dau: number; wau: number; mau: number };
+type ActiveUsersData = { total_users: number; anonymous_users: number; admin_users: number; dau: number; wau: number; mau: number };
 type RegistrationRow = { day: string; count: number };
 type RetentionRow = { cohort_date: string; cohort_size: number; d1_active: number; d7_active: number; d30_active: number };
 type FeatureRow = { feature: string; total_events: number; unique_users: number };
@@ -31,11 +31,30 @@ export function AnalyticsDashboard({ registrations, activeUsers, retention, feat
   return (
     <div className="flex flex-col gap-4">
       {/* Kartu ringkasan */}
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Total Pengguna" value={activeUsers.total_users} tone="sky" hint="Semua akun yang pernah mendaftar." />
-        <StatCard label="Aktif 24 Jam (DAU)" value={activeUsers.dau} tone="emerald" hint="Pengguna yang membuka aplikasi dalam 24 jam terakhir." />
-        <StatCard label="Aktif 7 Hari (WAU)" value={activeUsers.wau} tone="amber" hint="Pengguna aktif dalam 7 hari terakhir." />
-        <StatCard label="Aktif 30 Hari (MAU)" value={activeUsers.mau} tone="rose" hint="Pengguna aktif dalam 30 hari terakhir." />
+      {/* Breakdown pengguna */}
+      <section>
+        <h2 className="mb-2 text-sm font-semibold text-ink/70">Pengguna</h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <StatCard label="👤 Pengguna Terdaftar" value={activeUsers.total_users} tone="sky" hint="Pengguna dengan akun terdaftar dan email valid." />
+          <StatCard label="🕶️ Pengunjung Anonim" value={activeUsers.anonymous_users} tone="amber" hint="Pengunjung yang mengakses aplikasi tanpa mendaftar." />
+          <StatCard label="🛡️ Admin" value={activeUsers.admin_users} tone="rose" hint="Akun pengelola aplikasi." />
+        </div>
+      </section>
+
+      {/* Aktivitas pengguna terdaftar */}
+      <section>
+        <h2 className="mb-2 text-sm font-semibold text-ink/70">Aktivitas Pengguna Terdaftar</h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <StatCard label="DAU" value={activeUsers.dau} tone="emerald" hint="Aktif dalam 24 jam terakhir." />
+          <StatCard label="WAU" value={activeUsers.wau} tone="emerald" hint="Aktif dalam 7 hari terakhir." />
+          <StatCard label="MAU" value={activeUsers.mau} tone="emerald" hint="Aktif dalam 30 hari terakhir." />
+        </div>
+        <div className="mt-3 rounded-lg bg-ink/5 p-3 text-[11px] leading-relaxed text-ink/70">
+          <p className="mb-1 font-semibold text-ink/80">Keterangan singkatan:</p>
+          <p><b>DAU</b> · <i>Daily Active Users</i> — pengguna terdaftar yang aktif dalam 24 jam terakhir.</p>
+          <p><b>WAU</b> · <i>Weekly Active Users</i> — pengguna terdaftar yang aktif dalam 7 hari terakhir.</p>
+          <p><b>MAU</b> · <i>Monthly Active Users</i> — pengguna terdaftar yang aktif dalam 30 hari terakhir.</p>
+        </div>
       </section>
 
       {/* Chart registrasi + aktivitas harian */}

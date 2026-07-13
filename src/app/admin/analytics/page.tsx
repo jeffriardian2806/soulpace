@@ -6,7 +6,7 @@ import { getUiTexts } from "@/lib/uiTexts";
 
 export const metadata = { title: "Analytics — Admin Flouwell" };
 
-type ActiveUsersData = { total_users: number; dau: number; wau: number; mau: number };
+type ActiveUsersData = { total_users: number; anonymous_users: number; admin_users: number; dau: number; wau: number; mau: number };
 type RegistrationRow = { day: string; count: number };
 type RetentionRow = { cohort_date: string; cohort_size: number; d1_active: number; d7_active: number; d30_active: number };
 type FeatureRow = { feature: string; total_events: number; unique_users: number };
@@ -51,7 +51,7 @@ export default async function AdminAnalyticsPage() {
       ) : (
         <AnalyticsDashboard
           registrations={(regResp.data ?? []) as RegistrationRow[]}
-          activeUsers={(activeResp.data ?? { total_users: 0, dau: 0, wau: 0, mau: 0 }) as ActiveUsersData}
+          activeUsers={(activeResp.data ?? { total_users: 0, anonymous_users: 0, admin_users: 0, dau: 0, wau: 0, mau: 0 }) as ActiveUsersData}
           retention={(retentionResp.data ?? []) as RetentionRow[]}
           features={(featureResp.data ?? []) as FeatureRow[]}
           daily={(dailyResp.data ?? []) as DailyRow[]}
