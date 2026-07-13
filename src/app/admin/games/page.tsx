@@ -78,6 +78,9 @@ export default async function AdminGamesLanding() {
         <Link href="/admin/monetization" className="text-xs font-medium text-purple-600 hover:underline">
           💎 Monetisasi
         </Link>
+        <Link href="/admin/analytics" className="text-xs font-medium text-emerald-600 hover:underline">
+          📊 Analytics
+        </Link>
       </header>
       <h1 className="text-xl font-bold text-ink">🎮 Admin Games</h1>
       <p className="text-sm leading-relaxed text-ink/60">
