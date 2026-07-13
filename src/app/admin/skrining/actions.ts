@@ -1,5 +1,7 @@
 "use server";
 
+import { toSlug } from "@/lib/util/slug";
+
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { InstrumentPayload } from "./types";
@@ -28,8 +30,14 @@ export async function saveInstrumentAction(
   const options = p.options.filter((o) => o.label.trim());
   const bands = p.bands.filter((b) => b.label.trim());
 
-  if (!p.slug.trim() || !p.name.trim()) {
-    return { ok: false, error: "Slug dan nama wajib diisi." };
+  if (!p.name.trim()) {
+    return { ok: false, error: "Nama wajib diisi." };
+  }
+  // Slug auto: kalau kosong → generate dari nama. Kalau diisi → tetap normalisasi biar aman URL.
+  const rawSlug = p.slug.trim() || p.name;
+  const normalizedSlug = toSlug(rawSlug);
+  if (!normalizedSlug) {
+    return { ok: false, error: "Nama tidak valid — pastikan mengandung huruf/angka." };
   }
   if (items.length === 0 || options.length === 0 || bands.length === 0) {
     return { ok: false, error: "Minimal 1 pertanyaan, 1 opsi, dan 1 band." };
@@ -44,7 +52,7 @@ export async function saveInstrumentAction(
   }
 
   const fields = {
-    slug: p.slug.trim(),
+    slug: normalizedSlug,
     name: p.name.trim(),
     subtitle: p.subtitle.trim(),
     prompt: p.prompt.trim(),

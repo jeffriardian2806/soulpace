@@ -106,6 +106,13 @@ export default async function SettingsPage() {
             <span className="text-ink/40">→</span>
           </Link>
           <Link
+            href="/admin/monetization"
+            className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
+          >
+            <span>💎 Monetisasi</span>
+            <span className="text-ink/40">→</span>
+          </Link>
+          <Link
             href="/moderation"
             className="flex items-center justify-between rounded-xl px-2 py-3 text-sm text-ink/80 hover:bg-sky-50"
           >

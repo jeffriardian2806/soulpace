@@ -36,7 +36,7 @@ export default async function AdminAnalyticsPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-4 px-5 py-6">
       <header className="flex flex-wrap items-center justify-between gap-2">
-        <Link href="/admin" className="text-sm font-medium text-sky-600 hover:underline">← Admin</Link>
+        <Link href="/settings" className="text-sm font-medium text-sky-600 hover:underline">← Pengaturan</Link>
         <Link href="/admin/games" className="text-sm font-medium text-sky-600 hover:underline">⚙️ Konten Games</Link>
       </header>
       <h1 className="text-xl font-bold text-ink">{texts["admin.analytics.title"]}</h1>
