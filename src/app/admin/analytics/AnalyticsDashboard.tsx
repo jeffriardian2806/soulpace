@@ -143,7 +143,7 @@ function BarChart({ data, max, color }: { data: { label: string; value: number }
       {data.map((d, i) => {
         const h = max === 0 ? 0 : (d.value / max) * 100;
         return (
-          <div key={i} className="group relative flex-1">
+          <div key={i} className="group relative flex h-full flex-1 flex-col justify-end">
             <div className="w-full rounded-t transition-opacity hover:opacity-70" style={{ height: `${Math.max(h, 2)}%`, background: color }} title={`${d.label}: ${d.value}`} />
             <div className="pointer-events-none absolute -top-8 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-ink px-2 py-0.5 text-[10px] text-white group-hover:block">
               {d.label}: {d.value}

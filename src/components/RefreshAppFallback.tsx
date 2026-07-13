@@ -3,44 +3,58 @@
 import { useEffect, useState } from "react";
 
 /**
- * Tombol darurat yang muncul otomatis jika halaman gagal render dalam 6 detik.
- * Sekali klik = unregister service worker + clear cache + reload.
- * Ditujukan untuk kasus aplikasi stuck di logo (bug service worker versi lama).
+ * Tombol darurat yang muncul HANYA jika aplikasi benar-benar stuck di HTML shell
+ * (tidak ada <main> element sama sekali dalam 8 detik).
+ *
+ * Logika: kalau <main> pernah ke-render di session ini (sekali saja), tombol
+ * dinonaktifkan permanen untuk session — karena berarti React sudah hydrate
+ * dan aplikasi berjalan normal.
  */
 export function RefreshAppFallback() {
   const [show, setShow] = useState(false);
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    // Kalau dalam 6 detik page belum "interactive", tampilkan tombol.
-    const t = setTimeout(() => {
-      // Kalau document udah complete, kemungkinan besar page normal — jangan tampil.
-      if (document.readyState !== "complete") {
-        setShow(true);
-      } else {
-        // Kalau complete tapi konten utama gak ada, tetap tampil sebagai jaring pengaman.
-        const main = document.querySelector("main");
-        if (!main || (main.textContent ?? "").trim().length < 20) setShow(true);
+    // Kalau <main> udah ada sekarang (biasanya udah pas SSR selesai), langsung skip permanen.
+    if (document.querySelector("main")) return;
+
+    // Kasih waktu 8 detik. Kalau dalam window itu <main> muncul, batalin.
+    let cancelled = false;
+
+    // Observer: pantau apakah <main> muncul dalam periode tunggu
+    const observer = new MutationObserver(() => {
+      if (document.querySelector("main")) {
+        cancelled = true;
+        observer.disconnect();
       }
-    }, 6000);
-    return () => clearTimeout(t);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const timer = setTimeout(() => {
+      observer.disconnect();
+      if (cancelled) return;
+      // Cek final: kalau <main> tetep gak ada setelah 8 detik → stuck
+      if (!document.querySelector("main")) setShow(true);
+    }, 8000);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, []);
 
   const refresh = async () => {
     setRunning(true);
     try {
-      // Unregister semua service worker
       if ("serviceWorker" in navigator) {
         const regs = await navigator.serviceWorker.getRegistrations();
         await Promise.all(regs.map((r) => r.unregister()));
       }
-      // Hapus semua cache
       if ("caches" in window) {
         const keys = await caches.keys();
         await Promise.all(keys.map((k) => caches.delete(k)));
       }
     } catch { /* lanjut reload apapun errornya */ }
-    // Force reload dari server (bukan cache)
     window.location.reload();
   };
 
