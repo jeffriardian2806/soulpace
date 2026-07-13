@@ -1,5 +1,7 @@
 "use server";
 
+import { toSlug } from "@/lib/util/slug";
+
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,11 +31,13 @@ export async function saveMediaAction(p: {
   const { error: authErr, supabase } = await assertMod();
   if (authErr || !supabase) return { error: authErr ?? "Auth failed" };
 
-  if (!p.slug.trim() || !p.title.trim()) return { error: "Slug & title wajib." };
+  if (!p.title.trim()) return { error: "Title wajib." };
+  const cleanSlug = toSlug(p.slug || p.title);
+  if (!cleanSlug) return { error: "Title tidak valid — pastikan mengandung huruf/angka." };
   if (p.is_active && !p.media_url.trim()) return { error: "Media URL wajib kalau mau di-activate." };
 
   const row = {
-    slug: p.slug.trim(),
+    slug: cleanSlug,
     title: p.title.trim(),
     description: p.description.trim() || null,
     emoji: p.emoji.trim() || null,

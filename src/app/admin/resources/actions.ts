@@ -1,5 +1,7 @@
 "use server";
 
+import { toSlug } from "@/lib/util/slug";
+
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,9 +31,11 @@ export type ResourcePayload = {
 
 export async function saveResourceAction(p: ResourcePayload): Promise<{ error: string | null }> {
   const { supabase } = await requireAdmin();
-  if (!p.slug.trim() || !p.title.trim()) return { error: "Slug & title wajib." };
+  if (!p.title.trim()) return { error: "Title wajib." };
+  const cleanSlug = toSlug(p.slug || p.title);
+  if (!cleanSlug) return { error: "Title tidak valid — pastikan mengandung huruf/angka." };
   const row = {
-    slug: p.slug.trim(),
+    slug: cleanSlug,
     kind: p.kind,
     title: p.title.trim(),
     subtitle: p.subtitle?.trim() || null,

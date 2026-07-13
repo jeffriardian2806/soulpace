@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { toSlug } from "@/lib/util/slug";
 
 type QuizPayload = {
   slug: string;
@@ -18,7 +19,7 @@ export async function saveQuizAction(payload: QuizPayload): Promise<{ error: str
   if (!payload.slug.trim() || !payload.title.trim()) return { error: "Slug & judul wajib." };
   const { error } = await supabase.from("quizzes").upsert(
     {
-      slug: payload.slug.trim(),
+      slug: toSlug(payload.slug || payload.title || ""),
       title: payload.title.trim(),
       emoji: payload.emoji,
       intro: payload.intro,
@@ -173,7 +174,7 @@ export async function saveBreathingAction(p: BreathingPayload): Promise<{ error:
   const supabase = await createClient();
   if (!p.slug.trim() || !p.label.trim()) return { error: "Slug & label wajib." };
   const row = {
-    slug: p.slug.trim(),
+    slug: toSlug(p.slug || p.label || ""),
     label: p.label.trim(),
     in_seconds: p.in_seconds,
     hold_seconds: p.hold_seconds,
@@ -322,7 +323,7 @@ type MirrorProfilePayload = { id?: string; slug: string; name: string; emoji: st
 export async function saveMirrorProfileAction(p: MirrorProfilePayload): Promise<{ error: string | null }> {
   const supabase = await createClient();
   if (!p.slug.trim() || !p.name.trim()) return { error: "Slug & nama wajib." };
-  const row = { slug: p.slug.trim(), name: p.name.trim(), emoji: p.emoji, description: p.description, insight: p.insight, sort_order: p.sort_order, is_active: p.is_active };
+  const row = { slug: toSlug(p.slug || p.name || ""), name: p.name.trim(), emoji: p.emoji, description: p.description, insight: p.insight, sort_order: p.sort_order, is_active: p.is_active };
   const q = p.id ? supabase.from("mirror_profiles").update(row).eq("id", p.id) : supabase.from("mirror_profiles").insert(row);
   const { error } = await q; if (error) return { error: error.message };
   revalidatePath("/admin/games"); revalidatePath("/main/cermin");
@@ -479,7 +480,7 @@ type PersonalityCategoryPayload = { id?: string; slug: string; name: string; emo
 export async function savePersonalityCategoryAction(p: PersonalityCategoryPayload): Promise<{ error: string | null }> {
   const supabase = await createClient();
   if (!p.slug.trim() || !p.name.trim()) return { error: "Slug & nama wajib." };
-  const row = { slug: p.slug.trim(), name: p.name.trim(), emoji: p.emoji, description: p.description, sort_order: p.sort_order, is_active: p.is_active };
+  const row = { slug: toSlug(p.slug || p.name || ""), name: p.name.trim(), emoji: p.emoji, description: p.description, sort_order: p.sort_order, is_active: p.is_active };
   const q = p.id ? supabase.from("personality_categories").update(row).eq("id", p.id) : supabase.from("personality_categories").insert(row);
   const { error } = await q; if (error) return { error: error.message };
   revalidatePath("/admin/games"); revalidatePath("/main/spektrum");
@@ -582,7 +583,7 @@ export async function saveSupportMessageAction(p: SupportMessagePayload): Promis
   if (!p.slug.trim() || !p.template.trim()) return { error: "Slug & template wajib." };
   if (!["crisis_screening","severe_screening","low_mood_streak"].includes(p.trigger_type)) return { error: "trigger_type tidak valid." };
   const row = {
-    slug: p.slug.trim(),
+    slug: toSlug(p.slug),
     trigger_type: p.trigger_type,
     required_data: p.required_data,
     template: p.template.trim(),
