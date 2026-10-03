@@ -16,7 +16,7 @@ export async function sendOtpAction(email: string): Promise<{ error: string | nu
   return { error: null };
 }
 
-// Step 2: cek kode. Sukses -> sesi kebentuk (cookie) -> ke /main.
+// Step 2: cek kode. Sukses -> sesi kebentuk (cookie) -> ke /feed.
 export async function verifyOtpAction(
   email: string,
   token: string
@@ -28,7 +28,7 @@ export async function verifyOtpAction(
     return { error: e instanceof DomainError ? e.message : "Terjadi kesalahan." };
   }
   revalidatePath("/", "layout");
-  redirect("/main");
+  redirect("/feed");
 }
 
 export async function guestAction(): Promise<void> {
