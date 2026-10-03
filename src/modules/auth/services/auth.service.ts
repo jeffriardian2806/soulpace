@@ -6,23 +6,26 @@ import type { AuthUser } from "../domain/auth.types";
 export class AuthService {
   constructor(private readonly repo: AuthRepository) {}
 
-  private validate(email: string, password: string) {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  private normalizeEmail(email: string): string {
+    const clean = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) {
       throw new ValidationError("Format email tidak valid.");
     }
-    if (password.length < 8) {
-      throw new ValidationError("Kata sandi minimal 8 karakter.");
+    return clean;
+  }
+
+  // Login & daftar jadi satu: email belum terdaftar otomatis dibuatkan akun.
+  async requestOtp(email: string): Promise<void> {
+    return this.repo.sendOtp(this.normalizeEmail(email));
+  }
+
+  async verifyOtp(email: string, token: string): Promise<AuthUser> {
+    const clean = this.normalizeEmail(email);
+    const code = token.trim();
+    if (!/^\d{6}$/.test(code)) {
+      throw new ValidationError("Kode harus 6 digit angka.");
     }
-  }
-
-  async register(email: string, password: string): Promise<AuthUser> {
-    this.validate(email, password);
-    return this.repo.signUp({ email, password });
-  }
-
-  async login(email: string, password: string): Promise<AuthUser> {
-    this.validate(email, password);
-    return this.repo.signIn({ email, password });
+    return this.repo.verifyOtp(clean, code);
   }
 
   async loginAsGuest(): Promise<AuthUser> {

@@ -4,8 +4,3 @@ export interface AuthUser {
   email: string | null;
   isAnonymous: boolean;
 }
-
-export interface Credentials {
-  email: string;
-  password: string;
-}

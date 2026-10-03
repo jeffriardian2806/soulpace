@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { AuthForm } from "@/components/AuthForm";
-import { registerAction } from "@/app/auth/actions";
 
 export default function RegisterPage() {
   return (
@@ -10,10 +9,10 @@ export default function RegisterPage() {
         <Image src="/logo-full.png" alt="Soulpace" width={220} height={73} priority className="h-auto w-[180px]" />
         <h1 className="text-2xl font-medium text-ink">Buat akun</h1>
         <p className="mt-1 text-sm text-ink/60">
-          Nama tampilan kamu dibuat otomatis dan anonim.
+          Cukup pakai email. Nama tampilan kamu dibuat otomatis dan anonim.
         </p>
       </div>
-      <AuthForm action={registerAction} submitLabel="Daftar" />
+      <AuthForm submitLabel="Daftar" />
       <Link href="/login" className="text-center text-sm text-ink/60">
         Sudah punya akun? Masuk
       </Link>

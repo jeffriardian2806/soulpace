@@ -3,51 +3,32 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getAuthService } from "@/modules/auth";
-import { createClient } from "@/lib/supabase/server";
 import { DomainError } from "@/core/errors";
 
-export type FormState = { error: string | null; success?: boolean };
-
-export async function registerAction(
-  _prev: FormState,
-  formData: FormData
-): Promise<FormState> {
-  const email = String(formData.get("email") ?? "");
-  const password = String(formData.get("password") ?? "");
+// Step 1: kirim kode 6 digit ke email. Dipakai buat masuk maupun daftar.
+export async function sendOtpAction(email: string): Promise<{ error: string | null }> {
   try {
     const auth = await getAuthService();
-    await auth.register(email, password);
+    await auth.requestOtp(email);
   } catch (e) {
     return { error: e instanceof DomainError ? e.message : "Terjadi kesalahan." };
   }
-
-  // Kalau email confirmation OFF, signUp langsung bikin sesi -> user udah login.
-  // Kalau ON, belum ada sesi -> tampilkan "cek email".
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  revalidatePath("/", "layout");
-  if (user) {
-    redirect("/feed");
-  }
-  return { error: null, success: true };
+  return { error: null };
 }
 
-export async function loginAction(
-  _prev: FormState,
-  formData: FormData
-): Promise<FormState> {
-  const email = String(formData.get("email") ?? "");
-  const password = String(formData.get("password") ?? "");
+// Step 2: cek kode. Sukses -> sesi kebentuk (cookie) -> ke /main.
+export async function verifyOtpAction(
+  email: string,
+  token: string
+): Promise<{ error: string | null }> {
   try {
     const auth = await getAuthService();
-    await auth.login(email, password);
+    await auth.verifyOtp(email, token);
   } catch (e) {
     return { error: e instanceof DomainError ? e.message : "Terjadi kesalahan." };
   }
   revalidatePath("/", "layout");
-  redirect("/feed");
+  redirect("/main");
 }
 
 export async function guestAction(): Promise<void> {
