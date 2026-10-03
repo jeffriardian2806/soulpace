@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import Logo from "@/components/Logo";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -13,7 +13,9 @@ export default async function WelcomePage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-6 px-6 py-10">
       <div>
-        <Image src="/logo-full.png" alt="Soulpace" width={220} height={73} priority className="mb-4 h-auto w-[180px]" />
+        <div className="mb-4">
+          <Logo size="lg" />
+        </div>
         <h1 className="text-2xl font-bold text-ink">Selamat datang di Soulpace</h1>
         <p className="mt-2 text-ink/65">
           Ini ruang aman untuk melampiaskan beban. Sebelum mulai, beberapa hal

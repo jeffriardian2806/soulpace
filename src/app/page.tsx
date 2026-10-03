@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import Logo from "@/components/Logo";
 import { createPublicClient } from "@/lib/supabase/public";
 import { Stars } from "@/components/Stars";
 
@@ -48,7 +48,7 @@ export default async function Home() {
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-8 px-6 py-10">
       <div className="flex flex-col gap-6">
         <div>
-          <Image src="/logo-full.png" alt="Soulpace" width={220} height={73} priority className="h-auto w-[200px]" />
+          <Logo size="lg" />
           <p className="mt-2 text-ink/60">
             Tempat melampiaskan beban, tanpa dihakimi. Kamu nggak sendirian.
           </p>

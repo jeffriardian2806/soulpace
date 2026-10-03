@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Logo from "@/components/Logo";
 
 export function ScrollToTopButton() {
   const handleScroll = () => {
@@ -13,14 +13,7 @@ export function ScrollToTopButton() {
       className="flex items-center transition-opacity hover:opacity-70 cursor-pointer"
       title="Scroll ke atas"
     >
-      <Image
-        src="/logo-full.png"
-        alt="Soulpace"
-        width={160}
-        height={53}
-        priority
-        className="h-7 w-auto"
-      />
+      <Logo />
     </button>
   );
 }
