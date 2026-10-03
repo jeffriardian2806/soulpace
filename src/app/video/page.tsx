@@ -4,7 +4,7 @@ import { getActiveVideos } from "@/lib/videos/queries";
 import { VideoSection } from "@/components/videos/VideoSection";
 
 export const metadata: Metadata = {
-  title: "Video Edukasi Kesehatan Mental — Flouwell",
+  title: "Video Edukasi Kesehatan Mental — Soulpace",
   description:
     "Kumpulan video edukasi kesehatan mental dari psikolog & psikiater berlisensi: trauma, cemas, burnout, dan lainnya.",
   robots: { index: true, follow: true },

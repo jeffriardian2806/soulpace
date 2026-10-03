@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { UiTextEditor } from "./UiTextEditor";
 
-export const metadata = { title: "Teks Halaman Admin — Flouwell" };
+export const metadata = { title: "Teks Halaman Admin — Soulpace" };
 
 export default async function AdminUiTextPage() {
   const supabase = await createClient();

@@ -15,9 +15,9 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://soulpace.vercel.app"),
-  title: { default: "Flouwell", template: "%s · Flouwell" },
+  title: { default: "Soulpace", template: "%s · Soulpace" },
   description: "Tempat melampiaskan beban, tanpa dihakimi. Kamu nggak sendirian.",
-  applicationName: "Flouwell",
+  applicationName: "Soulpace",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
-  appleWebApp: { capable: true, title: "Flouwell", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "Soulpace", statusBarStyle: "default" },
   // Default: JANGAN index apa pun (privasi curhat). Landing di-override jadi index.
   robots: { index: false, follow: true },
   // Verifikasi Google Search Console: isi token lewat env GOOGLE_SITE_VERIFICATION di Vercel.

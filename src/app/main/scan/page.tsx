@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ScanDiriPlayer, type AuraMood, type ScanContent } from "@/components/games/ScanDiriPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Scan Diri AR — Flouwell" };
+export const metadata = { title: "Scan Diri AR — Soulpace" };
 
 export default async function ScanDiriPage() {
   const _blocked_ = await checkPremiumAccess("scan-diri");

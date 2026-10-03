@@ -9,7 +9,7 @@ import {
 } from "@/lib/konsultasi/queries";
 import { KeluhanForm } from "@/components/konsultasi/KeluhanForm";
 
-export const metadata = { title: "Sesi Baru — Konsultasi Flouwell" };
+export const metadata = { title: "Sesi Baru — Konsultasi Soulpace" };
 
 const CATEGORY_EMOJI: Record<string, string> = {
   "keluarga": "👨‍👩‍👧",

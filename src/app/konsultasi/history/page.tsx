@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserConsultationSessions } from "@/lib/konsultasi/queries";
 
-export const metadata = { title: "Riwayat Konsultasi — Flouwell" };
+export const metadata = { title: "Riwayat Konsultasi — Soulpace" };
 
 const CATEGORY_EMOJI: Record<string, string> = {
   "keluarga": "👨‍👩‍👧",

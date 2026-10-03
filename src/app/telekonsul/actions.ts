@@ -292,7 +292,7 @@ export async function sendMessageAction(
       error:
         "Pesan ga bisa dikirim — ke-detect ada kontak (" +
         leak.matches.join(", ") +
-        "). Flouwell policy: dilarang share kontak off-platform di chat.",
+        "). Soulpace policy: dilarang share kontak off-platform di chat.",
     };
   }
 

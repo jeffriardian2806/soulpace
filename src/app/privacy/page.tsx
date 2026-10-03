@@ -5,7 +5,7 @@ export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Kebijakan Privasi",
-  description: "Kebijakan Privasi Flouwell.",
+  description: "Kebijakan Privasi Soulpace.",
   robots: { index: true, follow: true },
 };
 

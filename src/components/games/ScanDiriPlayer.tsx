@@ -494,7 +494,7 @@ export function ScanDiriPlayer({ moods, contents }: { moods: AuraMood[]; content
               {locked.bodySignal && <p>Body Signal: <b>{locked.bodySignal}</b></p>}
             </div>
           )}
-          <p className="mt-3 text-[11px] text-ink/45">Flouwell · Scan Diri AR · {today}</p>
+          <p className="mt-3 text-[11px] text-ink/45">Soulpace · Scan Diri AR · {today}</p>
 
           {locked.camMode === "self" ? (
             <div className="mt-3">

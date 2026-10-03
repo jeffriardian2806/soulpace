@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "Ramalan Harianmu — Flouwell" };
+export const metadata = { title: "Ramalan Harianmu — Soulpace" };
 
 // seeded pick stabil per user+tanggal (ramalan sama sepanjang hari)
 function seedPick(seedStr: string, n: number): number {
@@ -71,7 +71,7 @@ export default async function RamalanPage() {
       <p className="text-xs text-ink/50">{todayStr}</p>
 
       <div className="rounded-xl bg-amber-50 p-3 text-xs leading-relaxed text-amber-800 ring-1 ring-amber-200">
-        ✨ Ramalan ini hiburan — tapi beda dari horoskop: dia dibaca dari <b>jejak datamu sendiri</b> di Flouwell, bukan bintang random.
+        ✨ Ramalan ini hiburan — tapi beda dari horoskop: dia dibaca dari <b>jejak datamu sendiri</b> di Soulpace, bukan bintang random.
       </div>
 
       {content ? (
@@ -79,7 +79,7 @@ export default async function RamalanPage() {
           <p className="text-4xl">{content.emoji}</p>
           <p className="mt-2 text-lg font-bold text-purple-800">{content.title}</p>
           <p className="mt-3 text-sm italic leading-relaxed text-ink/75">&ldquo;{content.body}&rdquo;</p>
-          <p className="mt-4 text-[11px] text-ink/45">Flouwell · Ramalan Harian · dibaca dari riwayat aura kamu</p>
+          <p className="mt-4 text-[11px] text-ink/45">Soulpace · Ramalan Harian · dibaca dari riwayat aura kamu</p>
         </div>
       ) : (
         <div className="rounded-2xl bg-white p-6 text-center ring-1 ring-ink/10">

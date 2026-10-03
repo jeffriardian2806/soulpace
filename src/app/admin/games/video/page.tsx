@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { VideoEditor } from "./VideoEditor";
 
-export const metadata = { title: "Video Edukasi — Admin Flouwell" };
+export const metadata = { title: "Video Edukasi — Admin Soulpace" };
 
 export default async function AdminVideoPage() {
   const supabase = await createClient();

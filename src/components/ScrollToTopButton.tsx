@@ -15,7 +15,7 @@ export function ScrollToTopButton() {
     >
       <Image
         src="/logo-full.png"
-        alt="Flouwell"
+        alt="Soulpace"
         width={160}
         height={53}
         priority

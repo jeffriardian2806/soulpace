@@ -7,7 +7,7 @@ import { getCrisisMessages } from "@/app/crisis-mode/messages";
 import { CrisisCompanion } from "@/components/crisis-mode/CrisisCompanion";
 
 export const metadata = {
-  title: "Crisis Mode — Flouwell",
+  title: "Crisis Mode — Soulpace",
   description: "Companion mode untuk moment yang berat.",
 };
 

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { InstrumentForm } from "@/components/InstrumentForm";
 import type { InstrumentPayload } from "@/app/admin/skrining/types";
 
-export const metadata = { title: "Admin · Edit Instrumen — Flouwell" };
+export const metadata = { title: "Admin · Edit Instrumen — Soulpace" };
 
 export default async function AdminSkriningEditPage({
   params,

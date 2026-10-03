@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { AuraMoodEditor } from "./AuraMoodEditor";
 
-export const metadata = { title: "Cek Aura AR — Admin Flouwell" };
+export const metadata = { title: "Cek Aura AR — Admin Soulpace" };
 
 export default async function AdminAuraPage() {
   const supabase = await createClient();

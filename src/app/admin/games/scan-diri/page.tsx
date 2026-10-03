@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { ScanContentEditor } from "./ScanContentEditor";
 
-export const metadata = { title: "Scan Diri AR — Admin Flouwell" };
+export const metadata = { title: "Scan Diri AR — Admin Soulpace" };
 
 export default async function AdminScanDiriPage() {
   const supabase = await createClient();

@@ -4,7 +4,7 @@ import { DailyMessageEditor } from "@/components/admin/MiscEditors";
 import { DailyMessageImport } from "@/components/admin/DailyMessageImport";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Pesan Hari Ini — Admin Flouwell" };
+export const metadata = { title: "Pesan Hari Ini — Admin Soulpace" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

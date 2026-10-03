@@ -4,7 +4,7 @@ import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { getAllEventsAdmin, getEventCategories } from "@/lib/events/queries";
 import { EventEditor } from "./EventEditor";
 
-export const metadata = { title: "Event — Admin Flouwell" };
+export const metadata = { title: "Event — Admin Soulpace" };
 
 export default async function AdminEventPage() {
   const supabase = await createClient();

@@ -4,7 +4,7 @@ import { checkPremiumAccess } from "@/components/PremiumGate";
 import { AmbientList } from "@/components/ambient/AmbientList";
 
 export const metadata = {
-  title: "Suara Tenang — Flouwell",
+  title: "Suara Tenang — Soulpace",
   description: "Audio & video ambient untuk grounding, relaksasi, dan tidur.",
 };
 

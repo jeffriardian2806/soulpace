@@ -5,16 +5,16 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { Stars } from "@/components/Stars";
 
 export const metadata: Metadata = {
-  title: "Flouwell — Ruang Curhat Anonim",
+  title: "Soulpace — Ruang Curhat Anonim",
   description:
-    "Flouwell adalah ruang aman untuk melampiaskan beban dan keluh kesah secara anonim, tanpa dihakimi. Kamu nggak sendirian.",
+    "Soulpace adalah ruang aman untuk melampiaskan beban dan keluh kesah secara anonim, tanpa dihakimi. Kamu nggak sendirian.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Flouwell — Ruang Curhat Anonim",
+    title: "Soulpace — Ruang Curhat Anonim",
     description: "Ruang aman buat melampiaskan beban, tanpa dihakimi.",
     url: "/",
-    siteName: "Flouwell",
+    siteName: "Soulpace",
     type: "website",
   },
 };
@@ -48,7 +48,7 @@ export default async function Home() {
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-8 px-6 py-10">
       <div className="flex flex-col gap-6">
         <div>
-          <Image src="/logo-full.png" alt="Flouwell" width={220} height={73} priority className="h-auto w-[200px]" />
+          <Image src="/logo-full.png" alt="Soulpace" width={220} height={73} priority className="h-auto w-[200px]" />
           <p className="mt-2 text-ink/60">
             Tempat melampiaskan beban, tanpa dihakimi. Kamu nggak sendirian.
           </p>

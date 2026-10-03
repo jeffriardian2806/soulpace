@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { VibeEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Vibe Presets — Admin Flouwell" };
+export const metadata = { title: "Vibe Presets — Admin Soulpace" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

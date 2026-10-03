@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { WellbeingContentEditor } from "./WellbeingContentEditor";
 
-export const metadata = { title: "Wellbeing AR — Admin Flouwell" };
+export const metadata = { title: "Wellbeing AR — Admin Soulpace" };
 
 export default async function AdminWellbeingPage() {
   const supabase = await createClient();

@@ -5,7 +5,7 @@ import { checkPremiumAccess } from "@/components/PremiumGate";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Edukasi & Tips Kesehatan Mental — Flouwell",
+  title: "Edukasi & Tips Kesehatan Mental — Soulpace",
   description:
     "Tips actionable per kondisi: overthinking, susah tidur, cemas, marah, sedih, burnout, dll. Plus definisi tiap kondisi dari sudut psikologi.",
   robots: { index: true, follow: true },

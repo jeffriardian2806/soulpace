@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { DetectiveEditor } from "@/components/admin/MiscEditors";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-export const metadata = { title: "Detektif Emosi — Admin Flouwell" };
+export const metadata = { title: "Detektif Emosi — Admin Soulpace" };
 
 export default async function AdminEditorPage() {
   const supabase = await createClient();

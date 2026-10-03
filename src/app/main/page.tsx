@@ -3,7 +3,7 @@ import { EventBannerSlot } from "@/components/events/EventBannerSlot";
 import { createClient } from "@/lib/supabase/server";
 import { getFeatureFlagMap, PremiumBadgeInline } from "@/components/PremiumGate";
 
-export const metadata = { title: "Main & Kenali Diri — Flouwell" };
+export const metadata = { title: "Main & Kenali Diri — Soulpace" };
 
 // Grup game — Augmented Reality paling atas (default kebuka), sisanya collapsed.
 type GameEntry = { href: string; slug: string; emoji: string; title: string; desc: string };

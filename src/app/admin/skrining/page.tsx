@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "Admin · Skrining — Flouwell" };
+export const metadata = { title: "Admin · Skrining — Soulpace" };
 
 export default async function AdminSkriningPage() {
   const supabase = await createClient();

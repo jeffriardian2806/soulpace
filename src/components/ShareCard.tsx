@@ -69,7 +69,7 @@ export function ShareCard({ text }: { text: string }) {
           &ldquo;{text}&rdquo;
         </div>
         <div style={{ fontSize: 13, opacity: 0.9, marginTop: 28 }}>
-          Flouwell — ruang melampiaskan beban
+          Soulpace — ruang melampiaskan beban
         </div>
       </div>
 

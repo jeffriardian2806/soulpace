@@ -1,4 +1,4 @@
-# Flouwell
+# Soulpace
 
 Anonymous mental wellness PWA. Built with Next.js 15 (App Router), TypeScript, Tailwind, and Supabase. Tempat melampiaskan
 beban tanpa dihakimi, dengan dukungan komunitas yang anonim.

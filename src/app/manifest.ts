@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Flouwell",
-    short_name: "Flouwell",
+    name: "Soulpace",
+    short_name: "Soulpace",
     description: "Ruang aman buat melampiaskan beban, tanpa dihakimi.",
     start_url: "/feed",
     display: "standalone",

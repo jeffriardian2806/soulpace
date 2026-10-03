@@ -6,7 +6,7 @@ import { getEventById } from "@/lib/events/queries";
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const w = await getEventById(id);
-  return { title: w ? `${w.title} — Flouwell` : "Event — Flouwell" };
+  return { title: w ? `${w.title} — Soulpace` : "Event — Soulpace" };
 }
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {

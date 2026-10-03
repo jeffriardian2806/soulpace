@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AnalyticsDashboard } from "./AnalyticsDashboard";
 import { getUiTexts } from "@/lib/uiTexts";
 
-export const metadata = { title: "Analytics — Admin Flouwell" };
+export const metadata = { title: "Analytics — Admin Soulpace" };
 
 type ActiveUsersData = { total_users: number; anonymous_users: number; admin_users: number; dau: number; wau: number; mau: number };
 type RegistrationRow = { day: string; count: number };

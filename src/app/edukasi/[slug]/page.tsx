@@ -19,10 +19,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     .eq("is_active", true)
     .maybeSingle();
 
-  if (!data) return { title: "Topik tidak ditemukan — Flouwell" };
+  if (!data) return { title: "Topik tidak ditemukan — Soulpace" };
 
   return {
-    title: `${data.title} — Tips & Edukasi · Flouwell`,
+    title: `${data.title} — Tips & Edukasi · Soulpace`,
     description: data.definition ?? `Tips actionable untuk ${data.title}. Pendekatan psikologis.`,
     robots: { index: true, follow: true },
   };

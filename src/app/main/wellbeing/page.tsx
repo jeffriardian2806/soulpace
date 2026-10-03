@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { WellbeingPlayer, type Content } from "@/components/games/WellbeingPlayer";
 import { checkPremiumAccess } from "@/components/PremiumGate";
 
-export const metadata = { title: "Wellbeing AR — Flouwell" };
+export const metadata = { title: "Wellbeing AR — Soulpace" };
 
 export default async function WellbeingPage() {
   const _blocked_ = await checkPremiumAccess("wellbeing");

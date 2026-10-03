@@ -319,7 +319,7 @@ export function AuraPlayer({ moods }: { moods: AuraMood[] }) {
             <p>Body Signal: <b>{locked.body}</b></p>
           </div>
           {effect === "mystic" && <p className="mt-2 text-xs italic leading-relaxed text-ink/65">&ldquo;{locked.aura.desc_mystic}&rdquo;</p>}
-          <p className="mt-3 text-[11px] text-ink/45">Flouwell · Cek Aura AR · {today}</p>
+          <p className="mt-3 text-[11px] text-ink/45">Soulpace · Cek Aura AR · {today}</p>
 
           {locked.mode === "self" && (
             <div className="mt-3">
